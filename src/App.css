@@ -1,0 +1,155 @@
+#root,
+html,
+body {
+  height: 100%;
+  margin: 0;
+  --calcite-shell-panel-min-width: 365px;
+  --calcite-shell-panel-width: 365px;
+  --calcite-shell-panel-max-width: 50vw;
+
+  --calcite-z-index-header: unset;
+}
+
+arcgis-legend {
+  width: 100%;
+}
+
+arcgis-basemap-gallery {
+  width: 100%;
+  min-height: 100%;
+}
+
+calcite-panel arcgis-search {
+  width: 100%;
+}
+
+calcite-panel arcgis-feature-table {
+  height: 100%;
+}
+
+#property-search calcite-tabs {
+  height: calc(100vh - 32px - 50px - 91px) !important;
+}
+#basemaps calcite-tabs {
+  height: calc(100vh - 32px - 50px - 41px) !important;
+}
+
+#bookmarks calcite-flow-item {
+  max-height: calc(100vh - 32px - 50px - 41px) !important;
+}
+
+calcite-shell-panel calcite-panel {
+  max-height: calc(100vh - 65px);
+  --calcite-tab-content-space-y: 0;
+}
+
+div[slot="top-right"] calcite-panel {
+  min-width: 350px;
+  max-width: 350px;
+}
+
+.search-top {
+  display: flex;
+  width: 100vw;
+}
+
+.feature-title {
+  font-size: var(--calcite-font-size-xl);
+  margin-top: var(--calcite-spacing-lg);
+  line-height: var(--calcite-font-line-height-relative-tight);
+  letter-spacing: 0px;
+  color: var(--calcite-color-text-1);
+  font-weight: var(--calcite-font-weight-semibold);
+  padding: 0 var(--calcite-spacing-sm);
+  background-color: var(--calcite-color-foreground-1);
+}
+
+#custom-actions {
+  position: absolute;
+  left: 45px;
+}
+
+#custom-actions calcite-action {
+  margin-bottom: var(--calcite-spacing-sm-plus);
+}
+
+#custom-actions calcite-action[active] {
+  --calcite-color-foreground-3: var(--calcite-color-brand);
+  --calcite-color-text-1: white;
+}
+
+.tab-content {
+  background-color: var(
+    --calcite-panel-background-color,
+    var(--calcite-color-foreground-1)
+  );
+  padding: var(--calcite-internal-panel-default-space);
+}
+
+.arcgis-print__export-title {
+  font-weight: 700;
+  font-size: var(--calcite-font-size);
+}
+
+.arcgis-print__exported-files-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--calcite-spacing-lg) var(--calcite-spacing-sm);
+  font-size: small;
+}
+
+.arcgis-print__panel-container {
+  display: flex;
+  flex: 1 0;
+  flex-direction: column;
+  gap: var(--calcite-spacing-sm);
+}
+
+.arcgis-print__export-section--centered {
+  text-align: center;
+}
+
+.arcgis-print__exported-file-link-title,
+.arcgis-print__exported-file-link-description {
+  word-wrap: break-word;
+  word-break: break-all;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  font-size: var(--calcite-font-size--2);
+}
+
+.arcgis-print__exported-file {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+#overview-map {
+  min-height: 200px;
+  width: 200px;
+}
+
+#coord-conversion {
+  width: 324px;
+}
+
+.feature-header {
+  display: flex;
+  justify-content: space-between;
+  background-color: var(--calcite-color-foreground-1);
+}
+.feature-header h2 {
+  width: 100%;
+  text-align: center;
+}
+
+.feature-sub-title {
+    display: flex;
+  justify-content: space-between;
+  background-color: var(--calcite-color-foreground-1);
+}

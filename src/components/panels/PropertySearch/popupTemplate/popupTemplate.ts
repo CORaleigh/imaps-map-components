@@ -1,0 +1,452 @@
+import { arcadeExpressionInfos } from "./arcadeExpressions";
+import FieldInfo from "@arcgis/core/popup/FieldInfo";
+import PopupTemplate from "@arcgis/core/PopupTemplate";
+import ImageMediaInfo from "@arcgis/core/popup/content/ImageMediaInfo";
+import * as arcade from "@arcgis/core/arcade";
+import CustomContent from "@arcgis/core/popup/content/CustomContent";
+import FeatureLayer from "@arcgis/core/layers/FeatureLayer";
+import { getPopupContent } from "./popupContent";
+import { getTableByTitle } from "../table";
+
+export const createTemplate = (
+  mapElement: HTMLArcgisMapElement | null,
+  feature: __esri.Graphic,
+  photos: __esri.MediaInfo[]
+) => {
+  if (!mapElement) return;
+  const condoTable = getTableByTitle(
+    mapElement,
+    "Condos"
+  ) as __esri.FeatureLayer;
+  if (condoTable) {
+    const popupTemplate = new PopupTemplate({
+      expressionInfos: arcadeExpressionInfos,
+      fieldInfos: getFieldInfos(condoTable).map((field) => {
+        return {
+          fieldName: field.fieldName,
+          label: field.label,
+          visible: [
+            "SITE_ADDRESS",
+            "OWNER",
+            "PIN_NUM",
+            "PIN_EXT",
+            "REID",
+          ].includes(field.fieldName as string),
+        };
+      }),
+
+      content: getPopupContent(
+        feature,
+        photos,
+        mapElement
+      ),
+    });
+    return popupTemplate;
+  }
+};
+
+const getFieldInfos = (condoTable: __esri.FeatureLayer): FieldInfo[] => {
+  let fieldConfigs: FieldInfo[] = [];
+  condoTable.fields.forEach((field: __esri.Field) => {
+    fieldConfigs.push(
+      new FieldInfo({
+        fieldName: field.name,
+        label: field.alias,
+        visible: [
+          "SITE_ADDRESS",
+          "OWNER",
+          "PIN_NUM",
+          "PIN_EXT",
+          "REID",
+        ].includes(field.name),
+      })
+    );
+  });
+  const ext = fieldConfigs.find((fc) => {
+    return fc.fieldName === "PIN_EXT";
+  }) as FieldInfo;
+  const pin = fieldConfigs.find((fc) => {
+    return fc.fieldName === "PIN_NUM";
+  }) as FieldInfo;
+  const reid = fieldConfigs.find((fc) => {
+    return fc.fieldName === "REID";
+  }) as FieldInfo;
+  const owner = fieldConfigs.find((fc) => {
+    return fc.fieldName === "OWNER";
+  }) as FieldInfo;
+  const address = fieldConfigs.find((fc) => {
+    return fc.fieldName === "SITE_ADDRESS";
+  }) as FieldInfo;
+  fieldConfigs = fieldConfigs.filter((fc) => {
+    return !["SITE_ADDRESS", "OWNER", "PIN_NUM", "PIN_EXT", "REID"].includes(
+      fc.fieldName as string
+    );
+  });
+  fieldConfigs.unshift(ext);
+  fieldConfigs.unshift(pin);
+  fieldConfigs.unshift(reid);
+  fieldConfigs.unshift(owner);
+  fieldConfigs.unshift(address);
+  return fieldConfigs;
+};
+
+export const getPhotos = async (
+  feature: __esri.Graphic,
+  mapElement: HTMLArcgisMapElement | null
+): Promise<__esri.MediaInfo[]> => {
+  if (!mapElement) return [];
+  
+  const photosTable = getTableByTitle(
+    mapElement,
+    "Photos"
+  ) as __esri.FeatureLayer;
+  // const relationship = (
+  //   condosTable as __esri.FeatureLayer
+  // )?.relationships?.find((r) => {
+  //   return r.name === "CONDO_PHOTOS";
+  // });
+
+  const mediaInfos: ImageMediaInfo[] = [];
+  const result = await photosTable?.queryFeatures({
+    where: "STATUS = 'A' AND PARCEL = '" + feature.getAttribute("REID") + "'",
+    outFields: ["*"]
+
+  });
+
+  //for (const key in result) {
+    //feature.setAttribute("OBJECTID", key);
+    result?.features.reverse().forEach((feature: __esri.Graphic) => {
+      mediaInfos.push(
+        new ImageMediaInfo({
+          title: "",
+          caption: "",
+          value: {
+            sourceURL: `https://services.wake.gov/realestate/photos/mvideo/${feature.getAttribute(
+              "IMAGEDIR"
+            )}/${feature.getAttribute("IMAGENAME")}`,
+          },
+        })
+      );
+    });
+  //}
+  if (feature.getAttribute("CITY_DECODE")?.includes("DURHAM COUNTY")) {
+    const photo = await getDurhamPhoto(feature);
+
+    mediaInfos.push(
+      new ImageMediaInfo({
+        title: "",
+        caption: "",
+        value: {
+          sourceURL: photo,
+        },
+      })
+    );
+  }
+  return mediaInfos;
+};
+
+export const getDurhamPhoto = async (feature: __esri.Graphic) => {
+  const photo = await executeArcade(
+    `if ($feature.CITY_DECODE == "RALEIGH - DURHAM COUNTY") { 
+            return Concatenate("https://image-cdn.spatialest.com/image/durham-images/lrg/",$feature.REID,".JPG");}`,
+    feature
+  );
+  const request = new Request(photo);
+  try {
+    const response = await fetch(request);
+    if (response.ok) {
+      return photo;
+    }
+  } catch {
+    console.log("no photo available");
+  }
+};
+
+const executeArcade = async (expression: string, feature: __esri.Graphic) => {
+  const executor = await arcade.createArcadeExecutor(expression, {
+    variables: [
+      {
+        name: "$feature",
+        type: "feature",
+      },
+    ],
+  });
+  return await executor.executeAsync({ $feature: feature });
+};
+
+const createButton = (icon: string, text: string) => {
+  const btn = document.createElement("calcite-button");
+  btn.setAttribute("scale", "m");
+  btn.setAttribute("width", "full");
+  btn.setAttribute("style", "margin: 0 .5em;");
+  btn.setAttribute("appearance", "outline");
+  btn.setAttribute("icon-start", icon);
+  btn.setAttribute("rel", "noreferrer");
+  btn.textContent = text;
+  return btn;
+};
+
+export const createEnvironmentalButtons = (
+  mapElement: HTMLArcgisMapElement
+) => {
+  return new CustomContent({
+    outFields: ["PIN_NUM"],
+    creator: async (
+      event?: __esri.PopupTemplateCreatorEvent
+    ): Promise<HTMLElement> => {
+      return wellCreator(event, mapElement);
+    },
+  });
+};
+
+const wellCreator = async (
+  event: __esri.PopupTemplateCreatorEvent | undefined,
+  mapElement: HTMLArcgisMapElement
+): Promise<HTMLElement> => {
+  let layer: __esri.Layer | undefined = mapElement?.map?.allLayers
+    .toArray()
+    .find((layer: __esri.Layer) => {
+      return layer?.title?.includes("Wells");
+    });
+
+  if (!layer) {
+    layer = new FeatureLayer({
+      portalItem: {
+        id: "ef42e9e1d1eb4689bf90b592c2f6c419",
+      },
+    });
+  }
+
+  const featureSet: __esri.FeatureSet = await (
+    layer as FeatureLayer
+  ).queryFeatures({
+    where: `PIN_NUM = '${event?.graphic.attributes["PIN_NUM"]}'`,
+    returnGeometry: false,
+  });
+
+  const div = document.createElement("div");
+  div.setAttribute(
+    "style",
+    "display: flex; flex-direction: row; justify-content: space-around;"
+  );
+
+  if (featureSet.features.length) {
+    const pin = featureSet.features[0].getAttribute("PIN_NUM");
+    const btn = createButton("link", "Wells");
+    btn.onclick = () => {
+      window.open(
+        `https://maps.wakegov.com/water-analysis/index.html#/?pin=${pin}`,
+        "wells"
+      );
+    };
+    div.append(btn);
+  }
+
+  layer = new FeatureLayer({
+    portalItem: {
+      id: "bb3eb1f6cc774bdda560554381a4c06f",
+    },
+  });
+
+  const septicFeatureSet: __esri.FeatureSet = await (
+    layer as __esri.FeatureLayer
+  ).queryFeatures({
+    where: `PIN_NUM = '${event?.graphic.attributes["PIN_NUM"]}'`,
+    returnGeometry: false,
+  });
+
+  if (septicFeatureSet.features.length) {
+    const pin = septicFeatureSet.features[0].getAttribute("PIN_NUM");
+    const btn = createButton("link", "Septic");
+    btn.onclick = () => {
+      window.open(
+        `https://maps.wakegov.com/septic/index.html#/?pin=${pin}`,
+        "septic"
+      );
+    };
+    div.append(btn);
+  }
+
+  return div; // Ensure to return the created div
+};
+
+export const createLinkButtons = () => {
+  return new CustomContent({
+    outFields: ["*"],
+    creator: async (
+      event?: __esri.PopupTemplateCreatorEvent
+    ): Promise<HTMLElement> => {
+      try {
+        const div = document.createElement("div");
+        div.setAttribute(
+          "style",
+          "display: flex; flex-direction: row; justify-content: space-around;"
+        );
+
+        const graphic = event?.graphic;
+        if (!graphic) {
+          return div; // Return empty div if graphic is undefined
+        }
+
+        const btn = createButton("link", "Google Maps");
+        btn.onclick = () => {
+          const latitude = (graphic.geometry as __esri.Polygon).centroid
+            ?.latitude;
+          const longitude = (graphic.geometry as __esri.Polygon).centroid
+            ?.longitude;
+          if (latitude && longitude) {
+            const url = `https://www.google.com/maps/@${
+              latitude - 0.0006721930485
+            },${longitude - 0.0000196467158},68a,35y,49.52t/data=!3m1!1e3`;
+            window.open(url, "googlewindow");
+          }
+        };
+        div.append(btn);
+
+        const tax = createButton("home", "Tax Page");
+
+        const taxUrl = await executeArcade(
+          `if ($feature.CITY_DECODE == "RALEIGH - DURHAM COUNTY") { 
+                    return Concatenate("https://taxcama.dconc.gov/camapwa/PropertySummary.aspx?REID=",$feature.REID);
+                  } else {
+                    return Concatenate("https://services.wake.gov/realestate/Account.asp?id=", $feature.REID);
+                  }`,
+          graphic // Use the defined graphic
+        );
+        tax.onclick = () => {
+          window.open(taxUrl, "taxwindow");
+        };
+        tax.textContent = "Tax Page";
+        div.append(tax);
+
+        return div; // Ensure to return the created div
+      } catch (error) {
+        console.error(error);
+        const fallback = document.createElement("div");
+        fallback.textContent = "Failed to load buttons.";
+        return fallback;
+      }
+    },
+  });
+};
+
+export const createDurhamButton = () => {
+  return new CustomContent({
+    outFields: ["*"],
+    creator: async (
+      event?: __esri.PopupTemplateCreatorEvent
+    ): Promise<HTMLElement> => {
+      const div = document.createElement("div");
+      div.setAttribute(
+        "style",
+        "display: flex; flex-direction: row; justify-content: space-around;"
+      );
+
+      if (!event || !event.graphic) {
+        // Return an empty div as a valid HTMLElement
+        return div; // Returning an empty content structure
+      }
+
+      const durham = await executeArcade(
+        `if (Find("DURHAM COUNTY", $feature.CITY_DECODE) > -1) { 
+              return Concatenate("https://maps.durhamnc.gov/?pid=", $feature.REID);}`,
+        event.graphic
+      );
+
+      if (durham) {
+        const durhamBtn = createButton("home", "Durham County");
+        durhamBtn.onclick = () => {
+          window.open(durham, "durham");
+        };
+        div.append(durhamBtn);
+      }
+
+      return div; // Return the div as HTMLElement
+    },
+  });
+};
+
+export const createDeedButtons = () => {
+  return new CustomContent({
+    outFields: ["OBJECTID", "REID"],
+    creator: deedCreator,
+  });
+};
+
+// Explicitly typing deedCreator as PopupTemplateContentCreator
+const deedCreator: __esri.PopupTemplateContentCreator = async (e) => {
+  const div = document.createElement("div");
+  div.setAttribute(
+    "style",
+    "display: flex; flex-direction: row; justify-content: space-around;"
+  );
+
+  let deed: string | null = null;
+  let bom: string | null = null;
+
+  const graphic = e?.graphic as __esri.Graphic;
+  const layer = graphic.layer as __esri.FeatureLayer;
+  const cityDecode = graphic.getAttribute("CITY_DECODE");
+  const reid = graphic.getAttribute("REID");
+
+  if (!cityDecode?.includes("DURHAM COUNTY")) {
+    const objectids = await layer.queryObjectIds({
+      where: `REID = '${reid}'`,
+    });
+
+    if (objectids.length) {
+      const relationshipId = layer.relationships?.find(
+        (r) => r.name === "CONDO_BOOKS"
+      )?.id;
+      if (relationshipId) {
+        const relatedFeatures = await layer.queryRelatedFeatures({
+          relationshipId,
+          objectIds: [objectids[0]],
+          outFields: ["BOM_DOC_NUM", "DEED_DOC_NUM"],
+        });
+        if (relatedFeatures[objectids[0]]) {
+          const relatedFeature = relatedFeatures[objectids[0]]?.features[0];
+          deed = relatedFeature?.getAttribute("DEED_DOC_NUM");
+          bom = relatedFeature?.getAttribute("BOM_DOC_NUM");
+        }
+      }
+    }
+
+    if (!cityDecode?.includes("DURHAM COUNTY") || !cityDecode) {
+      if (deed) {
+        const deedBtn = createButton("file-text", "Deeds");
+        deedBtn.onclick = () => {
+          window.open(
+            `https://rodtylerssdev.wake.gov/web/document/DOCC${deed}`, //`https://rodcrpi.wakegov.com/booksweb/pdfview.aspx?docid=${deed}&RecordDate=`,
+            "deedwindow"
+          );
+        };
+        div.append(deedBtn);
+      }
+      if (bom) {
+        const bombtn = createButton("map", "Book of Maps");
+        bombtn.onclick = () => {
+          window.open(
+            `https://rodtylerssdev.wake.gov/web/document/DOCC${bom}`, //`https://rodcrpi.wakegov.com/booksweb/pdfview.aspx?docid=${bom}&RecordDate=`,
+            "bomwindow"
+          );
+        };
+        div.append(bombtn);
+      }
+    }
+
+    return div; // Return the div directly
+  } else {
+    const deedBtn = createButton("file-text", "Deeds");
+    deedBtn.onclick = () => {
+      window.open(
+        `https://rodweb.dconc.gov/web/web/integration/search?field_BookPageID_DOT_Volume=${graphic.getAttribute(
+          "DEED_BOOK"
+        )}&field_BookPageID_DOT_Page=${graphic.getAttribute("DEED_PAGE")}`,
+        "deedwindow"
+      );
+    };
+    div.append(deedBtn);
+    return div; // Return the div directly
+  }
+};
