@@ -10,6 +10,7 @@ import { useSearchParams } from "react-router-dom";
 import Basemap from "@arcgis/core/Basemap";
 import type { TargetedEvent } from "@arcgis/map-components";
 import { layerService } from "../utils/mapLayerService";
+import * as reactiveUtils from "@arcgis/core/core/reactiveUtils.js";
 
 export type MapMode =
   | "identify"
@@ -70,9 +71,9 @@ export const MapProvider: React.FC<{ children: React.ReactNode }> = ({
   // Persist basemap in localStorage
   const persistBasemap = useCallback(() => {
     const view = mapElement.current.view;
-    if (!view?.map) return;
+    if (!view.map || !view.map.basemap) return;
 
-    view.map.watch("basemap", (basemap: __esri.Basemap) => {
+    reactiveUtils.watch(() => view.map!.basemap!, (basemap: __esri.Basemap) => {
       localStorage.setItem(
         `imaps_${webMapId.current}_basemap`,
         JSON.stringify(basemap.toJSON())

@@ -3,6 +3,7 @@ import { useRef, useEffect, type RefObject } from "react";
 import Graphic from "@arcgis/core/Graphic";
 import type { TargetedEvent } from "@arcgis/map-components";
 export type ToolType = "distance" | "area" | null;
+import * as reactiveUtils from "@arcgis/core/core/reactiveUtils.js";
 
 export interface UseOverviewMapProps {
   overviewMapElement: RefObject<HTMLArcgisMapElement | null>;
@@ -22,7 +23,7 @@ export const useOverviewMap = (
     event.target.basemap = mapElement.current.basemap;
     event.target.goTo(mapElement.current.extent.clone().expand(4));
 
-    mapElement.current.view.watch("extent", (mapExtent: __esri.Extent) => {
+    reactiveUtils.watch(() => mapElement.current.view.extent, (mapExtent: __esri.Extent) => {
       if (!overviewMapElement.current) return;
       overviewMapElement.current.goTo(mapExtent.clone().expand(4));
       overviewMapElement.current.graphics.removeAll();

@@ -39,6 +39,7 @@ const CoodinateConversion: React.FC<CoodinateConversionProps> = ({
       <calcite-block
         id="coord-conversion"
         heading={display}
+        label={display}
         collapsible
         expanded={expanded}
         oncalciteBlockBeforeOpen={(event) => {

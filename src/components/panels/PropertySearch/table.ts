@@ -83,19 +83,23 @@ export const createTableLayer = async (mapElement: HTMLArcgisMapElement) => {
     })
   );
   mapElement.view.map.add(copyTable);
-  copyTable.on(
-    "layerview-create",
-    (event: __esri.LayerLayerviewCreateEvent) => {
-      if (event.layerView.layer.type === "feature") {
-        const layerView: __esri.FeatureLayerView =
-          event.layerView as __esri.FeatureLayerView;
-        layerView.highlightOptions = {
-          color: new Color("red"),
-          fillOpacity: 0.5,
-        };
-      }
-    }
-  );
+  mapElement.view.highlights = [{
+    color: new Color("red"),
+    fillOpacity: 0.5,
+  }];
+  // copyTable.on(
+  //   "layerview-create",
+  //   (event: __esri.LayerLayerviewCreateEvent) => {
+  //     if (event.layerView.layer.type === "feature") {
+  //       const layerView: __esri.FeatureLayerView =
+  //         event.layerView as __esri.FeatureLayerView;
+  //       layerView.highlightOptions = {
+  //         color: new Color("red"),
+  //         fillOpacity: 0.5,
+  //       };
+  //     }
+  //   }
+  // );
   await copyTable.load();
   mapElement?.map?.add(copyTable);
   return copyTable;

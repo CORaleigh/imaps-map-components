@@ -27,7 +27,7 @@ const LayerList: React.FC<LayerListProps> = ({
   return (
     <>
     <calcite-panel
-      heading={loaded ? "layers" : ""}
+      heading="Layer List"
       closable
       oncalcitePanelClose={() => onPanelClose()}
       closed={closed}

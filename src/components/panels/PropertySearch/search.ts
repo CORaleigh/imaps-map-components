@@ -418,9 +418,9 @@ const setSearchHistory = (term: string, webMapId: string) => {
   if (history) {
     historyItems = JSON.parse(history) as Array<string>;
   }
-  historyItems = historyItems.filter((item) => {
-    return item !== term;
-  });
+  // historyItems = historyItems.filter((item) => {
+  //   return item !== term;
+  // });
   if (term.length >= 3) {
     historyItems.unshift(term);
   }

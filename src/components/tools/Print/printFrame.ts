@@ -1,7 +1,6 @@
 import type { Layout } from "./printLayouts";
 import { printTemplates, type Template } from "./templates";
 
-import * as projection from "@arcgis/core/geometry/projection";
 
 export const showPrintFrame = (
   mapElement: HTMLArcgisMapElement,
@@ -149,7 +148,7 @@ const addPrintGraphic = async (
   printTemplate: Template,
   printScale: number
 ) => {
-  await projection.load();
+  //await projection.load();
   //   const extent = projection.project(mapElement.extent, {
   //     wkid: 2264,
   //   }) as Extent;

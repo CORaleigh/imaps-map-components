@@ -96,11 +96,11 @@ export const useLocationSearch = (
   const handleSearchReady = (
     event: TargetedEvent<HTMLArcgisSearchElement, void>
   ) => {
-    event.target.sources = event.target.allSources.filter((source) => {
-      source.name = source.name.split(":")[0];
-      source.resultSymbol = marker;
-      return source.name !== "ArcGIS World Geocoding Service";
-    });
+    // event.target.sources = event.target.allSources.filter((source) => {
+    //   source.name = source.name.split(":")[0];
+    //   source.resultSymbol = marker;
+    //   return source.name !== "ArcGIS World Geocoding Service";
+    // });
     event.target.includeDefaultSourcesDisabled = true;
     addGeocodingSource(event.target);
     addIntersectionSource(event.target);

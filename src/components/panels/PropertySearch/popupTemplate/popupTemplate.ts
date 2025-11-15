@@ -3,6 +3,8 @@ import FieldInfo from "@arcgis/core/popup/FieldInfo";
 import PopupTemplate from "@arcgis/core/PopupTemplate";
 import ImageMediaInfo from "@arcgis/core/popup/content/ImageMediaInfo";
 import * as arcade from "@arcgis/core/arcade";
+import * as centroidOperator from "@arcgis/core/geometry/operators/centroidOperator.js";
+
 import CustomContent from "@arcgis/core/popup/content/CustomContent";
 import FeatureLayer from "@arcgis/core/layers/FeatureLayer";
 import { getPopupContent } from "./popupContent";
@@ -77,11 +79,11 @@ const getFieldInfos = (condoTable: __esri.FeatureLayer): FieldInfo[] => {
   const address = fieldConfigs.find((fc) => {
     return fc.fieldName === "SITE_ADDRESS";
   }) as FieldInfo;
-  fieldConfigs = fieldConfigs.filter((fc) => {
-    return !["SITE_ADDRESS", "OWNER", "PIN_NUM", "PIN_EXT", "REID"].includes(
-      fc.fieldName as string
-    );
-  });
+  // fieldConfigs = fieldConfigs.filter((fc) => {
+  //   return !["SITE_ADDRESS", "OWNER", "PIN_NUM", "PIN_EXT", "REID"].includes(
+  //     fc.fieldName as string
+  //   );
+  // });
   fieldConfigs.unshift(ext);
   fieldConfigs.unshift(pin);
   fieldConfigs.unshift(reid);
@@ -290,9 +292,9 @@ export const createLinkButtons = () => {
 
         const btn = createButton("link", "Google Maps");
         btn.onclick = () => {
-          const latitude = (graphic.geometry as __esri.Polygon).centroid
+          const latitude = centroidOperator.execute(graphic.geometry as __esri.Polygon)
             ?.latitude;
-          const longitude = (graphic.geometry as __esri.Polygon).centroid
+          const longitude = centroidOperator.execute(graphic.geometry as __esri.Polygon)
             ?.longitude;
           if (latitude && longitude) {
             const url = `https://www.google.com/maps/@${
