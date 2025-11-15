@@ -79,11 +79,11 @@ const getFieldInfos = (condoTable: __esri.FeatureLayer): FieldInfo[] => {
   const address = fieldConfigs.find((fc) => {
     return fc.fieldName === "SITE_ADDRESS";
   }) as FieldInfo;
-  // fieldConfigs = fieldConfigs.filter((fc) => {
-  //   return !["SITE_ADDRESS", "OWNER", "PIN_NUM", "PIN_EXT", "REID"].includes(
-  //     fc.fieldName as string
-  //   );
-  // });
+  fieldConfigs = fieldConfigs.filter((fc) => {
+    return !["SITE_ADDRESS", "OWNER", "PIN_NUM", "PIN_EXT", "REID"].includes(
+      fc.fieldName as string
+    );
+  });
   fieldConfigs.unshift(ext);
   fieldConfigs.unshift(pin);
   fieldConfigs.unshift(reid);
