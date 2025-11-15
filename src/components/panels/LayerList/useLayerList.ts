@@ -140,7 +140,7 @@ export const useLayerList = (
           await webmap.loadAll();
           return webmap;
         })(),
-       // layerService.addAllMissingSiblingsAfterLayerList(),
+        layerService.addAllMissingSiblingsAfterLayerList(),
       ]);
 
       webMapRef.current = freshWebMap;
