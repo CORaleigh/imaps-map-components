@@ -11,6 +11,8 @@ import LabelClass from "@arcgis/core/layers/support/LabelClass";
 
 import type { TargetedEvent } from "@arcgis/map-components";
 import type ActionToggle from "@arcgis/core/support/actions/ActionToggle";
+import GroupLayer from "@arcgis/core/layers/GroupLayer";
+import WebMap from "@arcgis/core/WebMap";
 
 export interface UseLayerListProps {
   listItemCreatedFunction: __esri.LayerListListItemCreatedHandler;
@@ -27,13 +29,15 @@ export interface UseLayerListProps {
 export const useLayerList = (
   mapElement: React.RefObject<HTMLArcgisMapElement>
 ): UseLayerListProps => {
-  const { webMap } = useMap();
+  const { webMap, webMapId } = useMap();
   const initializedRef = useRef(false);
+  const webMapRef = useRef<WebMap>(undefined);
   const [loaded, setLoaded] = useState(false);
   const listItemCreatedFunction = (
     event: __esri.LayerListListItemCreatedHandlerEvent
   ) => {
     const item = event.item;
+
     if (item.visible && item.parent && item.layer?.type !== "sublayer") {
       item.parent.open = item.parent.visible;
     }
@@ -41,7 +45,6 @@ export const useLayerList = (
     createItemPanel(item);
     createLabelToggles(item);
   };
-
   const handleTriggerAction = (
     event: TargetedEvent<
       HTMLArcgisLayerListElement,
@@ -127,12 +130,65 @@ export const useLayerList = (
   };
   useEffect(() => {
     if (!mapElement || !webMap || initializedRef.current) return;
-    // Initialize basemap logic only once
+
     initializedRef.current = true;
-    layerService.initLayersFromWebMap(webMap);
-    layerService.watchLayerChanges();
-    setLoaded(true);
-  }, [mapElement, webMap]);
+    (async () => {
+      // 1. Load fresh template and addAllMissing in parallel
+      const [freshWebMap] = await Promise.all([
+        (async () => {
+          const webmap = new WebMap({ portalItem: { id: webMapId.current } });
+          await webmap.loadAll();
+          return webmap;
+        })(),
+       // layerService.addAllMissingSiblingsAfterLayerList(),
+      ]);
+
+      webMapRef.current = freshWebMap;
+
+      // 2. Batch reorder operations
+      const reorderOperations: Array<{
+        parent: __esri.GroupLayer;
+        layer: __esri.Layer;
+        targetIndex: number;
+      }> = [];
+
+      mapElement.current.map?.allLayers.forEach((layer) => {
+        if (layer.type !== "group" && layer.parent instanceof GroupLayer) {
+          const currentIdx = layer.parent.layers.findIndex(
+            (l) => l.title === layer.title
+          );
+
+          const webLayer = webMapRef.current?.allLayers.find(
+            (l) => l.title === layer.title && l.type === layer.type
+          );
+
+          if (webLayer && webLayer.parent instanceof GroupLayer) {
+            const sourceIdx = webLayer.parent.layers.findIndex(
+              (l) => l.title === webLayer.title
+            );
+
+            if (currentIdx !== sourceIdx) {
+              reorderOperations.push({
+                parent: layer.parent,
+                layer: layer,
+                targetIndex: sourceIdx,
+              });
+            }
+          }
+        }
+      });
+
+      // 3. Execute reorders sorted by target index (bottom-up)
+      reorderOperations
+        .sort((a, b) => b.targetIndex - a.targetIndex)
+        .forEach(({ parent, layer, targetIndex }) => {
+          parent.reorder(layer, targetIndex);
+        });
+
+      layerService.watchLayerChanges();
+      setLoaded(true);
+    })();
+  }, [mapElement, webMap, webMapId]);
 
   return {
     listItemCreatedFunction,

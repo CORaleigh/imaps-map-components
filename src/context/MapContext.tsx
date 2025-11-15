@@ -28,6 +28,7 @@ export type MapMode =
 export interface MapContextType {
   mapElement: React.RefObject<HTMLArcgisMapElement>;
   webMap: WebMap | null;
+  setWebMap: (webMap: WebMap) => void;
   mapReady: boolean;
   setMapReady: (ready: boolean) => void;
   geometry: __esri.Geometry | null;
@@ -196,6 +197,7 @@ export const MapProvider: React.FC<{ children: React.ReactNode }> = ({
       value={{
         mapElement,
         webMap,
+        setWebMap,
         mapReady,
         setMapReady,
         geometry,

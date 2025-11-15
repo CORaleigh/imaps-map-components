@@ -28,6 +28,9 @@ class LayerService {
   persistKey = "imaps_<webmap id>_layerVisibility";
 
   REQUIRED_LAYER_TITLES = ["Property"]; // adjust as needed
+  
+  // Cache for persisted state to avoid repeated parsing
+  private persistedStateCache: Map<string, boolean> | null = null;
 
   attachView(view: MapView) {
     this.view = view;
@@ -40,14 +43,38 @@ class LayerService {
     return webmap;
   }
 
+  // Helper to get/create persisted state cache
+  private getPersistedStateCache(): Map<string, boolean> {
+    if (this.persistedStateCache) return this.persistedStateCache;
+    
+    const raw = localStorage.getItem(this.persistKey);
+    const persisted: PersistState = raw ? JSON.parse(raw) : { layers: [] };
+    
+    this.persistedStateCache = new Map(
+      persisted.layers.map(l => [l.id, l.visible])
+    );
+    
+    return this.persistedStateCache;
+  }
+
+  private clearPersistedCache() {
+    this.persistedStateCache = null;
+  }
+
   async createWebMapWithRequiredAndPersisted(
     id: string
   ): Promise<{ webmap: WebMap; webmapTemplate: WebMap }> {
     this.persistKey = `imaps_${id}_layerVisibility`;
+    this.clearPersistedCache();
+    
     this.webmapTemplate = new WebMap({ portalItem: { id } });
     await this.webmapTemplate.load();
-    const storedBookmarks = localStorage.getItem(`imaps_${id}_bookmarks`) ;
-    const bookmarks = storedBookmarks ? JSON.parse(storedBookmarks) : this.webmapTemplate.bookmarks;
+
+    const storedBookmarks = localStorage.getItem(`imaps_${id}_bookmarks`);
+    const bookmarks = storedBookmarks
+      ? JSON.parse(storedBookmarks)
+      : this.webmapTemplate.bookmarks;
+
     const webmap = new WebMap({
       basemap: this.webmapTemplate.basemap,
       initialViewProperties: this.webmapTemplate.initialViewProperties,
@@ -56,27 +83,18 @@ class LayerService {
     });
     this.map = webmap;
 
+    const stateCache = this.getPersistedStateCache();
+    const isVisibleLastSession = (title: string) => stateCache.get(title) === true;
+    const isRequired = (title: string) => this.REQUIRED_LAYER_TITLES.includes(title);
     const searchIds =
       this.webmapTemplate.applicationProperties?.viewing?.search?.layers
         .toArray()
         .map((layer: __esri.SearchLayer) => layer.id);
-
-    // Load persisted layer state
-    const raw = localStorage.getItem(this.persistKey);
-    const persisted: PersistState = raw ? JSON.parse(raw) : { layers: [] };
-    const isVisibleLastSession = (title: string) =>
-      persisted.layers.some((l) => l.id === title && l.visible);
-
-    // Recursive function to find required layers and their siblings, preserving group hierarchy
-    const addLayerWithSiblingsRecursive = (
-      sourceLayer: Layer,
-      parent: WebMap | GroupLayer
-    ): boolean => {
-      // If the source layer is a group layer, process its children recursively
-      if (sourceLayer.type === "group") {
-        const groupLayer = sourceLayer as GroupLayer;
-
-        // Create a new GroupLayer to hold filtered children
+    const isSearchable = (id: string) => searchIds?.includes(id);
+    // Add top-level layers: required or persisted-visible only
+    const addLayerRecursive = (layer: Layer, parent: WebMap | GroupLayer): boolean => {
+      if (layer.type === "group") {
+        const groupLayer = layer as GroupLayer;
         const newGroup = new GroupLayer({
           title: groupLayer.title,
           id: groupLayer.id,
@@ -84,167 +102,331 @@ class LayerService {
           visible: groupLayer.visible,
         });
 
-        //let hasRequiredOrSibling = false;
+        let anyChildAdded = false;
 
-        // Iterate over each child layer in the group
-        const childLayers = groupLayer.layers.toArray();
+        // Add children in template order if required or persisted-visible
+        for (const child of groupLayer.layers.toArray()) {
+          const title = child.title || "";
+          const shouldAdd = isRequired(title) || isVisibleLastSession(title) || isSearchable(child.id);
 
-        // Determine if any child qualifies
-        const childQualifies = childLayers.some((childLayer) => {
-          if (childLayer.type === "group") {
-            return addLayerWithSiblingsRecursive(childLayer, newGroup);
-          } else {
-            const childIsRequired =
-              this.REQUIRED_LAYER_TITLES.includes(childLayer.title || "") ||
-              searchIds?.includes(childLayer.id);
-            const childWasVisible = isVisibleLastSession(
-              childLayer.title || ""
-            );
-            return childIsRequired || childWasVisible;
-          }
-        });
-
-        if (childQualifies) {
-          // Add all siblings regardless of type
-          childLayers.forEach((siblingLayer) => {
-            // Avoid adding duplicates
-            if (!newGroup.layers.find((l) => l.title === siblingLayer.title)) {
-              if (siblingLayer.type === "group") {
-                // Recursively add group layers preserving hierarchy
-                addLayerWithSiblingsRecursive(siblingLayer, newGroup);
-              } else if (siblingLayer.type === "map-image") {
-                // Add MapImageLayer as is (no clone)
-                newGroup.layers.add(siblingLayer);
-              } else {
-                // For other layers (e.g., FeatureLayer), add as is
-                newGroup.layers.add(siblingLayer);
-              }
-
-              // Set visibility according to required or persisted-visible
-              const siblingIsRequired =
-                this.REQUIRED_LAYER_TITLES.includes(siblingLayer.title || "") ||
-                searchIds?.includes(siblingLayer.id);
-              const siblingWasVisible = isVisibleLastSession(
-                siblingLayer.title || ""
-              );
-              siblingLayer.visible = siblingIsRequired || siblingWasVisible;
+          if (child.type === "group") {
+            if (addLayerRecursive(child, newGroup)) {
+              anyChildAdded = true;
             }
-          });
-
-          if (!parent.layers.find((l) => l.title === newGroup.title)) {
-            parent.layers.add(newGroup);
+          } else if (shouldAdd) {
+            newGroup.layers.add(child);
+            child.visible = shouldAdd;
+            anyChildAdded = true;
           }
-          return true;
         }
 
-        // No required or visible layers found in this group or its children
-        return false;
-      }
-
-      // For MapImageLayer and other layer types, handle separately (no changes here)
-      if (sourceLayer.type === "map-image") {
-        const mil = sourceLayer as MapImageLayer;
-        // Add entire MapImageLayer if any sublayer is required or visible last session
-        const sublayersToAdd =
-          mil.sublayers?.toArray().filter((sl) => {
-            const slIsRequired = this.REQUIRED_LAYER_TITLES.includes(
-              sl.title || ""
-            );
-            const slWasVisible = persisted.layers.some((lp) =>
-              lp.sublayers?.some(
-                (s) => String(s.id) === String(sl.id) && s.visible
-              )
-            );
-            return slIsRequired || slWasVisible;
-          }) || [];
-
-        if (sublayersToAdd.length > 0) {
-          // Add MapImageLayer as is (no clone), with all sublayers (no filtering)
-          if (!parent.layers.find((l) => l.title === mil.title)) {
-            parent.layers.add(mil);
-          }
+        if (anyChildAdded) {
+          parent.layers.add(newGroup);
           return true;
         }
         return false;
       }
 
-      // For leaf layers, add if required or was visible last session
-      const isRequiredLeaf =
-        this.REQUIRED_LAYER_TITLES.includes(sourceLayer.title || "") ||
-        searchIds?.includes(sourceLayer.id);
-      const wasVisible = isVisibleLastSession(sourceLayer.title || "");
+      // Leaf layers outside groups
+      const title = layer.title || "";
+      const shouldAdd = isRequired(title) || isVisibleLastSession(title) || isSearchable(layer.id);
 
-      if (isRequiredLeaf || wasVisible) {
-        if (!parent.layers.find((l) => l.title === sourceLayer.title)) {
-          parent.layers.add(sourceLayer);
-        }
+      if (shouldAdd) {
+        parent.layers.add(layer);
+        layer.visible = shouldAdd;
         return true;
       }
 
-      // Layer does not meet criteria to be added
       return false;
     };
 
-    // Instead of adding layers one by one, process all top-level layers in template
-    this.webmapTemplate.layers.toArray().forEach((layer) => {
-      addLayerWithSiblingsRecursive(layer, webmap);
-    });
+    // Use for loop instead of forEach for potential early exit
+    for (const layer of this.webmapTemplate.layers.toArray()) {
+      addLayerRecursive(layer, webmap);
+    }
 
-    // Add tables
-    this.webmapTemplate.tables.toArray().forEach((table) => {
-      if (!webmap.tables.find((t) => t.title === table.title)) {
+    // Add tables - use Set for faster lookup
+    const existingTableTitles = new Set(webmap.tables.toArray().map(t => t.title));
+    for (const table of this.webmapTemplate.tables.toArray()) {
+      if (!existingTableTitles.has(table.title)) {
         webmap.tables.add(table);
       }
-    });
+    }
 
     return { webmap, webmapTemplate: this.webmapTemplate };
+  }
+
+  /** Adds all missing siblings after the layer list has loaded */
+  async addAllMissingSiblingsAfterLayerList() {
+    //console.log("🔍 addAllMissingSiblingsAfterLayerList called");
+    //console.log("🔍 this.map:", this.map);
+    //console.log("🔍 this.webmapTemplate:", this.webmapTemplate);
+    
+    if (!this.map || !this.webmapTemplate) {
+      //console.log("⚠️ Early return - map or webmapTemplate is null");
+      return;
+    }
+
+    const stateCache = this.getPersistedStateCache();
+    const isVisibleLastSession = (title: string) => stateCache.get(title) === true;
+
+    // Load all group layers in the template to access their children
+    const loadAllGroups = async (parent: WebMap | GroupLayer, depth: number = 0): Promise<void> => {
+      //const indent = "  ".repeat(depth);
+      const layers = parent.layers.toArray();
+      
+      //console.log(`${indent}loadAllGroups called with ${layers.length} layers`);
+      
+      for (const layer of layers) {
+        if (layer.type === "group") {
+          const groupLayer = layer as GroupLayer;
+          //const childCountBefore = groupLayer.layers.length;
+          
+          //console.log(`${indent}Loading group "${groupLayer.title}" (${childCountBefore} children visible before load)`);
+          
+          if (!groupLayer.loaded) {
+            await groupLayer.load();
+          }
+          
+          //const childCountAfter = groupLayer.layers.length;
+          //console.log(`${indent}  -> Loaded: ${groupLayer.loaded}, children after: ${childCountAfter}`);
+          
+          await loadAllGroups(groupLayer, depth + 1);
+        }
+      }
+    };
+
+    //console.log("=== Loading all template groups ===");
+    await loadAllGroups(this.webmapTemplate);
+    //console.log("=== Template groups loaded ===\n");
+
+    // PHASE 1: Add all missing layers recursively
+    const addMissingLayers = (
+      templateLayer: Layer,
+      parent: WebMap | GroupLayer
+    ) => {
+      // Find existing layer/group in parent
+      let existingLayer = parent.layers.find(
+        (l) => l.title === templateLayer.title
+      );
+
+      if (!existingLayer) {
+        if (templateLayer.type === "group") {
+          existingLayer = new GroupLayer({
+            title: templateLayer.title,
+            id: templateLayer.id,
+            opacity: templateLayer.opacity,
+            visible: templateLayer.visible,
+          });
+        } else {
+          existingLayer = templateLayer;
+        }
+        parent.layers.add(existingLayer);
+        //console.log(`Added missing layer "${templateLayer.title}" to "${(parent as __esri.Layer).title || 'Map'}"`);
+      }
+      
+      // Handle group children recursively
+      if (templateLayer.type === "group") {
+        const templateGroup = templateLayer as GroupLayer;
+        const existingGroup = existingLayer as GroupLayer;
+
+        for (const childTemplate of templateGroup.layers.toArray()) {
+          addMissingLayers(childTemplate, existingGroup);
+        }
+      }
+    };
+
+    // Execute Phase 1: Add all missing layers
+    //console.log("=== PHASE 1: Adding missing layers ===");
+    for (const layer of this.webmapTemplate.layers.toArray()) {
+      addMissingLayers(layer, this.map);
+    }
+    
+    //console.log("\n=== After Phase 1, checking template structure ===");
+    // Debug: Show what's in the template
+   // for (const templateLayer of this.webmapTemplate.layers.toArray()) {
+      //if (templateLayer.type === "group") {
+        //const group = templateLayer as GroupLayer;
+        //console.log(`Template group "${group.title}" has ${group.layers.length} children:`, group.layers.toArray().map(l => l.title).join(', '));
+   //   }
+   // }
+
+    // PHASE 2: Reorder from deepest level up to top level
+    // We can't use this.webmapTemplate.layers directly because they were moved to this.map
+    // Instead, we'll use the current map structure and the persisted/required layer names
+    const reorderRecursive = (
+      currentParent: WebMap | GroupLayer,
+      depth: number = 0
+    ) => {
+      //const indent = "  ".repeat(depth);
+      //const parentName = (currentParent as __esri.Layer).title || 'Map';
+      const currentLayers = currentParent.layers.toArray();
+      
+      //console.log(`${indent}Processing "${parentName}" with ${currentLayers.length} current layers`);
+      
+      // First, recursively reorder all nested groups (depth-first)
+      for (const currentLayer of currentLayers) {
+        if (currentLayer.type === "group") {
+          //console.log(`${indent}Found group "${currentLayer.title}", recursing...`);
+          reorderRecursive(currentLayer as GroupLayer, depth + 1);
+        }
+      }
+      
+      // For top-level only, reorder based on original webmap structure
+      // We need to use allLayers to find the original order from webmapTemplate
+      if (currentParent instanceof WebMap && this.webmapTemplate) {
+        //console.log(`${indent}Reordering top-level map layers based on template...`);
+        
+        // Get original order from webmapTemplate by looking at allLayers
+        const templateOrder: string[] = [];
+        this.webmapTemplate.allLayers.forEach(layer => {
+          // Only include top-level layers (those whose parent is the map)
+          const parent = (layer as __esri.Layer).parent;
+          if (parent && parent.declaredClass === "esri.WebMap") {
+            if (!templateOrder.includes(layer.title || '')) {
+              templateOrder.push(layer.title || '');
+            }
+          }
+        });
+        
+        //console.log(`${indent}  Template order from allLayers:`, templateOrder.join(', '));
+        //console.log(`${indent}  Current order:`, currentLayers.map(l => l.title).join(', '));
+        
+        const layersToReorder: Array<{ layer: Layer; targetIndex: number; title: string }> = [];
+        
+        for (let targetIndex = 0; targetIndex < templateOrder.length; targetIndex++) {
+          const templateTitle = templateOrder[targetIndex];
+          const existingLayer = currentLayers.find(l => l.title === templateTitle);
+          
+          if (existingLayer) {
+            const currentIndex = currentParent.layers.indexOf(existingLayer);
+            
+            // Apply visibility
+            const persistedVisible = isVisibleLastSession(templateTitle);
+            existingLayer.visible = persistedVisible || existingLayer.visible;
+            
+            if (currentIndex !== targetIndex) {
+              layersToReorder.push({ 
+                layer: existingLayer, 
+                targetIndex,
+                title: templateTitle
+              });
+            }
+          }
+        }
+        
+        // Sort by target index descending and reorder
+        layersToReorder.sort((a, b) => b.targetIndex - a.targetIndex);
+        
+        for (const { layer, targetIndex } of layersToReorder) {
+          //const beforeIndex = currentParent.layers.indexOf(layer);
+          currentParent.layers.reorder(layer, targetIndex);
+         // const afterIndex = currentParent.layers.indexOf(layer);
+          
+          //console.log(`${indent}  Reordered "${title}": ${beforeIndex} -> ${afterIndex} (target: ${targetIndex})`);
+        }
+        
+        //if (layersToReorder.length === 0) {
+          //console.log(`${indent}  No reordering needed`);
+        //}
+      }
+    };
+
+    // Execute Phase 2: Reorder everything from deepest to shallowest
+    //console.log("\n=== PHASE 2: Reordering layers ===");
+    reorderRecursive(this.map);
+    //console.log("=== Done ===\n");
   }
 
   async initLayersFromWebMap(webMap: WebMap) {
     if (!webMap || !this.view) return;
 
-    webMap.layers.toArray().forEach((layer, idx) => {
-      if (!this.view?.map?.layers.find((l) => l.title === layer.title)) {
-        this.view?.map?.layers.add(layer, idx);
-      }
-    });
+    // Use Set for faster lookup
+    const existingLayerTitles = new Set(
+      this.view.map?.layers.toArray().map(l => l.title) || []
+    );
 
-    webMap.tables.toArray().forEach((table) => {
-      if (!this.view?.map?.tables.find((t) => t.title === table.title)) {
-        this.view?.map?.tables.add(table);
+    const layersArray = webMap.layers.toArray();
+    for (let i = 0; i < layersArray.length; i++) {
+      const layer = layersArray[i];
+      if (!existingLayerTitles.has(layer.title)) {
+        this.view.map?.layers.add(layer, i);
       }
-    });
+    }
+
+    const existingTableTitles = new Set(
+      this.view.map?.tables.toArray().map(t => t.title) || []
+    );
+
+    for (const table of webMap.tables.toArray()) {
+      if (!existingTableTitles.has(table.title)) {
+        this.view.map?.tables.add(table);
+      }
+    }
 
     const raw = localStorage.getItem(this.persistKey);
     if (!raw) return;
 
     const state: PersistState = JSON.parse(raw);
-    for (const lp of state.layers) {
-      await this.applyLayerSettings(lp);
-    }
+    // Use Promise.all for parallel async operations
+    await Promise.all(state.layers.map(lp => this.applyLayerSettings(lp)));
   }
 
   async persistState() {
     if (!this.view?.map) return;
 
     const layers: LayerPersist[] = [];
+    const allLayers = this.view.map.allLayers.toArray();
 
-    for (const layer of this.view.map.allLayers.toArray()) {
-      if (layer instanceof MapImageLayer) {
-        await layer.load();
-      }
+    // Load all MapImageLayers in parallel
+    const loadPromises = allLayers
+      .filter(layer => layer instanceof MapImageLayer && !layer.loaded)
+      .map(layer => (layer as MapImageLayer).load());
+    
+    if (loadPromises.length > 0) {
+      await Promise.all(loadPromises);
+    }
+
+    for (const layer of allLayers) {
       layers.push(this.serializeLayer(layer));
     }
 
     localStorage.setItem(this.persistKey, JSON.stringify({ layers }));
+    this.clearPersistedCache(); // Invalidate cache after persist
   }
 
   restorePersistedState() {
     if (!this.view?.map) return;
+
     const raw = localStorage.getItem(this.persistKey);
     if (!raw) return;
+
     const state: PersistState = JSON.parse(raw);
-    state.layers.forEach((lp) => this.applyLayerSettings(lp));
+
+    // Create lookup map for faster access
+    const layerMap = new Map(
+      this.view.map.allLayers.toArray().map(l => [l.title, l])
+    );
+
+    for (const lp of state.layers) {
+      const layer = layerMap.get(lp.id);
+      if (!layer) continue;
+
+      layer.visible = lp.visible;
+      layer.opacity = lp.opacity;
+
+      if (layer instanceof GroupLayer && layer.layers && lp.sublayers) {
+        const sublayersArray = layer.layers.toArray();
+        for (let idx = 0; idx < sublayersArray.length; idx++) {
+          const sl = sublayersArray[idx];
+          const slPersist = lp.sublayers[idx];
+          if (slPersist) {
+            sl.visible = slPersist.visible;
+            if (slPersist.opacity != null) sl.opacity = slPersist.opacity;
+          }
+        }
+      }
+    }
   }
 
   serializeLayer(layer: Layer): LayerPersist {
@@ -283,46 +465,48 @@ class LayerService {
 
     if (layer instanceof MapImageLayer && lp.sublayers) {
       if (!layer.loaded) await layer.load();
-      layer.sublayers?.toArray().forEach((sl) => {
-        const slPersist = lp.sublayers?.find(
+      
+      const sublayersArray = layer.sublayers?.toArray() || [];
+      const supportsDynamicLayers = layer.capabilities.exportMap?.supportsDynamicLayers;
+      
+      for (const sl of sublayersArray) {
+        const slPersist = lp.sublayers.find(
           (s) => String(s.id) === String(sl.id)
         );
         if (slPersist) {
           sl.visible = slPersist.visible;
-          if (layer.capabilities.exportMap?.supportsDynamicLayers) {
-            if (slPersist.opacity != null) sl.opacity = slPersist.opacity;
+          if (supportsDynamicLayers && slPersist.opacity != null) {
+            sl.opacity = slPersist.opacity;
           }
         }
-      });
+      }
     } else if (layer instanceof GroupLayer && layer.layers && lp.sublayers) {
-      layer.layers.toArray().forEach((sl, idx) => {
-        const slPersist = lp.sublayers?.[idx];
+      const sublayersArray = layer.layers.toArray();
+      for (let idx = 0; idx < sublayersArray.length && idx < lp.sublayers.length; idx++) {
+        const sl = sublayersArray[idx];
+        const slPersist = lp.sublayers[idx];
         if (slPersist) {
           sl.visible = slPersist.visible;
           if (slPersist.opacity != null) sl.opacity = slPersist.opacity;
         }
-      });
+      }
     }
   }
 
   getOrLoadLayer(title: string): __esri.FeatureLayer | undefined {
-   
     if (!this.map || !this.webmapTemplate) return undefined;
 
-    // check if already in map
     const existing = this.map.allLayers.find((l) => l.title === title) as
       | __esri.FeatureLayer
       | undefined;
     if (existing) return existing;
 
-    // fallback to webmapTemplate
     const templateLayer = this.webmapTemplate.allLayers.find(
       (l) => l.title === title
     ) as __esri.FeatureLayer | undefined;
 
     if (!templateLayer) return undefined;
 
-    // add to map
     this.map.add(templateLayer);
     return templateLayer;
   }
@@ -330,26 +514,38 @@ class LayerService {
   watchLayerChanges() {
     if (!this.view?.map) return;
 
+    // Debounce persist calls to avoid excessive writes
+    let persistTimeout: number | null = null;
+    const debouncedPersist = () => {
+      if (persistTimeout) clearTimeout(persistTimeout);
+      persistTimeout = window.setTimeout(() => {
+        this.persistState();
+        persistTimeout = null;
+      }, 300);
+    };
+
     const watchLayer = (layer: Layer) => {
-      layer.watch("visible", () => this.persistState());
-      layer.watch("opacity", () => this.persistState());
+      layer.watch("visible", debouncedPersist);
+      layer.watch("opacity", debouncedPersist);
 
       if (layer instanceof MapImageLayer && layer.sublayers) {
-        layer.sublayers.toArray().forEach((sl) => {
-          sl.watch("visible", () => this.persistState());
-          sl.watch("opacity", () => this.persistState());
-        });
+        for (const sl of layer.sublayers.toArray()) {
+          sl.watch("visible", debouncedPersist);
+          sl.watch("opacity", debouncedPersist);
+        }
       }
 
       if (layer instanceof GroupLayer && layer.layers) {
-        layer.layers.toArray().forEach((sl) => {
-          sl.watch("visible", () => this.persistState());
-          sl.watch("opacity", () => this.persistState());
-        });
+        for (const sl of layer.layers.toArray()) {
+          sl.watch("visible", debouncedPersist);
+          sl.watch("opacity", debouncedPersist);
+        }
       }
     };
 
-    this.view.map.allLayers.toArray().forEach(watchLayer);
+    for (const layer of this.view.map.allLayers.toArray()) {
+      watchLayer(layer);
+    }
 
     this.view.map.layers.on("after-add", (event) => {
       watchLayer(event.item);

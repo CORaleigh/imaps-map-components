@@ -25,14 +25,15 @@ const LayerList: React.FC<LayerListProps> = ({
     loaded,
   } = useLayerList(mapElement);
   return (
+    <>
     <calcite-panel
-      heading="Layers"
+      heading={loaded ? "layers" : ""}
       closable
       oncalcitePanelClose={() => onPanelClose()}
       closed={closed}
     >
       <calcite-action
-        id="reset-layers-action"
+        
         text="Reset Layers"
         icon="reset"
         slot="header-actions-end"
@@ -41,7 +42,6 @@ const LayerList: React.FC<LayerListProps> = ({
       <calcite-tooltip reference-element="reset-layers-action">
         Reset Layers
       </calcite-tooltip>
-      {!loaded && <calcite-scrim loading></calcite-scrim>}
 
       {loaded && (
         <arcgis-layer-list
@@ -53,6 +53,9 @@ const LayerList: React.FC<LayerListProps> = ({
         ></arcgis-layer-list>
       )}
     </calcite-panel>
+          {!loaded && <calcite-scrim loading style={{width: "100%", height: "100vh"}}></calcite-scrim>}
+
+    </>
   );
 };
 
