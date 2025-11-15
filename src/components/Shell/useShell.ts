@@ -144,7 +144,9 @@ export const useShell = (): UseShellProps => {
     if (storedExtent) {
       event.target.view.extent = JSON.parse(storedExtent);
     }
+    event.target.view.highlights = [{ name: "default", color: "red" }];
     await event.target.view.when();
+
     setMapReady(true);
     event.target.addEventListener("arcgisViewChange", handleViewChange);
   };

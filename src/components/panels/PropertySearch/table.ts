@@ -64,7 +64,7 @@ export const createTableLayer = async (mapElement: HTMLArcgisMapElement) => {
             style: "none",
             outline: {
               type: "simple-line",
-              color: new Color("yellow"),
+              color: new Color("#ffe44c"),
               width: 2,
               style: "solid",
             },
@@ -83,10 +83,7 @@ export const createTableLayer = async (mapElement: HTMLArcgisMapElement) => {
     })
   );
   mapElement.view.map.add(copyTable);
-  mapElement.view.highlights = [{
-    color: new Color("red"),
-    fillOpacity: 0.5,
-  }];
+
   // copyTable.on(
   //   "layerview-create",
   //   (event: __esri.LayerLayerviewCreateEvent) => {
