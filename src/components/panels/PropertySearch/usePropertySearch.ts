@@ -558,7 +558,6 @@ export const usePropertySearch = (
     //onPropertiesSelected(condos);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [condos]);
-
   useEffect(() => {
     (async () => {
       if (!selectedCondo) return;

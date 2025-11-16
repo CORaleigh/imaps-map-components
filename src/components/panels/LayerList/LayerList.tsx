@@ -26,40 +26,46 @@ const LayerList: React.FC<LayerListProps> = ({
   } = useLayerList(mapElement);
   return (
     <>
-    <calcite-panel
-      heading="Layer List"
-      closable
-      oncalcitePanelClose={() => onPanelClose()}
-      closed={closed}
-    >
-      <calcite-action
-        
-        text="Reset Layers"
-        icon="reset"
-        slot="header-actions-end"
-        onClick={handleResetLayers}
-      ></calcite-action>
-      <calcite-tooltip reference-element="reset-layers-action">
-        Reset Layers
-      </calcite-tooltip>
+      <calcite-panel
+        heading="Layer List"
+        closable
+        oncalcitePanelClose={() => onPanelClose()}
+        closed={closed}
+      >
+        <calcite-action
+          text="Reset Layers"
+          icon="reset"
+          slot="header-actions-end"
+          onClick={handleResetLayers}
+        ></calcite-action>
+        <calcite-tooltip reference-element="reset-layers-action">
+          Reset Layers
+        </calcite-tooltip>
 
-      {loaded && (
-        <arcgis-layer-list
-          referenceElement={mapElement.current}
-          showFilter
-          visibilityAppearance="checkbox"
-          listItemCreatedFunction={listItemCreatedFunction}
-          onarcgisTriggerAction={handleTriggerAction}
-        ></arcgis-layer-list>
+        {loaded && (
+          <arcgis-layer-list
+            referenceElement={mapElement.current}
+            showFilter
+            visibilityAppearance="checkbox"
+            listItemCreatedFunction={listItemCreatedFunction}
+            onarcgisTriggerAction={handleTriggerAction}
+          ></arcgis-layer-list>
+        )}
+      </calcite-panel>
+      {!loaded && (
+        <calcite-scrim
+          loading
+          style={{ width: "100%", height: "100vh" }}
+        ></calcite-scrim>
       )}
-    </calcite-panel>
-          {!loaded && <calcite-scrim loading style={{width: "100%", height: "100vh"}}></calcite-scrim>}
-
     </>
   );
 };
 
 export default React.memo(
   LayerList,
-  (prev, next) => prev.mapElement === next.mapElement
+  (prev, next) =>
+    prev.mapElement === next.mapElement &&
+    prev.closed === next.closed &&
+    prev.onPanelClose === next.onPanelClose
 );

@@ -120,12 +120,8 @@ const Shell: React.FC = () => {
         width="l"
         resizable
       >
-        <div
-          style={{
-            display: activePanel === "propertySearch" ? "block" : "none",
-          }}
-        >
-          {openedPanels.includes("propertySearch") && mapReady && (
+        {openedPanels.includes("propertySearch") && mapReady && (
+          <div hidden={activePanel !== "propertySearch"}>
             <Suspense fallback={null}>
               <PropertySearch
                 mapElement={mapElement}
@@ -133,14 +129,9 @@ const Shell: React.FC = () => {
                 closed={activePanel !== "propertySearch"}
               />
             </Suspense>
-          )}
-        </div>
-
-        <div
-          style={{
-            display: activePanel === "bookmarks" ? "block" : "none",
-          }}
-        >
+          </div>
+        )}
+        {openedPanels.includes("bookmarks") && mapReady && (
           <Suspense fallback={null}>
             <Bookmarks
               mapElement={mapElement}
@@ -148,14 +139,9 @@ const Shell: React.FC = () => {
               closed={activePanel !== "bookmarks"}
             ></Bookmarks>
           </Suspense>
-        </div>
-
-        <div
-          style={{
-            display: activePanel === "layerList" ? "block" : "none",
-          }}
-        >
-          {openedPanels.includes("layerList") && (
+        )}
+        {openedPanels.includes("layerList") && (
+          <div hidden={activePanel !== "layerList"}>
             <Suspense fallback={null}>
               <LayerList
                 mapElement={mapElement}
@@ -163,27 +149,22 @@ const Shell: React.FC = () => {
                 closed={activePanel !== "layerList"}
               />
             </Suspense>
-          )}
-        </div>
-        <div
-          style={{
-            display: activePanel === "legend" ? "block" : "none",
-          }}
-        >
-          <Suspense fallback={null}>
-            <Legend
-              mapElement={mapElement}
-              onPanelClose={handlePanelClose}
-              closed={activePanel !== "legend"}
-            />
-          </Suspense>
-        </div>
-        <div
-          style={{
-            display: activePanel === "basemap" ? "block" : "none",
-          }}
-        >
-          {openedPanels.includes("basemap") && (
+          </div>
+        )}
+        {openedPanels.includes("legend") && (
+          <div hidden={activePanel !== "legend"}>
+            <Suspense fallback={null}>
+              <Legend
+                mapElement={mapElement}
+                onPanelClose={handlePanelClose}
+                closed={activePanel !== "legend"}
+              />
+            </Suspense>
+          </div>
+        )}
+
+        {openedPanels.includes("basemap") && (
+          <div hidden={activePanel !== "basemap"}>
             <Suspense fallback={null}>
               <Basemaps
                 mapElement={mapElement}
@@ -191,8 +172,9 @@ const Shell: React.FC = () => {
                 closed={activePanel !== "basemap"}
               />
             </Suspense>
-          )}
-        </div>
+          </div>
+        )}
+
         <calcite-action-bar slot="action-bar">
           <calcite-action-group>
             <calcite-action

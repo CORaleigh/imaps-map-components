@@ -210,6 +210,10 @@ export const useShell = (): UseShellProps => {
     setActivePanel("propertySearch");
   }, [selectedCondo]);
 
+  useEffect(() => {
+    console.log(activePanel)
+  }, [activePanel])
+
   return {
     mapElement,
     theme,

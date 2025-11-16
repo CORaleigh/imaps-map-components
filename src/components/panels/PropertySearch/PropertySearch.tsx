@@ -53,6 +53,7 @@ const PropertySearch: React.FC<PropertySearchProps> = ({
   } = usePropertySearch(mapElement);
 
   return (
+    <>
     <calcite-panel
       heading="Property Search"
       closable
@@ -229,11 +230,14 @@ const PropertySearch: React.FC<PropertySearchProps> = ({
           )}
         </calcite-tab>
       </calcite-tabs>
-    </calcite-panel>
+    </calcite-panel></>
   );
 };
 
 export default React.memo(
   PropertySearch,
-  (prev, next) => prev.mapElement === next.mapElement
+  (prev, next) => 
+    prev.mapElement === next.mapElement && 
+    prev.closed === next.closed &&
+    prev.onPanelClose === next.onPanelClose
 );
