@@ -312,7 +312,6 @@ const Shell: React.FC = () => {
       </calcite-shell-panel>
       <arcgis-map
         ref={mapElement}
-        // item-id="95092428774c4b1fb6a3b6f5fed9fbc4"
         onarcgisViewReadyChange={handleViewReady}
         onarcgisViewHold={handleViewHold}
       >

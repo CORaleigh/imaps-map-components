@@ -4,6 +4,7 @@ import "@arcgis/map-components/components/arcgis-search";
 import "@esri/calcite-components/components/calcite-combobox";
 import "@esri/calcite-components/components/calcite-combobox-item";
 import { useLocationSearch } from "./useLocationSearch";
+import styles from "./LocationSearch.module.css";
 
 interface LocationSearchProps {
   mapElement: React.RefObject<HTMLArcgisMapElement>;
@@ -35,6 +36,7 @@ const LocationSearch: React.FC<LocationSearchProps> = ({
       collapsible
     >
       <arcgis-search
+        className={styles.searchContainer}
         referenceElement={mapElement.current}
         onarcgisReady={handleSearchReady}
         onarcgisSelectResult={handleSelectResult}

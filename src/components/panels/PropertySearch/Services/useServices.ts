@@ -2,6 +2,7 @@ import type { TargetedEvent } from "@arcgis/map-components";
 import { useEffect, useRef, useState, type RefObject } from "react";
 import { SERVICE_DEFS, type Service } from "./config";
 import { layerService } from "../../../../utils/mapLayerService";
+import * as geodesicBufferOperator from "@arcgis/core/geometry/operators/geodesicBufferOperator.js";
 
 export interface UseServicesProps {
   services: Service[];
@@ -51,7 +52,8 @@ export const useServices = (
 
     setSearching((prev) => ({ ...prev, [svc.title]: true }));
     const newGraphics: __esri.Graphic[] = [];
-
+    await geodesicBufferOperator.load();
+    const buffered = geodesicBufferOperator.execute(selectedCondo.geometry, -5, {unit: "feet"});
     for (const serviceLayer of svc.layers) {
       // only load layer once
       if (!serviceLayer.layer) {
@@ -62,7 +64,7 @@ export const useServices = (
 
       const fl = serviceLayer.layer!;
       const result = await fl.queryFeatures({
-        geometry: selectedCondo.geometry,
+        geometry: buffered,
         outFields: ["*"],
       });
       if (result.features.length > 0) {

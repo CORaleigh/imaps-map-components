@@ -316,6 +316,7 @@ export const usePropertySearch = (
             "address-graphics"
           ) as __esri.GraphicsLayer
         ).add(feature);
+        mapElement.current.goTo(feature);
       }
     }
   };

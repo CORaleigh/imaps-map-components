@@ -492,7 +492,14 @@ class LayerService {
     layer.opacity = lp.opacity;
 
     if (layer instanceof MapImageLayer && lp.sublayers) {
-      if (!layer.loaded) await layer.load();
+      if (!layer.loaded) {
+        try {
+          await layer.load();
+        } catch (err) {
+          console.error(`Failed to load layer "${layer.title}":`, err);
+          return;
+        }
+      }
 
       const sublayersArray = layer.sublayers?.toArray() || [];
       const supportsDynamicLayers =
