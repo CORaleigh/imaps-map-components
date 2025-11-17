@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { TargetedEvent } from "@arcgis/map-components";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
@@ -130,7 +131,9 @@ export const usePropertySearch = (
 
   const handleTableReady = useCallback(
     async (event: TargetedEvent<HTMLArcgisFeatureTableElement, void>) => {
+      (event.target as any).viewModel.messages.header = `0 properties selected`;
       console.log("Feature table ready");
+
       const layer = await createTableLayer(mapElement.current);
       if (!layer) return;
       event.target.layer = layer;
@@ -152,15 +155,7 @@ export const usePropertySearch = (
       `;
 
       grid?.appendChild(style);
-
       await mapElement.current.whenLayerView(tableLayerRef.current);
-      const panel =
-        tableElement.current.shadowRoot?.querySelector("calcite-panel");
-      if (panel) {
-        panel.heading = `${condos.length} ${
-          condos.length === 1 ? "property" : "properties"
-        } selected`;
-      }
 
       reactiveUtils.watch(
         () => tableElement.current.visibleColumns,
@@ -172,7 +167,7 @@ export const usePropertySearch = (
         }
       );
     },
-    [mapElement, condos.length, webMapId]
+    [mapElement, webMapId]
   );
 
   const handleTableCellClick = async (
@@ -559,15 +554,10 @@ export const usePropertySearch = (
       clearAddressPoints(mapElement.current);
       setSelectedTab("list");
     }
-    setTimeout(() => {
-      const panel =
-        tableElement.current.shadowRoot?.querySelector("calcite-panel");
-      if (panel) {
-        panel.heading = `${condos.length} ${
-          condos.length === 1 ? "property" : "properties"
-        } selected`;
-      }
-    }, 500);
+
+    (tableElement.current as any).viewModel.messages.header = `${
+      condos.length
+    } ${condos.length === 1 ? "property" : "properties"} selected`;
 
     //onPropertiesSelected(condos);
     // eslint-disable-next-line react-hooks/exhaustive-deps
