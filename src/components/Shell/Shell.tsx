@@ -132,6 +132,8 @@ const Shell: React.FC = () => {
           </div>
         )}
         {openedPanels.includes("bookmarks") && mapReady && (
+          <div hidden={activePanel !== "bookmarks"}>
+
           <Suspense fallback={null}>
             <Bookmarks
               mapElement={mapElement}
@@ -139,6 +141,7 @@ const Shell: React.FC = () => {
               closed={activePanel !== "bookmarks"}
             ></Bookmarks>
           </Suspense>
+          </div>
         )}
         {openedPanels.includes("layerList") && (
           <div hidden={activePanel !== "layerList"}>

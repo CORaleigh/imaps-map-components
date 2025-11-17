@@ -59,4 +59,10 @@ const Basemaps: React.FC<BasemapsProps> = ({
   );
 };
 
-export default React.memo(Basemaps, (prev, next) => prev.mapElement === next.mapElement);
+export default React.memo(
+  Basemaps,
+  (prev, next) =>
+    prev.mapElement === next.mapElement &&
+    prev.closed === next.closed &&
+    prev.onPanelClose === next.onPanelClose
+);

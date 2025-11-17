@@ -27,11 +27,25 @@ calcite-panel arcgis-feature-table {
   height: 100%;
 }
 
-#property-search calcite-tabs {
+/* #property-search calcite-tabs {
   height: calc(100vh - 32px - 50px - 91px) !important;
+} */
+
+
+#property-search calcite-panel {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
 }
-#basemaps calcite-tabs {
-  height: calc(100vh - 32px - 50px - 41px) !important;
+/* #basemaps calcite-tabs {
+  height: calc(100vh - 32px - 50px - 41px -) !important;
+} */
+
+
+#basemaps calcite-panel {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
 }
 
 #bookmarks calcite-flow-item {
