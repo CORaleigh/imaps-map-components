@@ -149,9 +149,7 @@ export const useCoordinateConversion = (
     const nativeInput = event.target.shadowRoot?.querySelector(
       "input"
     ) as HTMLInputElement;
-    setTimeout(() => {
-      console.log(event.target.validity.valid);
-    }, 100);
+
     const valid = nativeInput?.checkValidity();
     setValidity({ valid: valid, message: valid ? "" : "Invalid format" });
   };
@@ -205,7 +203,6 @@ export const useCoordinateConversion = (
           mapPoint,
           new SpatialReference({ wkid: mapEl.spatialReference.wkid })
         ) as __esri.Point;
-        console.log("spft point", mapPoint);
         break;
       }
       case "usng": {
@@ -326,7 +323,6 @@ export const useCoordinateConversion = (
     if (display) {
       try {
         await navigator.clipboard.writeText(display);
-        console.log("Coordinate copied to clipboard:", display);
       } catch (err) {
         console.error("Failed to copy coordinate: ", err);
       }

@@ -27,7 +27,7 @@ export interface UsePropertySearchProps {
   tableElement: React.RefObject<HTMLArcgisFeatureTableElement>;
   addressTableElement: React.RefObject<HTMLArcgisFeatureTableElement>;
   searchElement: React.RefObject<HTMLArcgisSearchElement>;
-  siteAddressRef: React.RefObject<string>;
+  siteAddress: string;
   selectedTab: "list" | "info";
   selectedCondo: __esri.Graphic | null;
   condos: __esri.Graphic[];
@@ -110,7 +110,7 @@ export const usePropertySearch = (
     setGeometry,
   } = useMap();
 
-  const siteAddressRef = useRef<string>("");
+  const [siteAddress, setSiteAddress] = useState<string>("");
 
   const [selectedTab, setSelectedTab] = useState<"list" | "info">("list");
   const handleSearchReady = async (
@@ -470,8 +470,8 @@ export const usePropertySearch = (
 
       setSelectedCondo(feature);
       setGeometry(null);
-      // eslint-disable-next-line react-hooks/exhaustive-deps
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [geometry]
   );
 
@@ -579,17 +579,17 @@ export const usePropertySearch = (
         return info.title === "site-address";
       })?.expression;
       if (!arcade) return;
-      const a = await executeArcade(arcade, selectedCondo);
-      siteAddressRef.current = a as string;
+      const address = await executeArcade(arcade, selectedCondo);
+      setSiteAddress(address);
     })();
-  }, [mapElement, selectedCondo]);
+  }, [mapElement, selectedCondo, setSiteAddress]);
 
   return {
     mapElement,
     tableElement,
     addressTableElement,
     searchElement,
-    siteAddressRef,
+    siteAddress,
     selectedTab,
     selectedCondo,
     condos,

@@ -49,7 +49,6 @@ export const useBasemaps = (
         mapElement.current.extent
       );
 
-      console.log("In Raleigh:", inRaleigh);
       return inRaleigh;
     },
   });

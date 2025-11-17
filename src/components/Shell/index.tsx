@@ -19,10 +19,10 @@ import "@arcgis/map-components/components/arcgis-scale-bar";
 import { useShell } from "./useShell";
 import { lazyWithPreload } from "../../utils/lazyLoad";
 import Header from "../Header";
-import OverviewMap from "../tools/OverviewMap";
-import CoodinateConversion from "../tools/CoodinateConversion";
+
 
 import styles from "./Shell.module.css";
+import MapView from "../MapView";
 
 // -------------------- Panels --------------------
 interface PanelProps {
@@ -33,7 +33,7 @@ interface PanelProps {
 
 // Lazy-loaded panels with preload
 export const PropertySearch = lazyWithPreload<PanelProps>(
-  () => import("../panels/PropertySearch")
+  () => import("../panels/PropertySearch/PropertySearch")
 );
 
 export const LayerList = lazyWithPreload<PanelProps>(
@@ -50,34 +50,6 @@ export const Basemaps = lazyWithPreload<PanelProps>(
 
 export const Bookmarks = lazyWithPreload<PanelProps>(
   () => import("../panels/Bookmarks")
-);
-
-// -------------------- Tools --------------------
-interface ToolProps {
-  mapElement: React.RefObject<HTMLArcgisMapElement>;
-  onToolClose: () => void;
-  closed: boolean;
-}
-
-// Lazy-loaded tools with preload
-export const PropertySelect = lazyWithPreload<ToolProps>(
-  () => import("../tools/PropertySelect")
-);
-
-export const LocationSearch = lazyWithPreload<ToolProps>(
-  () => import("../tools/LocationSearch")
-);
-
-export const Measure = lazyWithPreload<ToolProps>(
-  () => import("../tools/Measure")
-);
-
-export const Sketch = lazyWithPreload<ToolProps>(
-  () => import("../tools/Sketch/Sketch")
-);
-
-export const Print = lazyWithPreload<ToolProps>(
-  () => import("../tools/Print")
 );
 
 const Shell: React.FC = () => {
@@ -106,10 +78,7 @@ const Shell: React.FC = () => {
   // -------------------- Prefetch all lazy panels/tools --------------------
   useEffect(() => {
     const panels = [PropertySearch, LayerList, Legend, Basemaps, Bookmarks];
-    const tools = [PropertySelect, LocationSearch, Measure, Sketch, Print];
-
     panels.forEach((p) => p.preload?.());
-    tools.forEach((t) => t.preload?.());
   }, []);
 
   return (
@@ -121,6 +90,7 @@ const Shell: React.FC = () => {
         collapsed={!activePanel}
         width="l"
         resizable={appSize === "large"}
+        className={styles.calciteShellPanel}
       >
         {openedPanels.includes("propertySearch") && mapReady && (
           <div hidden={activePanel !== "propertySearch"}>
@@ -135,14 +105,13 @@ const Shell: React.FC = () => {
         )}
         {openedPanels.includes("bookmarks") && mapReady && (
           <div hidden={activePanel !== "bookmarks"}>
-
-          <Suspense fallback={null}>
-            <Bookmarks
-              mapElement={mapElement}
-              onPanelClose={handleToolClose}
-              closed={activePanel !== "bookmarks"}
-            ></Bookmarks>
-          </Suspense>
+            <Suspense fallback={null}>
+              <Bookmarks
+                mapElement={mapElement}
+                onPanelClose={handleToolClose}
+                closed={activePanel !== "bookmarks"}
+              ></Bookmarks>
+            </Suspense>
           </div>
         )}
         {openedPanels.includes("layerList") && (
@@ -190,7 +159,10 @@ const Shell: React.FC = () => {
               active={activePanel === "propertySearch"}
               onClick={() => handlePanelActionClick("propertySearch")}
             ></calcite-action>
-            <calcite-tooltip closeOnClick reference-element="property-search-action">
+            <calcite-tooltip
+              closeOnClick
+              reference-element="property-search-action"
+            >
               Property Search
             </calcite-tooltip>
 
@@ -247,7 +219,10 @@ const Shell: React.FC = () => {
               active={activeTool === "select"}
               onClick={() => handleToolActionClick("select")}
             ></calcite-action>
-            <calcite-tooltip closeOnClick reference-element="property-select-action">
+            <calcite-tooltip
+              closeOnClick
+              reference-element="property-select-action"
+            >
               Property Select
             </calcite-tooltip>
             <calcite-action
@@ -258,7 +233,10 @@ const Shell: React.FC = () => {
               active={activeTool === "location"}
               onClick={() => handleToolActionClick("location")}
             ></calcite-action>
-            <calcite-tooltip closeOnClick reference-element="location-search-action">
+            <calcite-tooltip
+              closeOnClick
+              reference-element="location-search-action"
+            >
               Location Search
             </calcite-tooltip>
             <calcite-action
@@ -310,128 +288,27 @@ const Shell: React.FC = () => {
           </calcite-action-group>
         </calcite-action-bar>
       </calcite-shell-panel>
-      <arcgis-map
-        ref={mapElement}
-        onarcgisViewReadyChange={handleViewReady}
-        onarcgisViewHold={handleViewHold}
-      >
-        <arcgis-zoom slot="top-left"></arcgis-zoom>
-        <arcgis-home
-          slot="top-left"
-          goToOverride={handleGoToHome}
-        ></arcgis-home>
-        <arcgis-compass slot="top-left"></arcgis-compass>
-        <arcgis-track slot="top-left"></arcgis-track>
-        <div slot="top-left" className={styles.customActions}>
-          <calcite-action
-            id="identify-action"
-            scale="s"
-            label="identify"
-            slot="top-left"
-            text={"identify"}
-            icon="information"
-            active={mapMode === "identify"}
-            onClick={() => handleCustomActionClick("identify")}
-          ></calcite-action>
-          <calcite-tooltip
-            reference-element="identify-action"
-            placement="right"
-          >
-            Identify
-          </calcite-tooltip>
-          <calcite-action
-            id="streetview-action"
-            scale="s"
-            label="streetview"
-            slot="top-left"
-            text={"streetview"}
-            icon="360-view"
-            active={mapMode === "streetview"}
-            onClick={() => handleCustomActionClick("streetview")}
-          ></calcite-action>
-          <calcite-tooltip
-            reference-element="streetview-action"
-            placement="right"
-          >
-            Streetview
-          </calcite-tooltip>
-        </div>
-        <arcgis-expand
-          id="coordinate-action"
-          slot="bottom-left"
-          expandIcon="crosshair"
-          onarcgisPropertyChange={handleCoordinateExpandChange}
-        >
-          {mapElement.current?.map && (
-            <CoodinateConversion
-              mapElement={mapElement}
-              isOpen={coordinateConversionOpen}
-            ></CoodinateConversion>
-          )}
-        </arcgis-expand>
-
-        <arcgis-scale-bar slot="bottom-left"></arcgis-scale-bar>
-        <arcgis-expand
-          slot="bottom-right"
-          expandIcon="arrow-up-left"
-          collapseIcon="arrow-down-right"
-          id="overview-action"
-        >
-          <OverviewMap mapElement={mapElement}></OverviewMap>
-        </arcgis-expand>
-
-        <div slot="top-right">
-          {openedTools.includes("select") && (
-            <Suspense fallback={null}>
-              <PropertySelect
-                mapElement={mapElement}
-                onToolClose={handleToolClose}
-                closed={activeTool !== "select"}
-              ></PropertySelect>
-            </Suspense>
-          )}
-          {openedTools.includes("location") && (
-            <Suspense fallback={null}>
-              <LocationSearch
-                mapElement={mapElement}
-                onToolClose={handleToolClose}
-                closed={activeTool !== "location"}
-              />
-            </Suspense>
-          )}
-          {openedTools.includes("measure") && (
-            <Suspense fallback={null}>
-              <Measure
-                onToolClose={handleToolClose}
-                mapElement={mapElement}
-                closed={activeTool !== "measure"}
-              ></Measure>
-            </Suspense>
-          )}
-          {openedTools.includes("sketch") && (
-            <Suspense fallback={null}>
-              <Sketch
-                onToolClose={handleToolClose}
-                closed={activeTool !== "sketch"}
-                mapElement={mapElement}
-              ></Sketch>
-            </Suspense>
-          )}
-          {openedTools.includes("print") && (
-            <Suspense fallback={null}>
-              <Print
-                mapElement={mapElement}
-                onToolClose={handleToolClose}
-                closed={activeTool !== "print"}
-              ></Print>
-            </Suspense>
-          )}
-        </div>
-      </arcgis-map>
+      <MapView
+        mapElement={mapElement}
+        activeTool={activeTool}
+        mapMode={mapMode}
+        openedTools={openedTools}
+        coordinateConversionOpen={coordinateConversionOpen}
+        onMapReady={handleViewReady}
+        onViewHold={handleViewHold}
+        onCoordinateExpand={handleCoordinateExpandChange}
+        onCustomActionClick={handleCustomActionClick}
+        onGoHome={handleGoToHome}
+        onToolClose={handleToolClose}
+      ></MapView>
       <calcite-tooltip closeOnClick reference-element="overview-action">
         Overview
       </calcite-tooltip>
-      <calcite-tooltip closeOnClick reference-element="coordinate-action" placement="top">
+      <calcite-tooltip
+        closeOnClick
+        reference-element="coordinate-action"
+        placement="top"
+      >
         Coordinates
       </calcite-tooltip>
     </calcite-shell>

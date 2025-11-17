@@ -1,0 +1,18 @@
+:global(div[slot="top-right"]) :global(calcite-panel) {
+  min-width: 350px;
+  max-width: 350px;
+}
+
+.customActions {
+  position: absolute;
+  left: 45px;
+}
+
+.customActions calcite-action {
+  margin-bottom: var(--calcite-spacing-sm-plus);
+}
+
+.customActions calcite-action[active] {
+  --calcite-color-foreground-3: var(--calcite-color-brand);
+  --calcite-color-text-1: white;
+}

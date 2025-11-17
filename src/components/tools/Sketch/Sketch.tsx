@@ -16,10 +16,10 @@ import "@esri/calcite-components/components/calcite-input-number";
 import "@esri/calcite-components/components/calcite-tooltip";
 
 import "@esri/calcite-components/components/calcite-text-area";
-import LineSymbolPicker from "./symbols/LineSymbolPicker/LineSymbolPicker";
-import FillSymbolPicker from "./symbols/FillSymbolPicker/FillSymbolPicker";
-import TextSymbolPicker from "./symbols/TextSymbolPicker/TextSymbolPicker";
-import PointSymbolPicker from "./symbols/PointSymbolPicker/PointSymbolPicker";
+import LineSymbolPicker from "./symbols/LineSymbolPicker";
+import FillSymbolPicker from "./symbols/FillSymbolPicker";
+import TextSymbolPicker from "./symbols/TextSymbolPicker";
+import PointSymbolPicker from "./symbols/PointSymbolPicker";
 
 interface SketchProps {
   mapElement: React.RefObject<HTMLArcgisMapElement>;
