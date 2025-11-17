@@ -5,6 +5,7 @@ import "@esri/calcite-components/components/calcite-action";
 import "@esri/calcite-components/components/calcite-select";
 import "@esri/calcite-components/components/calcite-option";
 import "@esri/calcite-components/components/calcite-tooltip";
+import styles from "./CoordinateConversion.module.css";
 
 import { useCoordinateConversion } from "./useCoordinateConversion";
 interface CoodinateConversionProps {
@@ -37,7 +38,7 @@ const CoodinateConversion: React.FC<CoodinateConversionProps> = ({
   return (
     <>
       <calcite-block
-        id="coord-conversion"
+        className={styles.coordConversion}
         heading={display}
         label={display}
         collapsible

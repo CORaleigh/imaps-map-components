@@ -1,0 +1,9 @@
+.bookmarksPanel {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+}
+.bookmarksPanel calcite-flow-item {
+  flex: 1; /* Takes remaining space */
+  overflow: auto;
+}

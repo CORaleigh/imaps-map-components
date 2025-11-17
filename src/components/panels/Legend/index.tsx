@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import "@esri/calcite-components/components/calcite-panel";
 import "@arcgis/map-components/components/arcgis-legend";
+import styles from "./Legend.module.css";
 
 interface LegendProps {
   mapElement: React.RefObject<HTMLArcgisMapElement>;
@@ -23,7 +24,7 @@ const Legend: React.FC<LegendProps> = ({ mapElement, closed, onPanelClose }) => 
       oncalcitePanelClose={() => onPanelClose()}
       closed={closed}
     >
-      <arcgis-legend referenceElement={mapElement.current}></arcgis-legend>
+      <arcgis-legend className={styles.legend} referenceElement={mapElement.current}></arcgis-legend>
     </calcite-panel>
   );
 };

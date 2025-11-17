@@ -2,6 +2,7 @@ import React from "react";
 import "@esri/calcite-components/components/calcite-panel";
 import "@arcgis/map-components/components/arcgis-basemap-gallery";
 import { useBasemaps } from "./useBasemaps";
+import styles from "./Basemaps.module.css";
 
 interface BasemapsProps {
   mapElement: React.RefObject<HTMLArcgisMapElement>;
@@ -22,7 +23,7 @@ const Basemaps: React.FC<BasemapsProps> = ({
       closable
       oncalcitePanelClose={() => onPanelClose()}
       closed={closed}
-      id="basemaps"
+      className={styles.basemapsPanel}
     >
       <calcite-tabs
         position="bottom"
@@ -39,18 +40,21 @@ const Basemaps: React.FC<BasemapsProps> = ({
         </calcite-tab-nav>
         <calcite-tab selected>
           <arcgis-basemap-gallery
+            className={styles.basemapGallery}
             referenceElement={mapElement.current}
             source={mapsSource}
           ></arcgis-basemap-gallery>
         </calcite-tab>
         <calcite-tab>
           <arcgis-basemap-gallery
+            className={styles.basemapGallery}
             referenceElement={mapElement.current}
             source={imageSource}
           ></arcgis-basemap-gallery>
         </calcite-tab>
         <calcite-tab>
           <arcgis-basemap-gallery
+            className={styles.basemapGallery}
             referenceElement={mapElement.current}
           ></arcgis-basemap-gallery>
         </calcite-tab>

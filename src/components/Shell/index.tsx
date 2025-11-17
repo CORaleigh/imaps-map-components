@@ -18,9 +18,11 @@ import "@arcgis/map-components/components/arcgis-scale-bar";
 
 import { useShell } from "./useShell";
 import { lazyWithPreload } from "../../utils/lazyLoad";
-import Header from "../Header/Header";
-import OverviewMap from "../tools/OverviewMap/OverviewMap";
-import CoodinateConversion from "../tools/CoodinateConversion/CoodinateConversion";
+import Header from "../Header";
+import OverviewMap from "../tools/OverviewMap";
+import CoodinateConversion from "../tools/CoodinateConversion";
+
+import styles from "./Shell.module.css";
 
 // -------------------- Panels --------------------
 interface PanelProps {
@@ -31,23 +33,23 @@ interface PanelProps {
 
 // Lazy-loaded panels with preload
 export const PropertySearch = lazyWithPreload<PanelProps>(
-  () => import("../panels/PropertySearch/PropertySearch")
+  () => import("../panels/PropertySearch")
 );
 
 export const LayerList = lazyWithPreload<PanelProps>(
-  () => import("../panels/LayerList/LayerList")
+  () => import("../panels/LayerList")
 );
 
 export const Legend = lazyWithPreload<PanelProps>(
-  () => import("../panels/Legend/Legend")
+  () => import("../panels/Legend")
 );
 
 export const Basemaps = lazyWithPreload<PanelProps>(
-  () => import("../panels/Basemaps/Basemaps")
+  () => import("../panels/Basemaps")
 );
 
 export const Bookmarks = lazyWithPreload<PanelProps>(
-  () => import("../panels/Bookmarks/Bookmarks")
+  () => import("../panels/Bookmarks")
 );
 
 // -------------------- Tools --------------------
@@ -59,15 +61,15 @@ interface ToolProps {
 
 // Lazy-loaded tools with preload
 export const PropertySelect = lazyWithPreload<ToolProps>(
-  () => import("../tools/PropertySelect/PropertySelect")
+  () => import("../tools/PropertySelect")
 );
 
 export const LocationSearch = lazyWithPreload<ToolProps>(
-  () => import("../tools/LocationSearch/LocationSearch")
+  () => import("../tools/LocationSearch")
 );
 
 export const Measure = lazyWithPreload<ToolProps>(
-  () => import("../tools/Measure/Measure")
+  () => import("../tools/Measure")
 );
 
 export const Sketch = lazyWithPreload<ToolProps>(
@@ -75,7 +77,7 @@ export const Sketch = lazyWithPreload<ToolProps>(
 );
 
 export const Print = lazyWithPreload<ToolProps>(
-  () => import("../tools/Print/Print")
+  () => import("../tools/Print")
 );
 
 const Shell: React.FC = () => {
@@ -321,7 +323,7 @@ const Shell: React.FC = () => {
         ></arcgis-home>
         <arcgis-compass slot="top-left"></arcgis-compass>
         <arcgis-track slot="top-left"></arcgis-track>
-        <div slot="top-left" id="custom-actions">
+        <div slot="top-left" className={styles.customActions}>
           <calcite-action
             id="identify-action"
             scale="s"

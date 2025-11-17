@@ -15,6 +15,9 @@ import "@esri/calcite-components/components/calcite-loader";
 import { usePrint, type Format } from "./usePrint";
 import type { Layout, MapScale } from "./printLayouts";
 
+import styles from "./Print.module.css";
+
+
 interface PrintProps {
   mapElement: React.RefObject<HTMLArcgisMapElement>;
   closed: boolean;
@@ -64,7 +67,7 @@ const Print: React.FC<PrintProps> = ({ mapElement, closed, onToolClose }) => {
           </calcite-tab-title>
         </calcite-tab-nav>
         <calcite-tab selected={selectedTab === "layout"}>
-          <div className="tab-content">
+          <div className={styles.tabContent}>
             <calcite-label>
               Title
               <calcite-input-text

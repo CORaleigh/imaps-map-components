@@ -3,6 +3,7 @@ import "@esri/calcite-components/components/calcite-panel";
 import "@arcgis/map-components/components/arcgis-bookmarks";
 import * as reactiveUtils from "@arcgis/core/core/reactiveUtils.js";
 import { useMap } from "../../../context/useMap";
+import styles from "./Bookmarks.module.css";
 
 interface BookmarksProps {
   mapElement: React.RefObject<HTMLArcgisMapElement>;
@@ -28,7 +29,7 @@ const Bookmarks: React.FC<BookmarksProps> = ({
       closable
       oncalcitePanelClose={() => onPanelClose()}
       closed={closed}
-      id="bookmarks"
+      className={styles.bookmarksPanel}
     >
       <arcgis-bookmarks
         referenceElement={mapElement.current}

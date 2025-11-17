@@ -1,6 +1,7 @@
 import React from "react";
 import "@arcgis/map-components/components/arcgis-map";
 import { useOverviewMap } from "./useOverviewMap";
+import styles from "./OverviewMap.module.css";
 
 interface OverviewMapProps {
   mapElement: React.RefObject<HTMLArcgisMapElement>;
@@ -14,7 +15,7 @@ const OverviewMap: React.FC<OverviewMapProps> = ({ mapElement }) => {
     <>
       {mapElement.current && mapElement.current.basemap && (
         <arcgis-map
-          id="overview-map"
+          className={styles.overviewMap}
           ref={overviewMapElement}
           style={{ height: "200px", width: "200px" }}
           onarcgisViewReadyChange={handleOverviewReady}

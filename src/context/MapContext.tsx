@@ -55,6 +55,7 @@ export const MapProvider: React.FC<{ children: React.ReactNode }> = ({
   const mapElement = useRef<HTMLArcgisMapElement>(null!);
   const webMapId = useRef<string>("95092428774c4b1fb6a3b6f5fed9fbc4");
   const initialized = useRef<boolean>(false);
+  const prevSelectedRef = useRef<__esri.Graphic | null>(null);
 
   /** -------------------- State -------------------- **/
   const [webMap, setWebMap] = useState<WebMap | null>(null);
@@ -73,12 +74,15 @@ export const MapProvider: React.FC<{ children: React.ReactNode }> = ({
     const view = mapElement.current.view;
     if (!view.map || !view.map.basemap) return;
 
-    reactiveUtils.watch(() => view.map!.basemap!, (basemap: __esri.Basemap) => {
-      localStorage.setItem(
-        `imaps_${webMapId.current}_basemap`,
-        JSON.stringify(basemap.toJSON())
-      );
-    });
+    reactiveUtils.watch(
+      () => view.map!.basemap!,
+      (basemap: __esri.Basemap) => {
+        localStorage.setItem(
+          `imaps_${webMapId.current}_basemap`,
+          JSON.stringify(basemap.toJSON())
+        );
+      }
+    );
 
     const storedBasemap = localStorage.getItem(
       `imaps_${webMapId.current}_basemap`
@@ -180,19 +184,26 @@ export const MapProvider: React.FC<{ children: React.ReactNode }> = ({
     initMap();
   }, [searchParams, viewReady]);
   useEffect(() => {
+    const prevSelected = prevSelectedRef.current;
+
     if (selectedCondo && selectedCondo.getAttribute("PIN_NUM")) {
-      const pin = selectedCondo?.getAttribute("PIN_NUM");
+      const pin = selectedCondo.getAttribute("PIN_NUM");
       setSearchParams((prev) => {
-        prev.set("pin", pin);
-        return prev;
+        const params = new URLSearchParams(prev);
+        params.set("pin", pin);
+        return params;
       });
-    } else {
+    } else if (prevSelected) {
+      // Only clear if we had a selectedCondo before
       setSearchParams((prev) => {
-        prev.delete("pin");
-        return prev;
+        const params = new URLSearchParams(prev);
+        params.delete("pin");
+        return params;
       });
     }
-  }, [selectedCondo, searchParams, setSearchParams]);
+
+    prevSelectedRef.current = selectedCondo;
+  }, [selectedCondo, setSearchParams]);
 
   /** -------------------- Provider -------------------- **/
   return (
