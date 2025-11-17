@@ -118,7 +118,7 @@ const Shell: React.FC = () => {
         position="end"
         collapsed={!activePanel}
         width="l"
-        resizable
+        resizable={appSize === "large"}
       >
         {openedPanels.includes("propertySearch") && mapReady && (
           <div hidden={activePanel !== "propertySearch"}>
@@ -188,7 +188,7 @@ const Shell: React.FC = () => {
               active={activePanel === "propertySearch"}
               onClick={() => handlePanelActionClick("propertySearch")}
             ></calcite-action>
-            <calcite-tooltip reference-element="property-search-action">
+            <calcite-tooltip closeOnClick reference-element="property-search-action">
               Property Search
             </calcite-tooltip>
 
@@ -200,7 +200,7 @@ const Shell: React.FC = () => {
               active={activePanel === "layerList"}
               onClick={() => handlePanelActionClick("layerList")}
             ></calcite-action>
-            <calcite-tooltip reference-element="layerlist-action">
+            <calcite-tooltip closeOnClick reference-element="layerlist-action">
               Layer List
             </calcite-tooltip>
             <calcite-action
@@ -211,7 +211,7 @@ const Shell: React.FC = () => {
               active={activePanel === "legend"}
               onClick={() => handlePanelActionClick("legend")}
             ></calcite-action>
-            <calcite-tooltip reference-element="legend-action">
+            <calcite-tooltip closeOnClick reference-element="legend-action">
               Legend
             </calcite-tooltip>
             <calcite-action
@@ -222,7 +222,7 @@ const Shell: React.FC = () => {
               active={activePanel === "basemap"}
               onClick={() => handlePanelActionClick("basemap")}
             ></calcite-action>
-            <calcite-tooltip reference-element="basemaps-action">
+            <calcite-tooltip closeOnClick reference-element="basemaps-action">
               Basemaps
             </calcite-tooltip>
             <calcite-action
@@ -232,7 +232,7 @@ const Shell: React.FC = () => {
               icon="bookmark"
               onClick={() => handlePanelActionClick("bookmarks")}
             ></calcite-action>
-            <calcite-tooltip reference-element="bookmarks-action">
+            <calcite-tooltip closeOnClick reference-element="bookmarks-action">
               Bookmarks
             </calcite-tooltip>
           </calcite-action-group>
@@ -245,7 +245,7 @@ const Shell: React.FC = () => {
               active={activeTool === "select"}
               onClick={() => handleToolActionClick("select")}
             ></calcite-action>
-            <calcite-tooltip reference-element="property-select-action">
+            <calcite-tooltip closeOnClick reference-element="property-select-action">
               Property Select
             </calcite-tooltip>
             <calcite-action
@@ -256,7 +256,7 @@ const Shell: React.FC = () => {
               active={activeTool === "location"}
               onClick={() => handleToolActionClick("location")}
             ></calcite-action>
-            <calcite-tooltip reference-element="location-search-action">
+            <calcite-tooltip closeOnClick reference-element="location-search-action">
               Location Search
             </calcite-tooltip>
             <calcite-action
@@ -267,7 +267,7 @@ const Shell: React.FC = () => {
               active={activeTool === "measure"}
               onClick={() => handleToolActionClick("measure")}
             ></calcite-action>
-            <calcite-tooltip reference-element="measure-action">
+            <calcite-tooltip closeOnClick reference-element="measure-action">
               Measure
             </calcite-tooltip>
             <calcite-action
@@ -278,7 +278,7 @@ const Shell: React.FC = () => {
               active={activeTool === "sketch"}
               onClick={() => handleToolActionClick("sketch")}
             ></calcite-action>
-            <calcite-tooltip reference-element="sketch-action">
+            <calcite-tooltip closeOnClick reference-element="sketch-action">
               Sketch
             </calcite-tooltip>
 
@@ -290,7 +290,7 @@ const Shell: React.FC = () => {
               active={activeTool === "print"}
               onClick={() => handleToolActionClick("print")}
             ></calcite-action>
-            <calcite-tooltip reference-element="print-action">
+            <calcite-tooltip closeOnClick reference-element="print-action">
               Print
             </calcite-tooltip>
           </calcite-action-group>
@@ -302,7 +302,7 @@ const Shell: React.FC = () => {
               icon={theme === "light" ? "brightness" : "moon"}
               onClick={handleThemeClick}
             ></calcite-action>
-            <calcite-tooltip reference-element="theme-action">
+            <calcite-tooltip closeOnClick reference-element="theme-action">
               Toggle {theme === "light" ? "dark" : "light"} theme
             </calcite-tooltip>
           </calcite-action-group>
@@ -427,10 +427,10 @@ const Shell: React.FC = () => {
           )}
         </div>
       </arcgis-map>
-      <calcite-tooltip reference-element="overview-action">
+      <calcite-tooltip closeOnClick reference-element="overview-action">
         Overview
       </calcite-tooltip>
-      <calcite-tooltip reference-element="coordinate-action" placement="top">
+      <calcite-tooltip closeOnClick reference-element="coordinate-action" placement="top">
         Coordinates
       </calcite-tooltip>
     </calcite-shell>

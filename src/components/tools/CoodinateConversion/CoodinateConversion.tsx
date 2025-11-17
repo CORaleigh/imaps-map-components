@@ -134,16 +134,16 @@ const CoodinateConversion: React.FC<CoodinateConversionProps> = ({
           </div>
         )}
       </calcite-block>
-      <calcite-tooltip referenceElement="coordinate-search-action">
+      <calcite-tooltip closeOnClick referenceElement="coordinate-search-action">
         Search Coordinate
       </calcite-tooltip>
-      <calcite-tooltip referenceElement="coordinate-settings-action">
+      <calcite-tooltip closeOnClick referenceElement="coordinate-settings-action">
         Settings
       </calcite-tooltip>
-      <calcite-tooltip referenceElement="coordinate-mode-action">
+      <calcite-tooltip closeOnClick referenceElement="coordinate-mode-action">
         Change Input Mode
       </calcite-tooltip>
-      <calcite-tooltip referenceElement="coordinate-copy-action">
+      <calcite-tooltip closeOnClick referenceElement="coordinate-copy-action">
         Copy to Clipboard
       </calcite-tooltip>
     </>

@@ -27,15 +27,35 @@ calcite-panel arcgis-feature-table {
   height: 100%;
 }
 
-#property-search calcite-tabs {
-  height: calc(100dvh - 32px - 50px - 91px) !important;
-}
-#basemaps calcite-tabs {
-  height: calc(100dvh - 32px - 50px - 41px) !important;
+#property-search {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
 }
 
+#property-search calcite-tabs {
+  flex: 1; /* Takes remaining space */
+  overflow: auto;
+}
+#basemaps {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+}
+
+#basemaps calcite-tabs {
+  flex: 1; /* Takes remaining space */
+  overflow: auto;
+}
+
+#bookmarks {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+}
 #bookmarks calcite-flow-item {
-  max-height: calc(100dvh - 32px - 50px - 41px) !important;
+  flex: 1; /* Takes remaining space */
+  overflow: auto;
 }
 
 calcite-shell-panel calcite-panel {
@@ -149,7 +169,7 @@ div[slot="top-right"] calcite-panel {
 }
 
 .feature-sub-title {
-    display: flex;
+  display: flex;
   justify-content: space-between;
   background-color: var(--calcite-color-foreground-1);
 }

@@ -189,25 +189,25 @@ const Sketch: React.FC<SketchProps> = ({ mapElement, closed, onToolClose }) => {
       >
         Point sketch
       </calcite-tooltip>
-      <calcite-tooltip reference-element="sketch-line-action">
+      <calcite-tooltip closeOnClick reference-element="sketch-line-action">
         Line sketch
       </calcite-tooltip>
-      <calcite-tooltip reference-element="sketch-polygon-action">
+      <calcite-tooltip closeOnClick reference-element="sketch-polygon-action">
         Polygon sketch
       </calcite-tooltip>
-      <calcite-tooltip reference-element="sketch-rectangle-action">
+      <calcite-tooltip closeOnClick reference-element="sketch-rectangle-action">
         Rectangle sketch
       </calcite-tooltip>
-      <calcite-tooltip reference-element="sketch-circle-action">
+      <calcite-tooltip closeOnClick reference-element="sketch-circle-action">
         Circle sketch
       </calcite-tooltip>
-      <calcite-tooltip reference-element="sketch-text-action">
+      <calcite-tooltip closeOnClick reference-element="sketch-text-action">
         Text sketch
       </calcite-tooltip>
-      <calcite-tooltip reference-element="sketch-select-action">
+      <calcite-tooltip closeOnClick reference-element="sketch-select-action">
         Select sketch
       </calcite-tooltip>      
-      <calcite-tooltip reference-element="sketch-clear-action">
+      <calcite-tooltip closeOnClick reference-element="sketch-clear-action">
         Clear sketch
       </calcite-tooltip>
     </>

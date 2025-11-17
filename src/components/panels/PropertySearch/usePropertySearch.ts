@@ -88,6 +88,7 @@ export interface UsePropertySearchProps {
     >
   ) => void;
   handleNextPropertySelected: (feature: __esri.Graphic) => void;
+  handleTabClick: () => void;
 }
 export const usePropertySearch = (
   mapElement: React.RefObject<HTMLArcgisMapElement>
@@ -106,7 +107,7 @@ export const usePropertySearch = (
     setSelectedCondo,
     geometry,
     webMapId,
-    setGeometry
+    setGeometry,
   } = useMap();
 
   const siteAddressRef = useRef<string>("");
@@ -160,7 +161,6 @@ export const usePropertySearch = (
           condos.length === 1 ? "property" : "properties"
         } selected`;
       }
-
 
       reactiveUtils.watch(
         () => tableElement.current.visibleColumns,
@@ -360,6 +360,10 @@ export const usePropertySearch = (
     }
   };
 
+  const handleTabClick = useCallback(() => {
+    setSelectedTab("list");
+  }, []);
+
   const handleTabChange = useCallback(
     (event: TargetedEvent<HTMLCalciteTabNavElement, void>) => {
       setSelectedTab(
@@ -399,70 +403,76 @@ export const usePropertySearch = (
     event.target.searchTerm = checkPin(event.target.searchTerm);
   };
 
-  const updateFeature = useCallback(async (feature: __esri.Graphic) => {
-    setSelectedTab("info");
-    //check to see if the feature is coming from clicking on the list
-    const tableLayer = tableLayerRef.current as __esri.FeatureLayer;
-    const updates = await tableLayer.queryFeatures({
-      where: `1=1`,
-      outFields: ["*"],
-      returnGeometry: true,
-    });
-    const selectedFeatures = updates?.features.filter(
-      (selectedFeature) => selectedFeature.attributes["selected"] === "yes"
-    );
-    selectedFeatures?.forEach((selectedFeature) => {
-      selectedFeature.setAttribute("selected", "no");
-    });
-
-    await tableLayer?.applyEdits({ updateFeatures: selectedFeatures });
-
-    feature.setAttribute("selected", "yes");
-    feature.setAttribute("OID", feature.getObjectId());
-
-    await tableLayer?.applyEdits({ updateFeatures: [feature] });
-    await tableLayer?.refresh();
-
-    if (!(feature.layer as __esri.FeatureLayer).isTable) {
-      const condoTable = getTableByTitle(
-        mapElement.current,
-        "Condos"
-      ) as __esri.FeatureLayer;
-      const condos = await condoTable.queryFeatures({
-        where: `REID = '${feature.getAttribute("REID")}'`,
-        outFields: ["OBJECTID"],
+  const updateFeature = useCallback(
+    async (feature: __esri.Graphic) => {
+      setSelectedTab("info");
+      //check to see if the feature is coming from clicking on the list
+      const tableLayer = tableLayerRef.current as __esri.FeatureLayer;
+      const updates = await tableLayer.queryFeatures({
+        where: `1=1`,
+        outFields: ["*"],
         returnGeometry: true,
       });
-      if (condos.features.length) {
-        feature = condos.features[0];
-        feature.geometry = geometry;
-      }
-    }
-    const photos = await getPhotos(feature, mapElement.current);
-
-    feature.popupTemplate = createTemplate(mapElement.current, feature, photos);
-    clearAddressPoints(mapElement.current);
-    if (!feature.geometry) {
-      const property = await getProperty(
-        mapElement.current,
-        [feature.getObjectId() as number],
-        undefined
+      const selectedFeatures = updates?.features.filter(
+        (selectedFeature) => selectedFeature.attributes["selected"] === "yes"
       );
-      if (property.length) {
-        feature.geometry = property[0].geometry;
-      }
-    }
-    if (feature.geometry !== null && geometry === null) {
-      
-      mapElement.current?.goTo({
-        target: feature.geometry?.extent?.clone()?.expand(2),
+      selectedFeatures?.forEach((selectedFeature) => {
+        selectedFeature.setAttribute("selected", "no");
       });
-    }
 
-    setSelectedCondo(feature);
-    setGeometry(null);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [geometry]);
+      await tableLayer?.applyEdits({ updateFeatures: selectedFeatures });
+
+      feature.setAttribute("selected", "yes");
+      feature.setAttribute("OID", feature.getObjectId());
+
+      await tableLayer?.applyEdits({ updateFeatures: [feature] });
+      await tableLayer?.refresh();
+
+      if (!(feature.layer as __esri.FeatureLayer).isTable) {
+        const condoTable = getTableByTitle(
+          mapElement.current,
+          "Condos"
+        ) as __esri.FeatureLayer;
+        const condos = await condoTable.queryFeatures({
+          where: `REID = '${feature.getAttribute("REID")}'`,
+          outFields: ["OBJECTID"],
+          returnGeometry: true,
+        });
+        if (condos.features.length) {
+          feature = condos.features[0];
+          feature.geometry = geometry;
+        }
+      }
+      const photos = await getPhotos(feature, mapElement.current);
+
+      feature.popupTemplate = createTemplate(
+        mapElement.current,
+        feature,
+        photos
+      );
+      clearAddressPoints(mapElement.current);
+      if (!feature.geometry) {
+        const property = await getProperty(
+          mapElement.current,
+          [feature.getObjectId() as number],
+          undefined
+        );
+        if (property.length) {
+          feature.geometry = property[0].geometry;
+        }
+      }
+      if (feature.geometry !== null && geometry === null) {
+        mapElement.current?.goTo({
+          target: feature.geometry?.extent?.clone()?.expand(2),
+        });
+      }
+
+      setSelectedCondo(feature);
+      setGeometry(null);
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    },
+    [geometry]
+  );
 
   const handleClearClick = () => {
     setSelectedCondo(null);
@@ -597,5 +607,6 @@ export const usePropertySearch = (
     handleExportAddresses,
     handleSuggestStart,
     handleNextPropertySelected,
+    handleTabClick,
   };
 };

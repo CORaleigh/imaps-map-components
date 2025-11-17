@@ -50,6 +50,7 @@ const PropertySearch: React.FC<PropertySearchProps> = ({
     handleExportAddresses,
     handleSuggestStart,
     handleNextPropertySelected,
+    handleTabClick
   } = usePropertySearch(mapElement);
 
   return (
@@ -80,7 +81,7 @@ const PropertySearch: React.FC<PropertySearchProps> = ({
           text="History"
           scale="s"
         ></calcite-action>
-        <calcite-tooltip referenceElement="history-popover-button">
+        <calcite-tooltip closeOnClick referenceElement="history-popover-button">
           Search History
         </calcite-tooltip>
         <calcite-action
@@ -90,7 +91,7 @@ const PropertySearch: React.FC<PropertySearchProps> = ({
           scale="s"
           onClick={handleClearClick}
         ></calcite-action>
-        <calcite-tooltip referenceElement="search-clear-button">
+        <calcite-tooltip closeOnClick referenceElement="search-clear-button">
           Clear search
         </calcite-tooltip>
 
@@ -128,9 +129,10 @@ const PropertySearch: React.FC<PropertySearchProps> = ({
         <calcite-tab-nav
           slot="title-group"
           oncalciteTabChange={handleTabChange}
+     
           
         >
-          <calcite-tab-title label="list" selected={selectedTab === "list"}>
+          <calcite-tab-title label="list" selected={selectedTab === "list"} onClick={handleTabClick}>
             List
           </calcite-tab-title>
           <calcite-tab-title
@@ -163,7 +165,7 @@ const PropertySearch: React.FC<PropertySearchProps> = ({
           ></arcgis-feature-table>
         </calcite-tab>
 
-        <calcite-tab selected={selectedTab === "info"} tabIndex={-1}>
+        <calcite-tab selected={selectedTab === "info"}>
           
           {selectedCondo && (
             <>

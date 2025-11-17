@@ -71,7 +71,7 @@ const Header: React.FC<HeaderProps> = ({ theme }) => {
           </calcite-dropdown-group>
         </calcite-dropdown>
       </calcite-navigation>
-      <calcite-tooltip referenceElement="menu-button" placement="left" overlayPositioning="fixed">Menu</calcite-tooltip>
+      <calcite-tooltip closeOnClick referenceElement="menu-button" placement="left" overlayPositioning="fixed">Menu</calcite-tooltip>
     </>
   );
 };

@@ -118,22 +118,22 @@ const PropertySelect: React.FC<PropertySelectProps> = ({
       >
         Point Select
       </calcite-tooltip>
-      <calcite-tooltip reference-element="select-line-action" placement="top">
+      <calcite-tooltip closeOnClick reference-element="select-line-action" placement="top">
         Line Select
       </calcite-tooltip>
-      <calcite-tooltip reference-element="select-polygon-action" placement="top">
+      <calcite-tooltip closeOnClick reference-element="select-polygon-action" placement="top">
         Polygon Select
       </calcite-tooltip>
-      <calcite-tooltip reference-element="select-rectangle-action" placement="top">
+      <calcite-tooltip closeOnClick reference-element="select-rectangle-action" placement="top">
         Rectangle Select
       </calcite-tooltip>
-      <calcite-tooltip reference-element="select-circle-action" placement="top">
+      <calcite-tooltip closeOnClick reference-element="select-circle-action" placement="top">
         Circle Select
       </calcite-tooltip>
-      <calcite-tooltip reference-element="select-multipoint-action" placement="top">
+      <calcite-tooltip closeOnClick reference-element="select-multipoint-action" placement="top">
         Multipoint Select
       </calcite-tooltip>
-      <calcite-tooltip reference-element="select-clear-action" placement="top">
+      <calcite-tooltip closeOnClick reference-element="select-clear-action" placement="top">
         Clear Selection
       </calcite-tooltip>
     </>
