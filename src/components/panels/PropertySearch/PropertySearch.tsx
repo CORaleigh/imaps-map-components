@@ -61,6 +61,7 @@ const PropertySearch: React.FC<PropertySearchProps> = ({
       closed={closed}
       id="property-search"
     >
+    
       <div slot="content-top" className="search-top">
         <arcgis-search
           ref={searchElement}
@@ -123,7 +124,6 @@ const PropertySearch: React.FC<PropertySearchProps> = ({
         position="bottom"
         scale="l"
         layout="center"
-        style={{ height: "calc(100vh - 32px - 50px - 65px)" }}
       >
         <calcite-tab-nav
           slot="title-group"

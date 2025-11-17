@@ -27,75 +27,15 @@ calcite-panel arcgis-feature-table {
   height: 100%;
 }
 
-/* #property-search calcite-tabs {
-  height: calc(100vh - 32px - 50px - 91px) !important;
-} */
-
-
-/* #property-search calcite-panel {
-  display: flex;
-  flex-direction: column;
-  padding: 0;
+#property-search calcite-tabs {
+  height: calc(100dvh - 32px - 50px - 91px) !important;
 }
-
-#property-search calcite-panel > calcite-tabs {
-  flex: 1;
-  overflow: hidden; /* prevent double scrollbars */
-} */
-/* #basemaps calcite-tabs {
-  height: calc(100vh - 32px - 50px - 41px -) !important;
-} */
-
-#property-search {
-  display: flex;
-  flex-direction: column;
-  padding: 0;
-}
-
-/* Tabs inside the panel */
-#property-search > calcite-tabs {
-  flex: 1;
-  overflow: hidden;
-}
-
-/* Optional: make tabs scroll smoothly */
-#property-search calcite-tab {
-  flex: 1;
-  overflow: auto;
-}
-
-
-/* #basemaps calcite-panel {
-  display: flex;
-  flex-direction: column;
-  padding: 0;
-}
-
-#basemaps calcite-panel > calcite-tabs {
-  flex: 1;
-  overflow: hidden; /* prevent double scrollbars */
-} */
-
-#basemaps {
-  display: flex;
-  flex-direction: column;
-  padding: 0;
-}
-
-/* Tabs inside the panel */
-#basemaps > calcite-tabs {
-  flex: 1;
-  overflow: hidden;
-}
-
-/* Optional: make tabs scroll smoothly */
-#basemaps calcite-tab {
-  flex: 1;
-  overflow: auto;
+#basemaps calcite-tabs {
+  height: calc(100dvh - 32px - 50px - 41px) !important;
 }
 
 #bookmarks calcite-flow-item {
-  max-height: calc(100vh - 32px - 50px - 41px) !important;
+  max-height: calc(100dvh - 32px - 50px - 41px) !important;
 }
 
 calcite-shell-panel calcite-panel {
