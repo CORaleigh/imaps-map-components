@@ -26,6 +26,16 @@ export type MapMode =
   | "coordinate"
   | null;
 
+export interface Alert {
+  show: boolean;
+  message: string;
+  title: string;
+  id: number;
+  kind: "brand" | "warning" | "danger";
+  autoClose: boolean;
+  autoCloseDuration: "fast" | "slow" | "medium";
+  icon?: string;
+}
 export interface MapContextType {
   mapElement: React.RefObject<HTMLArcgisMapElement>;
   webMap: WebMap | null;
@@ -42,6 +52,8 @@ export interface MapContextType {
   mapMode: MapMode;
   setMapMode: (mode: MapMode) => void;
   handleCustomActionClick: (action: "identify" | "streetview" | null) => void;
+  alert: Alert;
+  setAlert: (alert: Alert) => void;
 }
 
 const MapContext = createContext<MapContextType | undefined>(undefined);
@@ -66,6 +78,15 @@ export const MapProvider: React.FC<{ children: React.ReactNode }> = ({
     null
   );
   const [mapMode, setMapMode] = useState<MapMode>("identify");
+  const [alert, setAlert] = useState<Alert>({
+    id: Date.now(),
+    show: false,
+    title: "",
+    message: "",
+    autoClose: false,
+    autoCloseDuration: "fast",
+    kind: "brand",
+  });
 
   /** -------------------- Callbacks / Functions -------------------- **/
 
@@ -224,6 +245,8 @@ export const MapProvider: React.FC<{ children: React.ReactNode }> = ({
         mapMode,
         setMapMode,
         handleCustomActionClick,
+        alert,
+        setAlert,
       }}
     >
       {children}

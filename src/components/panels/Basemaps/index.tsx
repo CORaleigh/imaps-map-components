@@ -1,5 +1,7 @@
 import React from "react";
 import "@esri/calcite-components/components/calcite-panel";
+import "@esri/calcite-components/components/calcite-alert";
+
 import "@arcgis/map-components/components/arcgis-basemap-gallery";
 import { useBasemaps } from "./useBasemaps";
 import styles from "./Basemaps.module.css";
@@ -16,8 +18,17 @@ const Basemaps: React.FC<BasemapsProps> = ({
   closed,
   onPanelClose,
 }) => {
-  const { mapsSource, imageSource } = useBasemaps(mapElement);
+  const {
+    mapsSource,
+    imageSource,
+    mapsGallery,
+    imagesGallery,
+    esriGallery,
+    handleGalleryReady,
+    handleTabChange,
+  } = useBasemaps(mapElement);
   return (
+    <>
     <calcite-panel
       heading="Basemaps"
       closable
@@ -31,35 +42,49 @@ const Basemaps: React.FC<BasemapsProps> = ({
         layout="center"
         style={{ height: "calc(100vh - 50px - 65px)" }}
       >
-        <calcite-tab-nav slot="title-group">
-          <calcite-tab-title selected iconStart="basemap">
+        <calcite-tab-nav
+          slot="title-group"
+          oncalciteTabChange={handleTabChange}
+        >
+          <calcite-tab-title selected iconStart="basemap" label="basemap">
             Maps
           </calcite-tab-title>
-          <calcite-tab-title iconStart="image-layer">Images</calcite-tab-title>
-          <calcite-tab-title iconStart="arcgis-online">Esri</calcite-tab-title>
+          <calcite-tab-title iconStart="image-layer" label="images">
+            Images
+          </calcite-tab-title>
+          <calcite-tab-title iconStart="arcgis-online" label="esri">
+            Esri
+          </calcite-tab-title>
         </calcite-tab-nav>
         <calcite-tab selected>
           <arcgis-basemap-gallery
+            ref={mapsGallery}
             className={styles.basemapGallery}
             referenceElement={mapElement.current}
             source={mapsSource}
+            onarcgisReady={handleGalleryReady}
           ></arcgis-basemap-gallery>
         </calcite-tab>
         <calcite-tab>
           <arcgis-basemap-gallery
+            ref={imagesGallery}
             className={styles.basemapGallery}
             referenceElement={mapElement.current}
             source={imageSource}
+            onarcgisReady={handleGalleryReady}
           ></arcgis-basemap-gallery>
         </calcite-tab>
         <calcite-tab>
           <arcgis-basemap-gallery
+            ref={esriGallery}
             className={styles.basemapGallery}
             referenceElement={mapElement.current}
+            onarcgisReady={handleGalleryReady}
           ></arcgis-basemap-gallery>
         </calcite-tab>
       </calcite-tabs>
     </calcite-panel>
+    </>
   );
 };
 

@@ -1,17 +1,34 @@
 import PortalBasemapsSource from "@arcgis/core/widgets/BasemapGallery/support/PortalBasemapsSource.js";
-import { useEffect, useRef } from "react";
+import type { TargetedEvent } from "@arcgis/map-components";
+import { useEffect, useRef, type RefObject } from "react";
+import * as reactiveUtils from "@arcgis/core/core/reactiveUtils.js";
+import * as intersectsOperator from "@arcgis/core/geometry/operators/intersectsOperator.js";
+import { raleighBoundary } from "./boundary";
+import { useMap } from "../../../context/useMap";
 
 export interface UseBasemapsProps {
   mapsSource: PortalBasemapsSource;
   imageSource: PortalBasemapsSource;
+  mapsGallery: RefObject<HTMLArcgisBasemapGalleryElement | null>;
+  imagesGallery: RefObject<HTMLArcgisBasemapGalleryElement | null>;
+  esriGallery: RefObject<HTMLArcgisBasemapGalleryElement | null>;
+  handleGalleryReady: (
+    event: TargetedEvent<HTMLArcgisBasemapGalleryElement, void>
+  ) => void;
+  handleTabChange: (
+    event: TargetedEvent<HTMLCalciteTabNavElement, void>
+  ) => void;
 }
 
 export const useBasemaps = (
   mapElement: React.RefObject<HTMLArcgisMapElement>
 ): UseBasemapsProps => {
-    
   const initializedRef = useRef(false);
-  
+  const mapsGallery = useRef<HTMLArcgisBasemapGalleryElement>(null);
+  const imagesGallery = useRef<HTMLArcgisBasemapGalleryElement>(null);
+  const esriGallery = useRef<HTMLArcgisBasemapGalleryElement>(null);
+
+  const { setAlert } = useMap();
 
   const mapsSource = new PortalBasemapsSource({
     portal: {
@@ -24,7 +41,92 @@ export const useBasemaps = (
       url: "https://ral.maps.arcgis.com",
     },
     query: "id: 492386759d264d49948bf7f83957ddb9",
+    filterFunction: async (item: __esri.Basemap) => {
+      await item.load();
+      if (item.portalItem?.tags?.includes("countywide")) return true;
+      const inRaleigh = intersectsOperator.execute(
+        raleighBoundary,
+        mapElement.current.extent
+      );
+
+      console.log("In Raleigh:", inRaleigh);
+      return inRaleigh;
+    },
   });
+
+  const handleGalleryReady = async (
+    event: TargetedEvent<HTMLArcgisBasemapGalleryElement, void>
+  ) => {
+    const gallery = event.target;
+    await reactiveUtils.whenOnce(() => gallery.source.basemaps.length > 0);
+
+    console.log(gallery.source.basemaps.length);
+    const selected = gallery.source.basemaps.find(
+      (basemap) =>
+        basemap.portalItem?.title === mapElement.current.map?.basemap?.title
+    );
+
+    if (selected) {
+      gallery.activeBasemap = selected;
+    }
+  };
+
+  const sortImageBasemaps = () => {
+    imagesGallery.current?.source.basemaps.sort((a, b) =>
+      (b.portalItem?.title ?? "").localeCompare(a.portalItem?.title ?? "")
+    );
+  };
+  const refreshImageBasemaps = async () => {
+    if (imagesGallery.current?.source instanceof PortalBasemapsSource) {
+      await imagesGallery.current?.source.refresh();
+      sortImageBasemaps();
+    }
+  };
+  const handleTabChange = async (
+    event: TargetedEvent<HTMLCalciteTabNavElement, void>
+  ) => {
+    if (
+      event.target.selectedTitle.getAttribute("label") === "images" &&
+      imagesGallery.current?.source instanceof PortalBasemapsSource
+    ) {
+      await refreshImageBasemaps();
+      reactiveUtils.watch(
+        () => mapElement.current.stationary,
+        async (stationary) => {
+          if (!imagesGallery.current) return;
+          if (stationary) {
+            await refreshImageBasemaps();
+            const inRaleigh = intersectsOperator.execute(
+              raleighBoundary,
+              mapElement.current.extent
+            );
+            const countywide = (
+              imagesGallery.current.activeBasemap as __esri.Basemap
+            ).portalItem?.tags?.includes("countywide");
+
+            if (!inRaleigh && !countywide) {
+              imagesGallery.current.activeBasemap =
+                imagesGallery.current.source.basemaps.at(0);
+              setTimeout(() => {
+                sortImageBasemaps();
+              }, 1000);
+              setAlert({
+                show: true,
+                message: `Map extent outside of Raleigh, switching to latest county imagery (${imagesGallery.current.activeBasemap?.portalItem?.title})`,
+                id: Date.now(),
+                title: "Basemap Not Available",
+                autoCloseDuration: "fast",
+                autoClose: true,
+                kind: "warning",
+                icon: "imagery-layer",
+              });
+            }
+          }
+        }
+      );
+    }
+  };
+
   useEffect(() => {
     if (!mapElement.current || initializedRef.current) return;
     // Initialize basemap logic only once
@@ -34,5 +136,10 @@ export const useBasemaps = (
   return {
     mapsSource,
     imageSource,
+    mapsGallery,
+    imagesGallery,
+    esriGallery,
+    handleGalleryReady,
+    handleTabChange,
   };
 };
