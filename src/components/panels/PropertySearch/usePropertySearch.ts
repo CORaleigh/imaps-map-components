@@ -117,6 +117,8 @@ export const usePropertySearch = (
   ) => {
     if (!mapElement.current) return;
     await mapElement.current.view.when();
+    console.log("Search ready");
+
     const sources = await getSearchSources(mapElement.current, event.target);
     if (!sources) return;
     event.target.sources = sources;
@@ -127,6 +129,7 @@ export const usePropertySearch = (
 
   const handleTableReady = useCallback(
     async (event: TargetedEvent<HTMLArcgisFeatureTableElement, void>) => {
+      console.log("Feature table ready");
       const layer = await createTableLayer(mapElement.current);
       if (!layer) return;
       event.target.layer = layer;
