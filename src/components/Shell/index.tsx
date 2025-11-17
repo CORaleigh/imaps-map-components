@@ -21,7 +21,6 @@ import { lazyWithPreload } from "../../utils/lazyLoad";
 import Header from "../Header";
 
 
-import styles from "./Shell.module.css";
 import MapView from "../MapView";
 
 // -------------------- Panels --------------------
@@ -90,7 +89,6 @@ const Shell: React.FC = () => {
         collapsed={!activePanel}
         width="l"
         resizable={appSize === "large"}
-        className={styles.calciteShellPanel}
       >
         {openedPanels.includes("propertySearch") && mapReady && (
           <div hidden={activePanel !== "propertySearch"}>

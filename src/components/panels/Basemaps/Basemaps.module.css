@@ -3,11 +3,10 @@
   min-height: 100%;
 }
 
-
 .basemapsPanel {
   display: flex;
   flex-direction: column;
-  height: 100dvh;
+  height: calc(100dvh - 65px);
 }
 
 .basemapsPanel calcite-tabs {

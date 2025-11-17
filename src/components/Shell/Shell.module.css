@@ -1,5 +1,0 @@
-.calciteShellPanel :global(calcite-panel) {
-  max-height: calc(100vh - 65px);
-  --calcite-tab-content-space-y: 0;
-}
-

@@ -1,7 +1,7 @@
 #propertySearch {
   display: flex;
   flex-direction: column;
-  height: 100dvh;
+  height: calc(100dvh - 65px);
 }
 
 #propertySearch calcite-tabs {
