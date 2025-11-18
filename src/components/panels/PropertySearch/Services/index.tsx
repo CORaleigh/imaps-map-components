@@ -21,6 +21,7 @@ const Services: React.FC<ServicesProps> = ({ mapElement, selectedCondo }) => {
           oncalciteAccordionItemExpand={handleAccordionExpand}
         >
           {searching[service.title] && <calcite-scrim loading />}{" "}
+          {service.graphics.length === 0 && <div>Service information not available</div>}
           {service.graphics.map((graphic, i) => (
             <arcgis-feature
               graphic={graphic}

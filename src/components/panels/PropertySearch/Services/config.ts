@@ -79,7 +79,6 @@ export const SERVICE_DEFS: Service[] = [
     title: "Solid Waste",
     graphics: [],
     layers: [
-      { title: "Cary Collection Routes", layer: undefined },
       { title: "Raleigh Solid Waste Collection Routes", layer: undefined },
     ],
   },
