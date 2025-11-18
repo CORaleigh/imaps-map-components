@@ -460,6 +460,7 @@ export const usePropertySearch = (
           [feature.getObjectId() as number],
           undefined
         );
+        tableLayerRef.current?.refresh();
         if (property.length) {
           feature.geometry = property[0].geometry;
         }
