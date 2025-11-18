@@ -5,6 +5,7 @@ import "@esri/calcite-components/components/calcite-tooltip";
 import "@arcgis/map-components/components/arcgis-layer-list";
 import { useLayerList } from "./useLayerList";
 import React from "react";
+import TipManager from "../../TipsManager";
 
 interface LayerListProps {
   mapElement: React.RefObject<HTMLArcgisMapElement>;
@@ -32,6 +33,8 @@ const LayerList: React.FC<LayerListProps> = ({
         oncalcitePanelClose={() => onPanelClose()}
         closed={closed}
       >
+        <TipManager name="layer-list"></TipManager>
+
         <calcite-action
           text="Reset Layers"
           icon="reset"

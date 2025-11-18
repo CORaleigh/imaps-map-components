@@ -86,6 +86,7 @@ const SearchInput: React.FC<SearchInputProps> = ({
         label="Search History"
         referenceElement="history-popover-button"
         closable
+        autoClose
       >
         <calcite-list label={"search history list"}>
           {getSearchHistory(webMapId.current).map((term, i) => (

@@ -78,6 +78,7 @@ export interface UsePrintProps {
   handleUserDefinedInput: (
     event: TargetedEvent<HTMLCalciteInputNumberElement, void>
   ) => void;
+
 }
 
 export const usePrint = (
@@ -247,6 +248,8 @@ export const usePrint = (
     );
   };
 
+
+
   useEffect(() => {
     (async () => {
       const config = await fetch("config.json");
@@ -328,6 +331,6 @@ export const usePrint = (
     handleShowLegendChange,
     handleShowPrintAreaChange,
     handleCustomScaleChange,
-    handleUserDefinedInput,
+    handleUserDefinedInput
   };
 };

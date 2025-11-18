@@ -14,7 +14,7 @@ calcite-shell-panel calcite-panel {
   --calcite-tab-content-space-y: 0;
 }
 
-@media (max-width: 500px) {
+@media (max-width: 420px) {
   #root,
   html,
   body {

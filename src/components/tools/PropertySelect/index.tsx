@@ -11,6 +11,7 @@ import "@esri/calcite-components/components/calcite-tooltip";
 import { usePropertySelect } from "./usePropertySelect";
 
 import styles from "./PropertySelect.module.css";
+import TipManager from "../../TipsManager";
 interface PropertySelectProps {
   mapElement: React.RefObject<HTMLArcgisMapElement>;
   closed: boolean;
@@ -30,7 +31,7 @@ const PropertySelect: React.FC<PropertySelectProps> = ({
     handleBufferDistanceInput,
     handleClear,
     handleToolClose,
-    handleBufferProperty
+    handleBufferProperty,
   } = usePropertySelect(mapElement, closed, onToolClose);
   return (
     <>
@@ -41,6 +42,8 @@ const PropertySelect: React.FC<PropertySelectProps> = ({
         closed={closed}
         collapsible
       >
+        <TipManager name="property-select"></TipManager>
+
         <calcite-action-bar layout="horizontal" expandDisabled>
           <calcite-action-group>
             <calcite-action
@@ -114,7 +117,9 @@ const PropertySelect: React.FC<PropertySelectProps> = ({
             ></calcite-input-number>
           </calcite-label>
           {selectedCondo && bufferDistance > 0 && (
-            <calcite-button width="full" onClick={handleBufferProperty}>Buffer Property</calcite-button>
+            <calcite-button width="full" onClick={handleBufferProperty}>
+              Buffer Property
+            </calcite-button>
           )}
         </div>
       </calcite-panel>

@@ -5,6 +5,7 @@ import "@esri/calcite-components/components/calcite-combobox";
 import "@esri/calcite-components/components/calcite-combobox-item";
 import { useLocationSearch } from "./useLocationSearch";
 import styles from "./LocationSearch.module.css";
+import TipManager from "../../TipsManager";
 
 interface LocationSearchProps {
   mapElement: React.RefObject<HTMLArcgisMapElement>;
@@ -24,7 +25,7 @@ const LocationSearch: React.FC<LocationSearchProps> = ({
     handleSearchReady,
     handleSelectResult,
     handleSearchClear,
-    handleIntersectingStreetChange
+    handleIntersectingStreetChange,
   } = useLocationSearch(mapElement, closed);
 
   return (
@@ -35,6 +36,8 @@ const LocationSearch: React.FC<LocationSearchProps> = ({
       closed={closed}
       collapsible
     >
+      <TipManager name="location-search"></TipManager>
+
       <arcgis-search
         className={styles.searchContainer}
         referenceElement={mapElement.current}

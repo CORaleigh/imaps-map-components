@@ -7,19 +7,12 @@ import "@esri/calcite-components/components/calcite-tooltip";
 import "@esri/calcite-components/components/calcite-action-bar";
 import "@esri/calcite-components/components/calcite-action-group";
 import "@esri/calcite-components/components/calcite-action";
-import "@arcgis/map-components/components/arcgis-map";
-import "@arcgis/map-components/components/arcgis-zoom";
-import "@arcgis/map-components/components/arcgis-compass";
-import "@arcgis/map-components/components/arcgis-track";
-import "@arcgis/map-components/components/arcgis-home";
-import "@arcgis/map-components/components/arcgis-expand";
 
-import "@arcgis/map-components/components/arcgis-scale-bar";
+import "@esri/calcite-components/components/calcite-scrim";
 
 import { useShell } from "./useShell";
 import { lazyWithPreload } from "../../utils/lazyLoad";
 import Header from "../Header";
-
 
 import MapView from "../MapView";
 
@@ -83,6 +76,8 @@ const Shell: React.FC = () => {
   return (
     <calcite-shell className={appSize}>
       <Header theme={theme} appSize={appSize}></Header>
+      {!mapReady && <calcite-scrim loading></calcite-scrim>}
+
       <calcite-shell-panel
         slot="panel-end"
         position="end"

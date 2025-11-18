@@ -22,6 +22,7 @@ import TextSymbolPicker from "./symbols/TextSymbolPicker";
 import PointSymbolPicker from "./symbols/PointSymbolPicker";
 
 import styles from "./Sketch.module.css";
+import TipManager from "../../TipsManager";
 
 interface SketchProps {
   mapElement: React.RefObject<HTMLArcgisMapElement>;
@@ -62,6 +63,8 @@ const Sketch: React.FC<SketchProps> = ({ mapElement, closed, onToolClose }) => {
           collapsible
           style={{ marginRight: "1em" }}
         >
+        <TipManager name="sketch"></TipManager>
+
           <div className={styles.panelContent}>
             <calcite-action-bar layout="horizontal" expandDisabled>
               <calcite-action

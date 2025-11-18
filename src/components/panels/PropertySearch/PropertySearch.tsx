@@ -19,6 +19,7 @@ import SearchInput from "./SearchInput";
 import PropertyTable from "./PropertyTable";
 
 import { usePropertySearch } from "./usePropertySearch";
+import TipManager from "../../TipsManager";
 
 interface PropertySearchProps {
   mapElement: React.RefObject<HTMLArcgisMapElement>;
@@ -66,6 +67,7 @@ const PropertySearch: React.FC<PropertySearchProps> = ({
         closed={closed}
         id={styles.propertySearch}
       >
+        <TipManager name="property-search"></TipManager>
         <div slot="content-top" className={styles.searchTop}>
           <SearchInput
             searchElement={searchElement}

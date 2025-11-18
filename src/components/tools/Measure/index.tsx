@@ -4,6 +4,7 @@ import "@arcgis/map-components/components/arcgis-distance-measurement-2d";
 import "@arcgis/map-components/components/arcgis-area-measurement-2d";
 
 import { useMeasure } from "./useMeasure";
+import TipManager from "../../TipsManager";
 
 interface MeasureProps {
   mapElement: React.RefObject<HTMLArcgisMapElement>;
@@ -11,7 +12,11 @@ interface MeasureProps {
   onToolClose: () => void;
 }
 
-const Measure: React.FC<MeasureProps> = ({ mapElement, closed, onToolClose }) => {
+const Measure: React.FC<MeasureProps> = ({
+  mapElement,
+  closed,
+  onToolClose,
+}) => {
   const { areaMeasure, distanceMeasure, activeTool, handleActionClick } =
     useMeasure(mapElement);
 
@@ -23,6 +28,8 @@ const Measure: React.FC<MeasureProps> = ({ mapElement, closed, onToolClose }) =>
       closed={closed}
       collapsible
     >
+      <TipManager name="measure"></TipManager>
+
       <calcite-action-bar layout="horizontal" expandDisabled>
         <calcite-action
           text="Distance"

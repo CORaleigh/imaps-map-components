@@ -16,6 +16,7 @@ import { usePrint, type Format } from "./usePrint";
 import type { Layout, MapScale } from "./printLayouts";
 
 import styles from "./Print.module.css";
+import TipManager from "../../TipsManager";
 
 interface PrintProps {
   mapElement: React.RefObject<HTMLArcgisMapElement>;
@@ -53,6 +54,8 @@ const Print: React.FC<PrintProps> = ({ mapElement, closed, onToolClose }) => {
       closed={closed}
       collapsible
     >
+      
+      <TipManager name="print"></TipManager>
       <calcite-tabs bordered position="top">
         <calcite-tab-nav
           slot="title-group"
