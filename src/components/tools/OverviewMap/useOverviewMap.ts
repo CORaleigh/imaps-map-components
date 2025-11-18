@@ -12,36 +12,48 @@ export interface UseOverviewMapProps {
   ) => void;
 }
 
+const addGraphic = (
+  overviewMap: HTMLArcgisMapElement,
+  mapExtent: __esri.Extent
+) => {
+  
+  overviewMap.graphics.removeAll();
+  overviewMap.graphics.add(
+    new Graphic({
+      geometry: mapExtent,
+      symbol: {
+        type: "simple-fill",
+        color: [0, 0, 0, 0.25], // fully transparent fill
+        outline: {
+          type: "simple-line",
+          color: [0, 0, 0, 0.5], // same blue as iOS highlight feel
+          width: 2,
+        },
+      },
+    })
+  );
+};
+
 export const useOverviewMap = (
   mapElement: React.RefObject<HTMLArcgisMapElement>
 ): UseOverviewMapProps => {
   const overviewMapElement = useRef<HTMLArcgisMapElement | null>(null);
   const initializedRef = useRef(false);
-  const handleOverviewReady = (
+  const handleOverviewReady =  async (
     event: TargetedEvent<HTMLArcgisMapElement, void>
   ) => {
     event.target.basemap = mapElement.current.basemap;
-    event.target.goTo(mapElement.current.extent.clone().expand(4));
+    await event.target.goTo(mapElement.current.extent.clone().expand(4));
+    addGraphic(event.target, mapElement.current.extent);
 
-    reactiveUtils.watch(() => mapElement.current.view.extent, (mapExtent: __esri.Extent) => {
-      if (!overviewMapElement.current) return;
-      overviewMapElement.current.goTo(mapExtent.clone().expand(4));
-      overviewMapElement.current.graphics.removeAll();
-      overviewMapElement.current.graphics.add(
-        new Graphic({
-          geometry: mapExtent,
-          symbol: {
-            type: "simple-fill",
-            color: [0, 0, 0, 0.25], // fully transparent fill
-            outline: {
-              type: "simple-line",
-              color: [0, 0, 0, 0.5], // same blue as iOS highlight feel
-              width: 2,
-            },
-          },
-        })
-      );
-    });
+    reactiveUtils.watch(
+      () => mapElement.current.view.extent,
+      async (mapExtent: __esri.Extent) => {
+        if (!overviewMapElement.current) return;
+        await overviewMapElement.current.goTo(mapExtent.clone().expand(4));
+        addGraphic(overviewMapElement.current, mapExtent);
+      }
+    );
   };
   useEffect(() => {
     if (
