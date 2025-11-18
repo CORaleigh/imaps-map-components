@@ -87,7 +87,6 @@ export const createTableLayer = async (mapElement: HTMLArcgisMapElement) => {
   );
   mapElement.view.map.add(copyTable);
 
-  
   copyTable.on(
     "layerview-create",
     (event: __esri.LayerLayerviewCreateEvent) => {

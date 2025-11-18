@@ -12,28 +12,14 @@ body {
 calcite-shell-panel calcite-panel {
   max-height: calc(100vh - 65px);
   --calcite-tab-content-space-y: 0;
-  
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+@media (max-width: 420px) {
+  #root,
+  html,
+  body {
+    --calcite-shell-panel-min-width: unset;
+    --calcite-shell-panel-width: unset;
+    --calcite-shell-panel-max-width: unset;
+  }
+}
