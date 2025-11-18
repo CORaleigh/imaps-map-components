@@ -10,6 +10,7 @@ import "@esri/calcite-components/components/calcite-tooltip";
 
 import { usePropertySelect } from "./usePropertySelect";
 
+import styles from "./PropertySelect.module.css";
 interface PropertySelectProps {
   mapElement: React.RefObject<HTMLArcgisMapElement>;
   closed: boolean;
@@ -25,9 +26,11 @@ const PropertySelect: React.FC<PropertySelectProps> = ({
     mapMode,
     handleActionClick,
     bufferDistance,
+    selectedCondo,
     handleBufferDistanceInput,
     handleClear,
     handleToolClose,
+    handleBufferProperty
   } = usePropertySelect(mapElement, closed, onToolClose);
   return (
     <>
@@ -97,7 +100,7 @@ const PropertySelect: React.FC<PropertySelectProps> = ({
             ></calcite-action>
           </calcite-action-group>
         </calcite-action-bar>
-        <div slot="content-bottom">
+        <div className={styles.panelContent}>
           <calcite-label>
             Buffer Distance
             <calcite-input-number
@@ -110,6 +113,9 @@ const PropertySelect: React.FC<PropertySelectProps> = ({
               step={100}
             ></calcite-input-number>
           </calcite-label>
+          {selectedCondo && bufferDistance > 0 && (
+            <calcite-button width="full" onClick={handleBufferProperty}>Buffer Property</calcite-button>
+          )}
         </div>
       </calcite-panel>
       <calcite-tooltip
@@ -118,22 +124,46 @@ const PropertySelect: React.FC<PropertySelectProps> = ({
       >
         Point Select
       </calcite-tooltip>
-      <calcite-tooltip closeOnClick reference-element="select-line-action" placement="top">
+      <calcite-tooltip
+        closeOnClick
+        reference-element="select-line-action"
+        placement="top"
+      >
         Line Select
       </calcite-tooltip>
-      <calcite-tooltip closeOnClick reference-element="select-polygon-action" placement="top">
+      <calcite-tooltip
+        closeOnClick
+        reference-element="select-polygon-action"
+        placement="top"
+      >
         Polygon Select
       </calcite-tooltip>
-      <calcite-tooltip closeOnClick reference-element="select-rectangle-action" placement="top">
+      <calcite-tooltip
+        closeOnClick
+        reference-element="select-rectangle-action"
+        placement="top"
+      >
         Rectangle Select
       </calcite-tooltip>
-      <calcite-tooltip closeOnClick reference-element="select-circle-action" placement="top">
+      <calcite-tooltip
+        closeOnClick
+        reference-element="select-circle-action"
+        placement="top"
+      >
         Circle Select
       </calcite-tooltip>
-      <calcite-tooltip closeOnClick reference-element="select-multipoint-action" placement="top">
+      <calcite-tooltip
+        closeOnClick
+        reference-element="select-multipoint-action"
+        placement="top"
+      >
         Multipoint Select
       </calcite-tooltip>
-      <calcite-tooltip closeOnClick reference-element="select-clear-action" placement="top">
+      <calcite-tooltip
+        closeOnClick
+        reference-element="select-clear-action"
+        placement="top"
+      >
         Clear Selection
       </calcite-tooltip>
     </>

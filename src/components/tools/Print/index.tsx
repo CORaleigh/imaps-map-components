@@ -17,7 +17,6 @@ import type { Layout, MapScale } from "./printLayouts";
 
 import styles from "./Print.module.css";
 
-
 interface PrintProps {
   mapElement: React.RefObject<HTMLArcgisMapElement>;
   closed: boolean;
@@ -45,7 +44,7 @@ const Print: React.FC<PrintProps> = ({ mapElement, closed, onToolClose }) => {
     handleShowPrintAreaChange,
     handleCustomScaleChange,
     handleUserDefinedInput,
-  } = usePrint(mapElement);
+  } = usePrint(mapElement, closed);
   return (
     <calcite-panel
       heading="Print"
@@ -153,6 +152,7 @@ const Print: React.FC<PrintProps> = ({ mapElement, closed, onToolClose }) => {
             {selectedCondo && (
               <calcite-label layout="inline">
                 <calcite-switch
+                  checked={printOptions.showAttributes}
                   oncalciteSwitchChange={handleShowAttributesChange}
                 ></calcite-switch>
                 Show attributes
@@ -160,12 +160,14 @@ const Print: React.FC<PrintProps> = ({ mapElement, closed, onToolClose }) => {
             )}
             <calcite-label layout="inline">
               <calcite-switch
+                checked={printOptions.showLegend}
                 oncalciteSwitchChange={handleShowLegendChange}
               ></calcite-switch>
               Show legend
             </calcite-label>
             <calcite-label layout="inline">
               <calcite-switch
+                checked={printOptions.showPrintArea}
                 oncalciteSwitchChange={handleShowPrintAreaChange}
               ></calcite-switch>
               Show print area

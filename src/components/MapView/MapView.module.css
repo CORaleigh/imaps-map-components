@@ -16,3 +16,10 @@
   --calcite-color-foreground-3: var(--calcite-color-brand);
   --calcite-color-text-1: white;
 }
+
+@media (max-width: 420px) {
+  :global(div[slot="top-right"]) :global(calcite-panel) {
+    min-width: calc(100vw - 48px - var(--calcite-spacing-lg));
+    max-width: calc(100vw - 48px - var(--calcite-spacing-lg));
+  }
+}

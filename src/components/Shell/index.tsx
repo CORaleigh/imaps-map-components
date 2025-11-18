@@ -82,7 +82,7 @@ const Shell: React.FC = () => {
 
   return (
     <calcite-shell className={appSize}>
-      <Header theme={theme}></Header>
+      <Header theme={theme} appSize={appSize}></Header>
       <calcite-shell-panel
         slot="panel-end"
         position="end"
@@ -106,7 +106,7 @@ const Shell: React.FC = () => {
             <Suspense fallback={null}>
               <Bookmarks
                 mapElement={mapElement}
-                onPanelClose={handleToolClose}
+                onPanelClose={handlePanelClose}
                 closed={activePanel !== "bookmarks"}
               ></Bookmarks>
             </Suspense>

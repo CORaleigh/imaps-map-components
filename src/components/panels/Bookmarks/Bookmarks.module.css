@@ -1,7 +1,7 @@
 .bookmarksPanel {
   display: flex;
   flex-direction: column;
-  height: 100dvh;
+  height: calc(100dvh - 65px);
 }
 .bookmarksPanel calcite-flow-item {
   flex: 1; /* Takes remaining space */

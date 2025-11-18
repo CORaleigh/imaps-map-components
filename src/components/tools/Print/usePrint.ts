@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 // hooks/useShell.ts
 import type { TargetedEvent } from "@arcgis/map-components";
 import { useState, useRef, useEffect, type RefObject } from "react";
@@ -80,7 +81,8 @@ export interface UsePrintProps {
 }
 
 export const usePrint = (
-  mapElement: React.RefObject<HTMLArcgisMapElement>
+  mapElement: React.RefObject<HTMLArcgisMapElement>,
+  closed: boolean
 ): UsePrintProps => {
   const { selectedCondo } = useMap();
   const printUrl = useRef("");
@@ -250,7 +252,7 @@ export const usePrint = (
       const config = await fetch("config.json");
       const data = await config.json();
       if (data.printUrl) {
-        printUrl.current = data.printUrl
+        printUrl.current = data.printUrl;
       }
       setScales(getScales());
       const layoutsLoaded = await getLayouts();
@@ -285,14 +287,22 @@ export const usePrint = (
       showLegend
     );
   }, [
-    mapElement,
-    printOptions,
+    printOptions.showPrintArea,
     printOptions.layout,
     printOptions.scale,
     printOptions.showAttributes,
     printOptions.showLegend,
-    printOptions.showPrintArea,
   ]);
+
+  useEffect(() => {
+    if (closed) {
+      hidePrintFrame(mapElement.current);
+      setPrintOptions((prev) => ({
+        ...prev,
+        showPrintArea: false,
+      }));
+    }
+  }, [closed]);
 
   useEffect(() => {
     if (!mapElement.current || initializedRef.current) return;

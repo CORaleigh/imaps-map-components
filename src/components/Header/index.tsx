@@ -11,9 +11,10 @@ import { useMap } from "../../context/useMap";
 
 interface HeaderProps {
   theme: "dark" | "light";
+  appSize: "small" | "medium" | "large";
 }
 
-const Header: React.FC<HeaderProps> = ({ theme }) => {
+const Header: React.FC<HeaderProps> = ({ theme, appSize }) => {
   const { webMapId } = useMap();
 
   const { links, handleDropdownOpen, handleClearStorage } = useHeader(
@@ -25,7 +26,7 @@ const Header: React.FC<HeaderProps> = ({ theme }) => {
         <calcite-navigation-logo
           slot="logo"
           thumbnail={theme === "light" ? "logo.svg" : "logo_dark.svg"}
-          description="Wake County and City of Raleigh"
+          description={appSize !== "small" ? "Wake County and City of Raleigh" : ""}
           href="https://www.wake.gov/departments-government/geographic-information-services-gis/maps-apps-data/imaps-information"
         ></calcite-navigation-logo>
 

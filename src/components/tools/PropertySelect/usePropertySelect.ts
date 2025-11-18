@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 // hooks/useShell.ts
 import { useState, useRef, useEffect, useCallback } from "react";
 import SketchViewModel from "@arcgis/core/widgets/Sketch/SketchViewModel.js";
@@ -30,12 +31,14 @@ const SKETCH_TOOLS: SketchTool[] = [
 export interface UsePropertySelectProps {
   mapMode: MapMode;
   bufferDistance: number;
+  selectedCondo: __esri.Graphic | null;
   handleActionClick: (tool: MapMode) => void;
   handleBufferDistanceInput: (
     event: TargetedEvent<HTMLCalciteInputNumberElement, void>
   ) => void;
   handleClear: () => void;
   handleToolClose: () => void;
+  handleBufferProperty: () => void;
 }
 
 export const usePropertySelect = (
@@ -43,8 +46,14 @@ export const usePropertySelect = (
   closed: boolean,
   onToolClose: () => void
 ): UsePropertySelectProps => {
-  const { setGeometry, setCondos, setSelectedCondo, mapMode, setMapMode } =
-    useMap();
+  const {
+    setGeometry,
+    setCondos,
+    setSelectedCondo,
+    mapMode,
+    setMapMode,
+    selectedCondo,
+  } = useMap();
   const [bufferDistance, setBufferDistance] = useState(0);
 
   const bufferDistanceRef = useRef(0);
@@ -120,29 +129,29 @@ export const usePropertySelect = (
     return propertyLayerView.highlight(result.features);
   };
 
+  const addBufferGraphic = (geometry: __esri.Geometry) => {
+    sketchViewModel.current?.removeAllGraphics();
+    sketchViewModel.current?.addGraphic(
+      new Graphic({
+        geometry,
+        symbol: {
+          type: "simple-fill",
+          style: "none",
+          outline: {
+            type: "simple-line",
+            width: 2,
+            style: "dash",
+          },
+        },
+      })
+    );
+  };
   // Handle SketchViewModel create events
   const handleCreate = useCallback(
     async (event: __esri.SketchViewModelCreateEvent) => {
       if (!event.graphic.geometry) return;
       if (!geodesicBufferOperator.isLoaded())
         await geodesicBufferOperator.load();
-
-      const addBufferGraphic = (geometry: __esri.Geometry) => {
-        sketchViewModel.current?.addGraphic(
-          new Graphic({
-            geometry,
-            symbol: {
-              type: "simple-fill",
-              style: "none",
-              outline: {
-                type: "simple-line",
-                width: 2,
-                style: "dash",
-              },
-            },
-          })
-        );
-      };
 
       if (event.state === "start" || event.state === "cancel") {
         graphicsLayer.current?.removeAll();
@@ -213,6 +222,19 @@ export const usePropertySelect = (
     onToolClose();
   }, [onToolClose, setMapMode]);
 
+  const handleBufferProperty = useCallback(async () => {
+    if (bufferDistance > 0 && selectedCondo?.geometry) {
+      if (!geodesicBufferOperator.isLoaded())
+        await geodesicBufferOperator.load();
+      const buffer = geodesicBufferOperator.execute(
+        selectedCondo.geometry,
+        bufferDistanceRef.current,
+        { unit: "feet" }
+      ) as __esri.Geometry;
+      setGeometry(buffer);
+      addBufferGraphic(buffer);
+    }
+  }, [bufferDistance, selectedCondo]);
   // -----------------------------
   // Initialize SketchViewModel after view is ready
   // -----------------------------
@@ -255,9 +277,11 @@ export const usePropertySelect = (
   return {
     mapMode,
     bufferDistance,
+    selectedCondo,
     handleActionClick,
     handleBufferDistanceInput,
     handleClear,
     handleToolClose,
+    handleBufferProperty,
   };
 };
