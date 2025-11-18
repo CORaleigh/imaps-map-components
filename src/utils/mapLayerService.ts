@@ -84,6 +84,15 @@ class LayerService {
     });
     this.map = webmap;
 
+    const urlParams = new URLSearchParams(window.location.search);
+    const layersParam = urlParams.get("layers");
+
+    // Parse it into an array, trimming spaces from each layer
+    const urlLayers = layersParam
+      ? layersParam.split(",").map((layer) => layer.trim())
+      : [];
+
+    const inUrl = (title: string) => urlLayers.includes(title);
     const stateCache = this.getPersistedStateCache();
     const isVisibleLastSession = (title: string) =>
       stateCache.get(title) === true;
@@ -113,10 +122,12 @@ class LayerService {
         // Add children in template order if required or persisted-visible
         for (const child of groupLayer.layers.toArray()) {
           const title = child.title || "";
+          const shouldDisplay =
+            isRequired(title) || isVisibleLastSession(title) || inUrl(title);
           const shouldAdd =
             isRequired(title) ||
             isVisibleLastSession(title) ||
-            isSearchable(child.id);
+            isSearchable(child.id) || inUrl(title);
 
           if (child.type === "group") {
             if (addLayerRecursive(child, newGroup)) {
@@ -124,7 +135,7 @@ class LayerService {
             }
           } else if (shouldAdd) {
             newGroup.layers.add(child);
-            child.visible = shouldAdd;
+            child.visible = shouldDisplay;
             anyChildAdded = true;
           }
         }
@@ -166,7 +177,22 @@ class LayerService {
         webmap.tables.add(table);
       }
     }
+  if (urlLayers.length > 0) {
+    const makeParentsVisible = (layer: Layer) => {
+      let current = layer.parent as GroupLayer | null;
+      while (current && current.type === "group") {
+        current.visible = true;
+        current = current.parent as GroupLayer | null;
+      }
+    };
 
+    // Find all layers that match URL layers and make their parents visible
+    webmap.allLayers.forEach((layer) => {
+      if (layer.title && inUrl(layer.title)) {
+        makeParentsVisible(layer);
+      }
+    });
+  }
     return { webmap, webmapTemplate: this.webmapTemplate };
   }
 
@@ -202,9 +228,9 @@ class LayerService {
 
           //console.log(`${indent}Loading group "${groupLayer.title}" (${childCountBefore} children visible before load)`);
 
-          if (!groupLayer.loaded) {
-            await groupLayer.load();
-          }
+          // if (!groupLayer.loaded) {
+          //   await groupLayer.load();
+          // }
 
           //const childCountAfter = groupLayer.layers.length;
           //console.log(`${indent}  -> Loaded: ${groupLayer.loaded}, children after: ${childCountAfter}`);

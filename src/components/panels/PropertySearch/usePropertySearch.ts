@@ -131,10 +131,9 @@ export const usePropertySearch = (
 
   const handleTableReady = useCallback(
     async (event: TargetedEvent<HTMLArcgisFeatureTableElement, void>) => {
-      (event.target as any).viewModel.messages.header = `0 properties selected`;
-      console.log("Feature table ready");
-
       const layer = await createTableLayer(mapElement.current);
+      (event.target as any).viewModel.messages.header = `0 properties selected`;
+
       if (!layer) return;
       event.target.layer = layer;
       tableLayerRef.current = layer;
@@ -208,7 +207,7 @@ export const usePropertySearch = (
     event: TargetedEvent<HTMLArcgisFeatureTableElement, void>
   ) => {
     console.log("address table ready");
-    
+
     (event.target as any).viewModel.messages.header = `0 addresses`;
 
     const table = event.target;
@@ -278,13 +277,14 @@ export const usePropertySearch = (
       }
     >
   ) => {
-    console.log(event.detail.name)
+    console.log(event.detail.name);
 
     if (event.detail.name === "size") {
       event.target.style.maxHeight = "500px";
       event.target.style.height = `${(event.target.size + 2) * 40 + 100}px`;
-          (event.target as any).viewModel.messages.header = `${event.target.size} ${event.target.size === 1 ? 'address' : 'addresses'}`;
-
+      (event.target as any).viewModel.messages.header = `${event.target.size} ${
+        event.target.size === 1 ? "address" : "addresses"
+      }`;
     }
   };
 

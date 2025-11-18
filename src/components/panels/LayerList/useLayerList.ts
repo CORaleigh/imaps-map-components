@@ -137,7 +137,7 @@ export const useLayerList = (
       const [freshWebMap] = await Promise.all([
         (async () => {
           const webmap = new WebMap({ portalItem: { id: webMapId.current } });
-          await webmap.loadAll();
+          await webmap.load();
           return webmap;
         })(),
         layerService.addAllMissingSiblingsAfterLayerList(),
