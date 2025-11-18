@@ -208,6 +208,9 @@ export const usePropertySearch = (
     event: TargetedEvent<HTMLArcgisFeatureTableElement, void>
   ) => {
     console.log("address table ready");
+    
+    (event.target as any).viewModel.messages.header = `0 addresses`;
+
     const table = event.target;
     const tableTemplate: TableTemplate = new TableTemplate({
       columnTemplates: [
@@ -275,9 +278,13 @@ export const usePropertySearch = (
       }
     >
   ) => {
+    console.log(event.detail.name)
+
     if (event.detail.name === "size") {
       event.target.style.maxHeight = "500px";
       event.target.style.height = `${(event.target.size + 2) * 40 + 100}px`;
+          (event.target as any).viewModel.messages.header = `${event.target.size} ${event.target.size === 1 ? 'address' : 'addresses'}`;
+
     }
   };
 

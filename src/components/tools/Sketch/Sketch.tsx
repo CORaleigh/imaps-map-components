@@ -21,6 +21,8 @@ import FillSymbolPicker from "./symbols/FillSymbolPicker";
 import TextSymbolPicker from "./symbols/TextSymbolPicker";
 import PointSymbolPicker from "./symbols/PointSymbolPicker";
 
+import styles from "./Sketch.module.css";
+
 interface SketchProps {
   mapElement: React.RefObject<HTMLArcgisMapElement>;
   closed: boolean;
@@ -60,7 +62,7 @@ const Sketch: React.FC<SketchProps> = ({ mapElement, closed, onToolClose }) => {
           collapsible
           style={{ marginRight: "1em" }}
         >
-          <div slot="content-top">
+          <div className={styles.panelContent}>
             <calcite-action-bar layout="horizontal" expandDisabled>
               <calcite-action
               id="sketch-point-action"
