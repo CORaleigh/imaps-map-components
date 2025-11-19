@@ -550,7 +550,7 @@ class LayerService {
 
     if (!templateLayer) return undefined;
 
-    this.map.add(templateLayer);
+    //this.map.add(templateLayer);
     return templateLayer;
   }
 
