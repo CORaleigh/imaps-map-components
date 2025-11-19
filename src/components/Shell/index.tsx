@@ -74,7 +74,7 @@ const Shell: React.FC = () => {
   }, []);
 
   return (
-    <calcite-shell className={appSize}>
+    <calcite-shell className={appSize} contentBehind={appSize === "small"}>
       <Header theme={theme} appSize={appSize}></Header>
       {!mapReady && <calcite-scrim loading></calcite-scrim>}
 
@@ -84,6 +84,7 @@ const Shell: React.FC = () => {
         collapsed={!activePanel}
         width="l"
         resizable={appSize === "large"}
+        
       >
         {openedPanels.includes("propertySearch") && mapReady && (
           <div hidden={activePanel !== "propertySearch"}>
