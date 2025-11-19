@@ -48,7 +48,7 @@ const PropertySelect: React.FC<PropertySelectProps> = ({
           <calcite-action-group>
             <calcite-action
               id="select-point-action"
-              text="point"
+              text="Point"
               icon="pin"
               onClick={() => handleActionClick("point")}
               active={mapMode === "point"}
@@ -56,7 +56,7 @@ const PropertySelect: React.FC<PropertySelectProps> = ({
 
             <calcite-action
               id="select-line-action"
-              text="line"
+              text="Line"
               icon="line"
               onClick={() => handleActionClick("polyline")}
               active={mapMode === "polyline"}
@@ -64,7 +64,7 @@ const PropertySelect: React.FC<PropertySelectProps> = ({
 
             <calcite-action
               id="select-polygon-action"
-              text="polygon"
+              text="Polygon"
               icon="polygon"
               onClick={() => handleActionClick("polygon")}
               active={mapMode === "polygon"}
@@ -72,7 +72,7 @@ const PropertySelect: React.FC<PropertySelectProps> = ({
 
             <calcite-action
               id="select-rectangle-action"
-              text="rectangle"
+              text="Rectangle"
               icon="rectangle"
               onClick={() => handleActionClick("rectangle")}
               active={mapMode === "rectangle"}
@@ -80,7 +80,7 @@ const PropertySelect: React.FC<PropertySelectProps> = ({
 
             <calcite-action
               id="select-circle-action"
-              text="circle"
+              text="Circle"
               icon="circle"
               onClick={() => handleActionClick("circle")}
               active={mapMode === "circle"}
@@ -88,7 +88,7 @@ const PropertySelect: React.FC<PropertySelectProps> = ({
 
             <calcite-action
               id="select-multipoint-action"
-              text="multipoint"
+              text="Multipoint"
               icon="pins"
               onClick={() => handleActionClick("multipoint")}
               active={mapMode === "multipoint"}
@@ -97,7 +97,7 @@ const PropertySelect: React.FC<PropertySelectProps> = ({
           <calcite-action-group>
             <calcite-action
               id="select-clear-action"
-              text="clear"
+              text="Clear"
               icon="trash"
               onClick={handleClear}
             ></calcite-action>

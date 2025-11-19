@@ -56,12 +56,14 @@ const Measure: React.FC<MeasureProps> = ({
         ref={distanceMeasure}
         referenceElement={mapElement.current}
         style={{ display: activeTool === "distance" ? "block" : "none" }}
+        unit="imperial"
       ></arcgis-distance-measurement-2d>
 
       <arcgis-area-measurement-2d
         ref={areaMeasure}
         referenceElement={mapElement.current}
         style={{ display: activeTool === "area" ? "block" : "none" }}
+        unit="imperial"
       ></arcgis-area-measurement-2d>
     </calcite-panel>
   );

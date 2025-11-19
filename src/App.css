@@ -7,6 +7,7 @@ body {
   --calcite-shell-panel-width: 365px;
   --calcite-shell-panel-max-width: 50vw;
   --calcite-z-index-header: unset;
+  --calcite-font-size--1: 16px;
 }
 
 calcite-shell-panel calcite-panel {
@@ -14,12 +15,12 @@ calcite-shell-panel calcite-panel {
   --calcite-tab-content-space-y: 0;
 }
 
-@media (max-width: 420px) {
+@media (max-width: 500px) {
   #root,
   html,
   body {
-    --calcite-shell-panel-min-width: unset;
-    --calcite-shell-panel-width: unset;
-    --calcite-shell-panel-max-width: unset;
+    --calcite-shell-panel-min-width: calc(100vw - 48px);
+    --calcite-shell-panel-width: calc(100vw - 48px);
+    --calcite-shell-panel-max-width: calc(100vw - 48px);
   }
 }

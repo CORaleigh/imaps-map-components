@@ -23,9 +23,11 @@ export const useMeasure = (
       if (!areaMeasure.current || !distanceMeasure.current) return;
       if (tool === "area") {
         areaMeasure.current.start();
+        distanceMeasure.current.clear();
       }
       if (tool === "distance") {
         distanceMeasure.current.start();
+        areaMeasure.current.clear();
       }
       if (!tool) {
         areaMeasure.current.clear();

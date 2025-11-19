@@ -69,42 +69,42 @@ const Sketch: React.FC<SketchProps> = ({ mapElement, closed, onToolClose }) => {
             <calcite-action-bar layout="horizontal" expandDisabled>
               <calcite-action
               id="sketch-point-action"
-                text="point"
+                text="Point"
                 icon="pin"
                 onClick={() => handleActionClick("point")}
                 active={mapMode === "point"}
               ></calcite-action>
               <calcite-action
                 id="sketch-line-action"
-                text="line"
+                text="Line"
                 icon="line"
                 onClick={() => handleActionClick("polyline")}
                 active={mapMode === "polyline"}
               ></calcite-action>
               <calcite-action
                 id="sketch-polygon-action"
-                text="polygon"
+                text="Polygon"
                 icon="polygon"
                 onClick={() => handleActionClick("polygon")}
                 active={mapMode === "polygon"}
               ></calcite-action>
               <calcite-action
                 id="sketch-rectangle-action"  
-                text="rectangle"
+                text="Rectangle"
                 icon="rectangle"
                 onClick={() => handleActionClick("rectangle")}
                 active={mapMode === "rectangle"}
               ></calcite-action>
               <calcite-action
                 id="sketch-circle-action"
-                text="circle"
+                text="Circle"
                 icon="circle"
                 onClick={() => handleActionClick("circle")}
                 active={mapMode === "circle"}
               ></calcite-action>
               <calcite-action
                 id="sketch-text-action" 
-                text="text"
+                text="Text"
                 icon="text"
                 onClick={() => handleActionClick("text")}
                 active={mapMode === "text"}
@@ -113,14 +113,14 @@ const Sketch: React.FC<SketchProps> = ({ mapElement, closed, onToolClose }) => {
             <calcite-action-bar layout="horizontal" expandDisabled>
               <calcite-action
                 id="sketch-select-action"
-                text="select"
+                text="Select"
                 icon="select"
                 onClick={() => handleActionClick("select")}
                 active={mapMode === "select"}
               ></calcite-action>
               <calcite-action
                 id="sketch-clear-action"
-                text="clear"
+                text="Clear"
                 icon="trash"
                 onClick={clearSketches}
               ></calcite-action>
