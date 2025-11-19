@@ -196,6 +196,7 @@ export const useShell = (): UseShellProps => {
     >
   ) => {
     setCoordinateConversionOpen(event.target.expanded);
+    
   };
 
   useEffect(() => {

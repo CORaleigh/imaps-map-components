@@ -28,4 +28,9 @@
   :global(div[slot="bottom-right"]) :global(calcite-panel) {
     margin-right: 48px;
   }
+
+  :global(arcgis-map) {
+    width: calc(100% - 48px);
+  }
 }
+
