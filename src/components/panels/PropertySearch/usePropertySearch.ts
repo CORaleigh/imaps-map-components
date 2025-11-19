@@ -277,7 +277,6 @@ export const usePropertySearch = (
       }
     >
   ) => {
-    console.log(event.detail.name);
 
     if (event.detail.name === "size") {
       event.target.style.maxHeight = "500px";

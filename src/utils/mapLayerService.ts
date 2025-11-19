@@ -103,6 +103,7 @@ class LayerService {
         .toArray()
         .map((layer: __esri.SearchLayer) => layer.id);
     const isSearchable = (id: string) => searchIds?.includes(id);
+    
     // Add top-level layers: required or persisted-visible only
     const addLayerRecursive = (
       layer: Layer,
@@ -127,7 +128,8 @@ class LayerService {
           const shouldAdd =
             isRequired(title) ||
             isVisibleLastSession(title) ||
-            isSearchable(child.id) || inUrl(title);
+            isSearchable(child.id) ||
+            inUrl(title);
 
           if (child.type === "group") {
             if (addLayerRecursive(child, newGroup)) {
@@ -177,33 +179,30 @@ class LayerService {
         webmap.tables.add(table);
       }
     }
-  if (urlLayers.length > 0) {
-    const makeParentsVisible = (layer: Layer) => {
-      let current = layer.parent as GroupLayer | null;
-      while (current && current.type === "group") {
-        current.visible = true;
-        current = current.parent as GroupLayer | null;
-      }
-    };
+    
+    if (urlLayers.length > 0) {
+      const makeParentsVisible = (layer: Layer) => {
+        let current = layer.parent as GroupLayer | null;
+        while (current && current.type === "group") {
+          current.visible = true;
+          current = current.parent as GroupLayer | null;
+        }
+      };
 
-    // Find all layers that match URL layers and make their parents visible
-    webmap.allLayers.forEach((layer) => {
-      if (layer.title && inUrl(layer.title)) {
-        makeParentsVisible(layer);
-      }
-    });
-  }
+      // Find all layers that match URL layers and make their parents visible
+      webmap.allLayers.forEach((layer) => {
+        if (layer.title && inUrl(layer.title)) {
+          makeParentsVisible(layer);
+        }
+      });
+    }
+    
     return { webmap, webmapTemplate: this.webmapTemplate };
   }
 
   /** Adds all missing siblings after the layer list has loaded */
   async addAllMissingSiblingsAfterLayerList() {
-    //console.log("🔍 addAllMissingSiblingsAfterLayerList called");
-    //console.log("🔍 this.map:", this.map);
-    //console.log("🔍 this.webmapTemplate:", this.webmapTemplate);
-
     if (!this.map || !this.webmapTemplate) {
-      //console.log("⚠️ Early return - map or webmapTemplate is null");
       return;
     }
 
@@ -213,43 +212,26 @@ class LayerService {
 
     // Load all group layers in the template to access their children
     const loadAllGroups = async (
-      parent: WebMap | GroupLayer,
-      depth: number = 0
+      parent: WebMap | GroupLayer
     ): Promise<void> => {
-      //const indent = "  ".repeat(depth);
       const layers = parent.layers.toArray();
-
-      //console.log(`${indent}loadAllGroups called with ${layers.length} layers`);
 
       for (const layer of layers) {
         if (layer.type === "group") {
           const groupLayer = layer as GroupLayer;
-          //const childCountBefore = groupLayer.layers.length;
-
-          //console.log(`${indent}Loading group "${groupLayer.title}" (${childCountBefore} children visible before load)`);
-
-          // if (!groupLayer.loaded) {
-          //   await groupLayer.load();
-          // }
-
-          //const childCountAfter = groupLayer.layers.length;
-          //console.log(`${indent}  -> Loaded: ${groupLayer.loaded}, children after: ${childCountAfter}`);
-
-          await loadAllGroups(groupLayer, depth + 1);
+          await loadAllGroups(groupLayer);
         }
       }
     };
 
-    //console.log("=== Loading all template groups ===");
     await loadAllGroups(this.webmapTemplate);
-    //console.log("=== Template groups loaded ===\n");
 
     // PHASE 1: Add all missing layers recursively
     const addMissingLayers = (
       templateLayer: Layer,
       parent: WebMap | GroupLayer
     ) => {
-      // Find existing layer/group in parent
+      // Find existing layer/group in THIS parent
       let existingLayer = parent.layers.find(
         (l) => l.title === templateLayer.title
       );
@@ -262,11 +244,33 @@ class LayerService {
             opacity: templateLayer.opacity,
             visible: templateLayer.visible,
           });
+          parent.layers.add(existingLayer);
         } else {
-          existingLayer = templateLayer;
+          // Check if this layer already exists ANYWHERE in the map
+          const layerExistsInMap = this.map?.allLayers.find(
+            (l) => l.title === templateLayer.title
+          );
+          
+          if (layerExistsInMap) {
+            // Check if it's already in the correct parent
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const existingParent = (layerExistsInMap as any).parent;
+            const targetParentTitle = parent instanceof WebMap ? 'Map' : (parent as GroupLayer).title || 'Map';
+            const existingParentTitle = existingParent?.declaredClass === 'esri.WebMap' ? 'Map' : (existingParent?.title || 'Map');
+            
+            if (existingParentTitle !== targetParentTitle) {
+              console.log(`Layer "${templateLayer.title}" exists in "${existingParentTitle}" but template wants it in "${targetParentTitle}", skipping to avoid duplicate`);
+              return;
+            }
+            
+            // Layer exists in correct parent, use it
+            existingLayer = layerExistsInMap;
+          } else {
+            // Layer doesn't exist yet - safe to add from template
+            parent.layers.add(templateLayer);
+            existingLayer = templateLayer;
+          }
         }
-        parent.layers.add(existingLayer);
-        //console.log(`Added missing layer "${templateLayer.title}" to "${(parent as __esri.Layer).title || 'Map'}"`);
       }
 
       // Handle group children recursively
@@ -281,47 +285,26 @@ class LayerService {
     };
 
     // Execute Phase 1: Add all missing layers
-    //console.log("=== PHASE 1: Adding missing layers ===");
     for (const layer of this.webmapTemplate.layers.toArray()) {
       addMissingLayers(layer, this.map);
     }
 
-    //console.log("\n=== After Phase 1, checking template structure ===");
-    // Debug: Show what's in the template
-    // for (const templateLayer of this.webmapTemplate.layers.toArray()) {
-    //if (templateLayer.type === "group") {
-    //const group = templateLayer as GroupLayer;
-    //console.log(`Template group "${group.title}" has ${group.layers.length} children:`, group.layers.toArray().map(l => l.title).join(', '));
-    //   }
-    // }
-
     // PHASE 2: Reorder from deepest level up to top level
-    // We can't use this.webmapTemplate.layers directly because they were moved to this.map
-    // Instead, we'll use the current map structure and the persisted/required layer names
     const reorderRecursive = (
-      currentParent: WebMap | GroupLayer,
-      depth: number = 0
+      currentParent: WebMap | GroupLayer
     ) => {
-      //const indent = "  ".repeat(depth);
-      //const parentName = (currentParent as __esri.Layer).title || 'Map';
       const currentLayers = currentParent.layers.toArray();
-
-      //console.log(`${indent}Processing "${parentName}" with ${currentLayers.length} current layers`);
 
       // First, recursively reorder all nested groups (depth-first)
       for (const currentLayer of currentLayers) {
         if (currentLayer.type === "group") {
-          //console.log(`${indent}Found group "${currentLayer.title}", recursing...`);
-          reorderRecursive(currentLayer as GroupLayer, depth + 1);
+          reorderRecursive(currentLayer as GroupLayer);
         }
       }
 
       // For top-level only, reorder based on original webmap structure
-      // We need to use allLayers to find the original order from webmapTemplate
       if (currentParent instanceof WebMap && this.webmapTemplate) {
-        //console.log(`${indent}Reordering top-level map layers based on template...`);
-
-        // Get original order from webmapTemplate by looking at allLayers
+        // Get original order from webmapTemplate
         const templateOrder: string[] = [];
         this.webmapTemplate.allLayers.forEach((layer) => {
           // Only include top-level layers (those whose parent is the map)
@@ -333,63 +316,57 @@ class LayerService {
           }
         });
 
-        //console.log(`${indent}  Template order from allLayers:`, templateOrder.join(', '));
-        //console.log(`${indent}  Current order:`, currentLayers.map(l => l.title).join(', '));
+        // Track which layers we've already added to avoid duplicates
+        const addedLayers = new Set<Layer>();
+        const layersWithoutTitle: Layer[] = [];
+        
+        currentLayers.forEach(layer => {
+          if (!layer.title) {
+            // Graphics layers or other layers without titles
+            layersWithoutTitle.push(layer);
+          }
+        });
 
-        const layersToReorder: Array<{
-          layer: Layer;
-          targetIndex: number;
-          title: string;
-        }> = [];
-
-        for (
-          let targetIndex = 0;
-          targetIndex < templateOrder.length;
-          targetIndex++
-        ) {
-          const templateTitle = templateOrder[targetIndex];
-          const existingLayer = currentLayers.find(
-            (l) => l.title === templateTitle
+        // Build ordered array following template order
+        const orderedTemplateLayers: Layer[] = [];
+        for (const templateTitle of templateOrder) {
+          // Find ALL layers with this title that haven't been added yet
+          const matchingLayers = currentLayers.filter(
+            l => l.title === templateTitle && !addedLayers.has(l)
           );
-
-          if (existingLayer) {
-            const currentIndex = currentParent.layers.indexOf(existingLayer);
-
+          
+          for (const existingLayer of matchingLayers) {
             // Apply visibility
             const persistedVisible = isVisibleLastSession(templateTitle);
             existingLayer.visible = persistedVisible || existingLayer.visible;
-
-            if (currentIndex !== targetIndex) {
-              layersToReorder.push({
-                layer: existingLayer,
-                targetIndex,
-                title: templateTitle,
-              });
-            }
+            
+            orderedTemplateLayers.push(existingLayer);
+            addedLayers.add(existingLayer);
           }
         }
 
-        // Sort by target index descending and reorder
-        layersToReorder.sort((a, b) => b.targetIndex - a.targetIndex);
+        // Add any remaining layers with titles that aren't in template order
+        const remainingLayers = currentLayers.filter(
+          l => l.title && !addedLayers.has(l)
+        );
 
-        for (const { layer, targetIndex } of layersToReorder) {
-          //const beforeIndex = currentParent.layers.indexOf(layer);
-          currentParent.layers.reorder(layer, targetIndex);
-          // const afterIndex = currentParent.layers.indexOf(layer);
+        // Combine: template layers in order, then remaining layers, then layers without titles
+        const finalLayerOrder = [
+          ...orderedTemplateLayers,
+          ...remainingLayers,
+          ...layersWithoutTitle
+        ];
 
-          //console.log(`${indent}  Reordered "${title}": ${beforeIndex} -> ${afterIndex} (target: ${targetIndex})`);
-        }
-
-        //if (layersToReorder.length === 0) {
-        //console.log(`${indent}  No reordering needed`);
-        //}
+        // Remove all layers then re-add in correct order
+        currentParent.layers.removeAll();
+        finalLayerOrder.forEach(layer => {
+          currentParent.layers.add(layer);
+        });
       }
     };
 
     // Execute Phase 2: Reorder everything from deepest to shallowest
-    //console.log("\n=== PHASE 2: Reordering layers ===");
     reorderRecursive(this.map);
-    //console.log("=== Done ===\n");
   }
 
   async initLayersFromWebMap(webMap: WebMap) {

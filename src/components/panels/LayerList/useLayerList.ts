@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   createItemPanel,
   createLabelToggles,
@@ -33,7 +33,7 @@ export const useLayerList = (
   const initializedRef = useRef(false);
   const webMapRef = useRef<WebMap>(undefined);
   const [loaded, setLoaded] = useState(false);
-  const listItemCreatedFunction = (
+  const listItemCreatedFunction = useCallback((
     event: __esri.LayerListListItemCreatedHandlerEvent
   ) => {
     const item = event.item;
@@ -44,8 +44,8 @@ export const useLayerList = (
     watchLayerList(item, "");
     createItemPanel(item);
     createLabelToggles(item);
-  };
-  const handleTriggerAction = (
+  }, []);
+  const handleTriggerAction = useCallback((
     event: TargetedEvent<
       HTMLArcgisLayerListElement,
       __esri.LayerListTriggerActionEvent
@@ -112,9 +112,9 @@ export const useLayerList = (
         minScale: 5000,
       }),
     ];
-  };
+  }, []);
 
-  const handleResetLayers = () => {
+  const handleResetLayers = useCallback(() => {
     if (!mapElement.current || !mapElement.current.map) return;
     const map = mapElement.current.map;
 
@@ -127,7 +127,7 @@ export const useLayerList = (
         return;
       layer.visible = layer.title.includes("Property");
     });
-  };
+  }, [mapElement]);
   useEffect(() => {
     if (!mapElement || !webMap || initializedRef.current) return;
 
