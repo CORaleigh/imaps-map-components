@@ -11,7 +11,7 @@ interface Layer {
 
 export const getLayerByTitle = (mapElement: HTMLArcgisMapElement, name: string) => {
   return mapElement.view.map?.allLayers.find(
-    (layer: __esri.Layer) => layer.title === name
+    (layer: __esri.Layer) => layer.title === name && layer.type !== "group"
   );
 };
 

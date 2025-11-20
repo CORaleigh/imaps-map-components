@@ -163,4 +163,14 @@ export const tips: Tips[] = [
       },
     ],
   },
+  {
+  panel: "map",
+  title: "Map Tips",
+  tips: [
+    {title: "Long Press Property", text: "Pressing and holding on a property will select the property at that location."},
+    {title: "Overview Map", text: "The button in the lower right corner of the map will display an overview map to show where in the county your current map extent is located."},
+    {title: "Display Coordinates", text: "The button in the lower left corner of the map will display an the current location of your cursor.  Coordinates can be shown in decimal degrees, degrees minutes seconds, Stateplane feet or US National Grid, this can be changed using by clicking the gear icon.  Coordinates can also be search for by selecting the search icon and entering the coordinates in the format specified."},
+    {title: "Google Streeview", text: "Next to the zoom in and out buttons is a button that will open Google Streetview in another tab at the location clicked."},
+
+  ]}
 ];

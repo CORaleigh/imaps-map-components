@@ -11,6 +11,10 @@ import Basemap from "@arcgis/core/Basemap";
 import type { TargetedEvent } from "@arcgis/map-components";
 import { layerService } from "../utils/mapLayerService";
 import * as reactiveUtils from "@arcgis/core/core/reactiveUtils.js";
+import { getLayerByTitle } from "../components/panels/PropertySearch/Services/config";
+import Collection from "@arcgis/core/core/Collection";
+import FeatureLayer from "@arcgis/core/layers/FeatureLayer";
+import * as centroidOperator from "@arcgis/core/geometry/operators/centroidOperator.js";
 
 export type MapMode =
   | "identify"
@@ -123,17 +127,44 @@ export const MapProvider: React.FC<{ children: React.ReactNode }> = ({
     },
     []
   );
+  const customizePopup = async () => {
+    const propertyLayer = getLayerByTitle(mapElement.current, "Property");
+    if (propertyLayer && propertyLayer instanceof FeatureLayer) {
+      
+      await mapElement.current.whenLayerView(propertyLayer);
+      if (propertyLayer.popupTemplate) {
+        propertyLayer.popupTemplate.actions = new Collection([
+          {
+            title: "Select",
+            id: "property-select",
+            icon: "search",
+          } as __esri.ActionButton,
+        ]);
+      }
+    }
+    await reactiveUtils.whenOnce(() => mapElement.current.popup?.actions);
 
+    mapElement.current.popup?.on("trigger-action", (event) => {
+    
+      const popup = mapElement.current.popup;
+      
+      if (event.action.title === "Select" && popup && popup.selectedFeature) {
+        
+        setGeometry(centroidOperator.execute(popup.selectedFeature.geometry as __esri.Polygon));
+        popup.close();
+      }
+    });
+  };
   // Called once the map view is ready
-  const viewReady = useCallback(() => {
+  const viewReady = useCallback(async () => {
     const view = mapElement.current.view;
     if (!view) return;
 
     layerService.attachView(view);
-    layerService.restorePersistedState();
+    await layerService.restorePersistedState();
     persistBasemap();
+    customizePopup();
   }, [persistBasemap]);
-
   // Handle custom actions like identify / streetview
   const handleCustomActionClick = useCallback(
     (action: "identify" | "streetview" | null) => {
@@ -211,7 +242,7 @@ export const MapProvider: React.FC<{ children: React.ReactNode }> = ({
       const pin = selectedCondo.getAttribute("PIN_NUM");
       setSearchParams((prev) => {
         const params = new URLSearchParams(prev);
-        console.log(params)
+        console.log(params);
         params.set("pin", pin);
         params.delete("search");
         return params;

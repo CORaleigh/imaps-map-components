@@ -16,6 +16,7 @@ import type { MapMode } from "../../context/MapContext";
 import type { ToolType } from "../Shell/useShell";
 
 import styles from "./MapView.module.css";
+import TipManager from "../TipsManager";
 
 interface MapViewProps {
   mapElement: React.RefObject<HTMLArcgisMapElement>;
@@ -98,6 +99,9 @@ const MapView: React.FC<MapViewProps> = ({
         <arcgis-home slot="top-left" goToOverride={onGoHome}></arcgis-home>
         <arcgis-compass slot="top-left"></arcgis-compass>
         <arcgis-track slot="top-left"></arcgis-track>
+        <div slot="top-left">
+          <TipManager name="map" scale="s"></TipManager>
+        </div>
         <div slot="top-left" className={styles.customActions}>
           <calcite-action
             id="identify-action"

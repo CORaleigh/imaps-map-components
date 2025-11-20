@@ -9,9 +9,10 @@ import styles from "./TipManager.module.css";
 import { useTips } from "./useTips";
 interface TipManagerProps {
   name: string;
+  scale?: "s" | "m" | "l"
 }
 
-const TipManager: React.FC<TipManagerProps> = ({ name }) => {
+const TipManager: React.FC<TipManagerProps> = ({ name, scale }) => {
   const { panelTips } = useTips(name);
   return (
     <>
@@ -22,6 +23,7 @@ const TipManager: React.FC<TipManagerProps> = ({ name }) => {
             slot="header-actions-end"
             text="Tips"
             icon="lightbulb"
+            scale={scale ? scale : "m"}
           ></calcite-action>
 
           <calcite-popover
