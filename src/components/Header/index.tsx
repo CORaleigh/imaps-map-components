@@ -8,14 +8,21 @@ import "@esri/calcite-components/components/calcite-tooltip";
 
 import { useHeader } from "./useHeader";
 import { useMap } from "../../context/useMap";
+import Disclaimer from "../Disclaimer";
+import { useDisclaimer } from "../Disclaimer/useDisclaimer";
 
 interface HeaderProps {
   theme: "dark" | "light";
   appSize: "small" | "medium" | "large";
 }
 
-const Header: React.FC<HeaderProps> = ({ theme, appSize }) => {
+const Header: React.FC<HeaderProps> = ({
+  theme,
+  appSize
+}) => {
   const { webMapId } = useMap();
+  const { open, checkbox, handleDialogClose, handleDialogOpen } =
+    useDisclaimer();
 
   const { links, handleDropdownOpen, handleClearStorage } = useHeader(
     webMapId.current
@@ -26,7 +33,9 @@ const Header: React.FC<HeaderProps> = ({ theme, appSize }) => {
         <calcite-navigation-logo
           slot="logo"
           thumbnail={theme === "light" ? "logo.svg" : "logo_dark.svg"}
-          description={appSize !== "small" ? "Wake County and City of Raleigh" : ""}
+          description={
+            appSize !== "small" ? "Wake County and City of Raleigh" : ""
+          }
           href="https://www.wake.gov/departments-government/geographic-information-services-gis/maps-apps-data/imaps-information"
         ></calcite-navigation-logo>
 
@@ -44,7 +53,11 @@ const Header: React.FC<HeaderProps> = ({ theme, appSize }) => {
             icon="hamburger"
             slot="trigger"
           ></calcite-action>
-
+          <calcite-dropdown-group groupTitle="About" selectionMode="none">
+            <calcite-dropdown-item onClick={handleDialogOpen}>
+              Disclaimer
+            </calcite-dropdown-item>
+          </calcite-dropdown-group>
           {links.current.map((group, i) => (
             <calcite-dropdown-group
               groupTitle={group.title}
@@ -72,7 +85,15 @@ const Header: React.FC<HeaderProps> = ({ theme, appSize }) => {
           </calcite-dropdown-group>
         </calcite-dropdown>
       </calcite-navigation>
-      <calcite-tooltip closeOnClick referenceElement="menu-button" placement="left" overlayPositioning="fixed">Menu</calcite-tooltip>
+      <calcite-tooltip
+        closeOnClick
+        referenceElement="menu-button"
+        placement="left"
+        overlayPositioning="fixed"
+      >
+        Menu
+      </calcite-tooltip>
+      <Disclaimer open={open} checkbox={checkbox} onClose={handleDialogClose}></Disclaimer>
     </>
   );
 };

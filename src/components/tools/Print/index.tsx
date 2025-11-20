@@ -133,7 +133,7 @@ const Print: React.FC<PrintProps> = ({ mapElement, closed, onToolClose }) => {
                     oncalciteSelectChange={handleCustomScaleChange}
                   >
                     {scales.map((scale: MapScale) => (
-                      <calcite-option value={scale.scale} key={scale.label}>
+                      <calcite-option value={scale.scale}>
                         {scale.label}
                       </calcite-option>
                     ))}
