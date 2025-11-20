@@ -48,6 +48,14 @@ export const tips: Tips[] = [
         title: "Septic and Wells",
         text: "If there is a septic system or well on a property, you will see a button linking to septic permits or well sampling results.",
       },      
+      {
+        title: "Addresses",
+        text: "All addresses located on a property are displayed in a table at the bottom of the property information.  Selecting an address in the table will zoom and mark that location on the map.  Addresses can also be exported by selecting Export CSV in the menu.",
+      },         
+      {
+        title: "Export Results",
+        text: "All attributes for the selected properties can be exported by selecting Export CSV in the menu on the table in the list tab.",
+      },         
     ],
   },
   {
