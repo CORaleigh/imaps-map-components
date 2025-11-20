@@ -49,6 +49,7 @@ const LayerList: React.FC<LayerListProps> = ({
           <arcgis-layer-list
             referenceElement={mapElement.current}
             showFilter
+            filterPlaceholder="Search by layer title"
             visibilityAppearance="checkbox"
             listItemCreatedFunction={listItemCreatedFunction}
             onarcgisTriggerAction={handleTriggerAction}
