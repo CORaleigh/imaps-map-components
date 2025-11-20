@@ -3,6 +3,10 @@
   max-width: 350px;
 }
 
+  :global(div[slot="bottom-left"]) {
+    z-index: 0;
+  }
+
 .customActions {
   position: absolute;
   left: 45px;
@@ -33,4 +37,6 @@
     width: calc(100% - 48px);
   }
 }
+
+
 

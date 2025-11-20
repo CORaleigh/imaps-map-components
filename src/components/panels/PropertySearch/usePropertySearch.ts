@@ -126,6 +126,10 @@ export const usePropertySearch = (
     event.target.sources = sources;
     if (searchParams.get("pin")) {
       event.target.search(searchParams.get("pin")!);
+
+    } else if (searchParams.get("search")) {
+      event.target.search(searchParams.get("search")!);
+
     }
   };
 

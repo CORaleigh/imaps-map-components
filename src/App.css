@@ -8,6 +8,7 @@ body {
   --calcite-shell-panel-max-width: 50vw;
   --calcite-z-index-header: unset;
   --calcite-font-size--1: 16px;
+
 }
 
 calcite-shell-panel calcite-panel {

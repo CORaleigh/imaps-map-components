@@ -138,6 +138,7 @@ export const useShell = (): UseShellProps => {
     event: TargetedEvent<HTMLArcgisMapElement, void>
   ) => {
     event.target.constraints = constraints as __esri.View2DConstraints;
+
     const storedExtent = localStorage.getItem(
       `imaps_${webMapId.current}_extent`
     );
@@ -196,7 +197,6 @@ export const useShell = (): UseShellProps => {
     >
   ) => {
     setCoordinateConversionOpen(event.target.expanded);
-    
   };
 
   useEffect(() => {
@@ -209,7 +209,6 @@ export const useShell = (): UseShellProps => {
   useEffect(() => {
     setActivePanel("propertySearch");
   }, [selectedCondo]);
-
 
   return {
     mapElement,

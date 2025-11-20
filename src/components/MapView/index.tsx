@@ -103,7 +103,6 @@ const MapView: React.FC<MapViewProps> = ({
             id="identify-action"
             scale="s"
             label="identify"
-            slot="top-left"
             text={"identify"}
             icon="information"
             active={mapMode === "identify"}
@@ -119,7 +118,6 @@ const MapView: React.FC<MapViewProps> = ({
             id="streetview-action"
             scale="s"
             label="streetview"
-            slot="top-left"
             text={"streetview"}
             icon="360-view"
             active={mapMode === "streetview"}
