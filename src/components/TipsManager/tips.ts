@@ -30,12 +30,14 @@ export const tips: Tips[] = [
     panel: "property-search",
     title: "Property Search Tips",
     tips: [
-      { title: "Display Additional Columns",
-        text: "Display addressional columns in the table on the list tab.  These columns will remain next time iMAPS loads."
+      {
+        title: "Display Additional Columns",
+        text: "Display addressional columns in the table on the list tab.  These columns will remain next time iMAPS loads.",
       },
-      { title: "Search History",
-        text: "View recent searches by clicking on the clock icon next to the search input.  Clicking on a recent search will select that property."
-      },      
+      {
+        title: "Search History",
+        text: "View recent searches by clicking on the clock icon next to the search input.  Clicking on a recent search will select that property.",
+      },
       {
         title: "Click and Hold to Select",
         text: "Click and hold on a property to select it from the map.",
@@ -47,15 +49,15 @@ export const tips: Tips[] = [
       {
         title: "Septic and Wells",
         text: "If there is a septic system or well on a property, you will see a button linking to septic permits or well sampling results.",
-      },      
+      },
       {
         title: "Addresses",
         text: "All addresses located on a property are displayed in a table at the bottom of the property information.  Selecting an address in the table will zoom and mark that location on the map.  Addresses can also be exported by selecting Export CSV in the menu.",
-      },         
+      },
       {
         title: "Export Results",
         text: "All attributes for the selected properties can be exported by selecting Export CSV in the menu on the table in the list tab.",
-      },         
+      },
     ],
   },
   {
@@ -80,23 +82,23 @@ export const tips: Tips[] = [
       {
         title: "Layer Filter",
         text: "Use the search box above the layer list to filter the layers by title.",
-      },      
+      },
       {
         title: "Reset Layers",
         text: "The reset button the header will set all layers to not visible, except for the property layer.",
-      },          
+      },
       {
         title: "Property Labels",
         text: "Clicking on the ... button next to the property layer will allow for labels to be shown on the map for site address, PIN number, owner and sale information.  Multiple can be selected to show stacked labels.",
-      },  
+      },
       {
         title: "Layer Visiblity Stored",
         text: "Layer visibility is automatically stored so the next time you visit iMAPS, those layers will be visible (unless browser cache is cleared).",
-      },              
+      },
       {
         title: "Changing Transparency",
         text: "The transparency for layer can be adjusted by clicking the icon to the right of the layer name.  This will persist during your next session.",
-      },            
+      },
     ],
   },
   {
@@ -110,7 +112,7 @@ export const tips: Tips[] = [
       {
         title: "Intersection Search",
         text: "Searching by street name and selecting a street name under the intersections category will display a list of all intersecting streets.  Selecting an intersecting street will zoom to that location on the map.",
-      },      
+      },
     ],
   },
   {
@@ -138,6 +140,10 @@ export const tips: Tips[] = [
     title: "Property Select Tips",
     tips: [
       {
+        title: "Buffer Property",
+        text: "If a single property is selected and the buffer distance its greater than 0, a button will appear that will select properties within the buffer distance entered.",
+      },
+      {
         title: "Long Press to Select",
         text: "Long pressing on a property will select that property without the property select tool being opened.",
       },
@@ -154,7 +160,7 @@ export const tips: Tips[] = [
       {
         title: "Adjust Existing Sketches",
         text: "By clicking the sketch select tool (arrow) and selecting a sketch on the map, you can adjust its symbol, adjust the content of a text sketch or delete the sketch.",
-      },      
+      },
     ],
   },
 ];
