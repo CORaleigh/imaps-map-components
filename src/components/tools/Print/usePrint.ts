@@ -8,7 +8,7 @@ import {
   type Layout,
   type MapScale,
 } from "./printLayouts";
-import { prepareExport, type Export } from "./printService";
+import { prepareExport, roundScale, type Export } from "./printService";
 import { useMap } from "../../../context/useMap";
 import { getPrintTemplate, hidePrintFrame, showPrintFrame } from "./printFrame";
 
@@ -227,7 +227,7 @@ export const usePrint = (
     if (!printUrl.current) return;
     prepareExport(
       mapElement.current,
-      printOptions.scale,
+      printOptions.scaleType === "custom" ? printOptions.scale : roundScale(mapElement.current.scale),
       printOptions.layout,
       printOptions.format,
       printOptions.title,
@@ -285,7 +285,7 @@ export const usePrint = (
     showPrintFrame(
       mapElement.current,
       layout,
-      scale,
+      printOptions.scaleType === "custom" ? scale : roundScale(mapElement.current.scale),
       showAttributes,
       showLegend
     );
