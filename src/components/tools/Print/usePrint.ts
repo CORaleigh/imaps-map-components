@@ -130,9 +130,12 @@ export const usePrint = (
   const handleScaleTypeChange = (
     event: TargetedEvent<HTMLCalciteRadioButtonGroupElement, void>
   ) => {
+    const scale = event.target.selectedItem.value === "current" ? mapElement.current.scale : scales.at(0)?.scale;
+    console.log(scale)
     setPrintOptions((prev) => ({
       ...prev,
       scaleType: event.target.selectedItem.value,
+      scale: scale as number
     }));
   };
 
