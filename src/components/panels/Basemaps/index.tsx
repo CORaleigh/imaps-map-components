@@ -98,3 +98,4 @@ export default React.memo(
     prev.closed === next.closed &&
     prev.onPanelClose === next.onPanelClose
 );
+ 

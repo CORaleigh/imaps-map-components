@@ -22,6 +22,7 @@ import * as reactiveUtils from "@arcgis/core/core/reactiveUtils.js";
 import { executeArcade } from "./popupTemplate/popupContent";
 import { arcadeExpressionInfos } from "./popupTemplate/arcadeExpressions";
 import { getTableByTitle } from "../../../utils/layerHelper";
+import { updateClusters } from "./clusterLayer";
 
 export interface UsePropertySearchProps {
   mapElement: React.RefObject<HTMLArcgisMapElement>;
@@ -563,6 +564,7 @@ export const usePropertySearch = (
       await (tableLayerRef.current as __esri.FeatureLayer).applyEdits({
         addFeatures: condos,
       });
+      updateClusters(condos, mapElement.current);
       tableElement.current?.refresh();
     };
     updateTableLayer();

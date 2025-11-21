@@ -18,6 +18,7 @@ import * as centroidOperator from "@arcgis/core/geometry/operators/centroidOpera
 import { searchCondos } from "../components/panels/PropertySearch/search";
 import { getLayerByTitle } from "../utils/layerHelper";
 import { useCondoHistory } from "./useCondoHistory";
+import { addClusterLayer } from "../components/panels/PropertySearch/clusterLayer";
 
 export type MapMode =
   | "identify"
@@ -70,7 +71,6 @@ const MapContext = createContext<MapContextType | undefined>(undefined);
 export const MapProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-
   /** -------------------- Refs -------------------- **/
   const mapElement = useRef<HTMLArcgisMapElement>(null!);
   const webMapId = useRef<string>("95092428774c4b1fb6a3b6f5fed9fbc4");
@@ -175,8 +175,9 @@ export const MapProvider: React.FC<{ children: React.ReactNode }> = ({
     layerService.attachView(view);
     await layerService.restorePersistedState();
 
-            persistBasemap();
-        customizePopup();
+    persistBasemap();
+    customizePopup();
+    addClusterLayer(mapElement.current);
   }, [persistBasemap]);
   // Handle custom actions like identify / streetview
   const handleCustomActionClick = useCallback(
