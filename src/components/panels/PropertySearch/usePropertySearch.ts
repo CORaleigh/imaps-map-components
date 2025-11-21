@@ -19,7 +19,6 @@ import FeatureLayer from "@arcgis/core/layers/FeatureLayer";
 import PictureMarkerSymbol from "@arcgis/core/symbols/PictureMarkerSymbol";
 import GraphicsLayer from "@arcgis/core/layers/GraphicsLayer";
 import * as reactiveUtils from "@arcgis/core/core/reactiveUtils.js";
-import { useSearchParams } from "react-router-dom";
 import { executeArcade } from "./popupTemplate/popupContent";
 import { arcadeExpressionInfos } from "./popupTemplate/arcadeExpressions";
 import { getTableByTitle } from "../../../utils/layerHelper";
@@ -95,8 +94,6 @@ export interface UsePropertySearchProps {
 export const usePropertySearch = (
   mapElement: React.RefObject<HTMLArcgisMapElement>
 ): UsePropertySearchProps => {
-  const [searchParams] = useSearchParams();
-
   const initializedRef = useRef(false);
   const tableElement = useRef<HTMLArcgisFeatureTableElement>(null!);
   const addressTableElement = useRef<HTMLArcgisFeatureTableElement>(null!);
@@ -110,7 +107,7 @@ export const usePropertySearch = (
     geometry,
     webMapId,
     setGeometry,
-    setSearchReady
+    setSearchReady,
   } = useMap();
 
   const [siteAddress, setSiteAddress] = useState<string>("");
@@ -126,10 +123,11 @@ export const usePropertySearch = (
     const sources = await getSearchSources(mapElement.current, event.target);
     if (!sources) return;
     event.target.sources = sources;
-    if (searchParams.get("pin")) {
-      //event.target.search(searchParams.get("pin")!);
-    } else if (searchParams.get("search")) {
-      event.target.search(searchParams.get("search")!);
+    const params = new URLSearchParams(window.location.search);
+    const pin = params.get("pin");
+    const search = params.get("pin");
+    if (!pin && search) {
+      event.target.search(search);
     }
 
     setTimeout(() => {
@@ -511,7 +509,7 @@ export const usePropertySearch = (
   useEffect(() => {
     if (!mapElement.current || initializedRef.current) return;
     initializedRef.current = true;
-  }, [mapElement, searchParams]);
+  }, [mapElement]);
 
   useEffect(() => {
     if (geometry && mapElement) {

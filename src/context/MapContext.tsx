@@ -6,7 +6,6 @@ import React, {
   useCallback,
 } from "react";
 import WebMap from "@arcgis/core/WebMap";
-import { useSearchParams } from "react-router-dom";
 import Basemap from "@arcgis/core/Basemap";
 import type { TargetedEvent } from "@arcgis/map-components";
 import { layerService } from "../utils/mapLayerService";
@@ -71,7 +70,6 @@ const MapContext = createContext<MapContextType | undefined>(undefined);
 export const MapProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [searchParams] = useSearchParams();
 
   /** -------------------- Refs -------------------- **/
   const mapElement = useRef<HTMLArcgisMapElement>(null!);
@@ -103,7 +101,7 @@ export const MapProvider: React.FC<{ children: React.ReactNode }> = ({
     setCondos,
     mapElementRef: mapElement,
     searchCondos,
-    searchReady
+    searchReady,
   });
   /** -------------------- Callbacks / Functions -------------------- **/
 
@@ -170,22 +168,22 @@ export const MapProvider: React.FC<{ children: React.ReactNode }> = ({
     });
   };
   // Called once the map view is ready
-const viewReady = useCallback(async () => {
-  const view = mapElement.current.view;
-  if (!view) return;
+  const viewReady = useCallback(async () => {
+    const view = mapElement.current.view;
+    if (!view) return;
 
-  layerService.attachView(view);
-  await layerService.restorePersistedState();
+    layerService.attachView(view);
+    await layerService.restorePersistedState();
 
-  // 🔥 Wait for view.map to exist before calling persistBasemap
-  reactiveUtils.when(
-    () => !!view.map,
-    () => {
-      persistBasemap();
-      customizePopup();
-    }
-  );
-}, [persistBasemap]);
+    // 🔥 Wait for view.map to exist before calling persistBasemap
+    reactiveUtils.when(
+      () => !!view.map,
+      () => {
+        persistBasemap();
+        customizePopup();
+      }
+    );
+  }, [persistBasemap]);
   // Handle custom actions like identify / streetview
   const handleCustomActionClick = useCallback(
     (action: "identify" | "streetview" | null) => {
@@ -224,8 +222,9 @@ const viewReady = useCallback(async () => {
     initialized.current = true;
 
     async function initMap() {
-      const app = searchParams.get("app");
-      const id = searchParams.get("id");
+      const params = new URLSearchParams(window.location.search);
+      const app = params.get("app");
+      const id = params.get("id");
       const mapId =
         app === "puma"
           ? "1feff5b9d152475b828c8483b12a86bb"
@@ -254,7 +253,7 @@ const viewReady = useCallback(async () => {
     }
 
     initMap();
-  }, [searchParams, viewReady]);
+  }, [viewReady]);
 
   /** -------------------- Provider -------------------- **/
   return (

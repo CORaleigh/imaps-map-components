@@ -12,8 +12,7 @@
   "dependencies": {
     "@arcgis/map-components": "^4.34.4",
     "react": "^19.1.1",
-    "react-dom": "^19.1.1",
-    "react-router-dom": "^7.9.5"
+    "react-dom": "^19.1.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.36.0",
