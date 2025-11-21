@@ -175,14 +175,8 @@ export const MapProvider: React.FC<{ children: React.ReactNode }> = ({
     layerService.attachView(view);
     await layerService.restorePersistedState();
 
-    // 🔥 Wait for view.map to exist before calling persistBasemap
-    reactiveUtils.when(
-      () => !!view.map,
-      () => {
-        persistBasemap();
+            persistBasemap();
         customizePopup();
-      }
-    );
   }, [persistBasemap]);
   // Handle custom actions like identify / streetview
   const handleCustomActionClick = useCallback(
