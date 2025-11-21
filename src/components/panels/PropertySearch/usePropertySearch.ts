@@ -144,8 +144,9 @@ export const usePropertySearch = (
 
   const handleTableReady = useCallback(
     async (event: TargetedEvent<HTMLArcgisFeatureTableElement, void>) => {
-      const layer = await createTableLayer(mapElement.current);
       (event.target as any).viewModel.messages.header = `0 properties selected`;
+      (event.target as any).viewModel.messages.noLayer = "";
+      const layer = await createTableLayer(mapElement.current);
 
       if (!layer) return;
       event.target.layer = layer;
