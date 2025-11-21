@@ -7,6 +7,8 @@ interface Props {
 }
 export const OpacitySlider: React.FC<Props> = ({ layer, value }) => {
   return (
+    <calcite-label scale="s">
+      Transparency
     <calcite-slider
       value={value}
       max={1}
@@ -17,7 +19,10 @@ export const OpacitySlider: React.FC<Props> = ({ layer, value }) => {
       ) => {
         layer.opacity = event.target.value as number;
       }}
+      maxLabel="100%"
+      minLabel="0%"
     ></calcite-slider>
+    </calcite-label>
   );
 };
 export default OpacitySlider;

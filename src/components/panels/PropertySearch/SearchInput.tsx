@@ -58,7 +58,7 @@ const SearchInput: React.FC<SearchInputProps> = ({
         onarcgisSearchComplete={onSearchComplete}
         onarcgisSuggestStart={onSuggestStart}
         popupDisabled
-        allPlaceholder="Address, owner, PIN or REID"
+        allPlaceholder=""
       ></arcgis-search>
       <calcite-action
         id="history-popover-button"

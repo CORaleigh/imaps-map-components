@@ -21,6 +21,7 @@ const LayerList: React.FC<LayerListProps> = ({
   onPanelClose,
 }) => {
   const {
+    layerListElement,
     listItemCreatedFunction,
     handleTriggerAction,
     handleResetLayers,
@@ -49,6 +50,7 @@ const LayerList: React.FC<LayerListProps> = ({
 
         {loaded && (
           <arcgis-layer-list
+            ref={layerListElement}
             referenceElement={mapElement.current}
             showFilter
             filterPlaceholder="Search by layer title"

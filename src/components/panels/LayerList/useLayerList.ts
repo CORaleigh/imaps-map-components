@@ -1,4 +1,10 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type RefObject,
+} from "react";
 import {
   createItemPanel,
   createLabelToggles,
@@ -15,6 +21,7 @@ import GroupLayer from "@arcgis/core/layers/GroupLayer";
 import WebMap from "@arcgis/core/WebMap";
 
 export interface UseLayerListProps {
+  layerListElement: RefObject<HTMLArcgisLayerListElement | null>;
   listItemCreatedFunction: __esri.LayerListListItemCreatedHandler;
   handleTriggerAction: (
     event: TargetedEvent<
@@ -31,88 +38,93 @@ export const useLayerList = (
 ): UseLayerListProps => {
   const { webMap, webMapId } = useMap();
   const initializedRef = useRef(false);
+  const layerListElement = useRef<HTMLArcgisLayerListElement>(null);
   const webMapRef = useRef<WebMap>(undefined);
   const [loaded, setLoaded] = useState(false);
-  const listItemCreatedFunction = useCallback((
-    event: __esri.LayerListListItemCreatedHandlerEvent
-  ) => {
-    const item = event.item;
+  const listItemCreatedFunction = useCallback(
+    (event: __esri.LayerListListItemCreatedHandlerEvent) => {
+      const item = event.item;
 
-    if (item.visible && item.parent && item.layer?.type !== "sublayer") {
-      item.parent.open = item.parent.visible;
-    }
-    watchLayerList(item, "");
-    createItemPanel(item);
-    createLabelToggles(item);
-  }, []);
-  const handleTriggerAction = useCallback((
-    event: TargetedEvent<
-      HTMLArcgisLayerListElement,
-      __esri.LayerListTriggerActionEvent
-    >
-  ) => {
-    const item = event.detail.item;
-    if (
-      event.detail.action.type !== "toggle" ||
-      !item.layer ||
-      item.layer.type !== "feature" ||
-      item.actionsSections.length === 0
-    )
-      return;
-    const action = event.detail.action;
-    const layer = item.layer as __esri.FeatureLayer;
-    action.icon = action.value ? "toggle-on" : "toggle-off";
-    requestAnimationFrame(() => {
-      event.detail.item.actionsOpen = true;
-    });
-    if (!layer.labelsVisible) {
-      layer.labelsVisible = true;
-    }
+      if (item.visible && item.parent && item.layer?.type !== "sublayer") {
+        item.parent.open = item.parent.visible;
+      }
+      watchLayerList(item, "");
+      createItemPanel(item);
+      createLabelToggles(item);
+    },
+    []
+  );
+  const handleTriggerAction = useCallback(
+    (
+      event: TargetedEvent<
+        HTMLArcgisLayerListElement,
+        __esri.LayerListTriggerActionEvent
+      >
+    ) => {
+      const item = event.detail.item;
+      if (
+        event.detail.action.type !== "toggle" ||
+        !item.layer ||
+        item.layer.type !== "feature" ||
+        item.actionsSections.length === 0
+      )
+        return;
+      const action = event.detail.action;
+      const layer = item.layer as __esri.FeatureLayer;
+      action.icon = action.value ? "toggle-on" : "toggle-off";
+      requestAnimationFrame(() => {
+        event.detail.item.actionsOpen = true;
+      });
+      if (!layer.labelsVisible) {
+        layer.labelsVisible = true;
+      }
 
-    const selected = item.actionsSections
-      .getItemAt(0)
-      ?.filter((toggle: ActionToggle | __esri.ActionButton) => {
-        if (toggle.type !== "toggle") return false;
-        toggle.icon = toggle.value ? "toggle-on" : "toggle-off";
-        return toggle.value;
+      const selected = item.actionsSections
+        .getItemAt(0)
+        ?.filter((toggle: ActionToggle | __esri.ActionButton) => {
+          if (toggle.type !== "toggle") return false;
+          toggle.icon = toggle.value ? "toggle-on" : "toggle-off";
+          return toggle.value;
+        });
+
+      const selectedTitles = selected?.map((section) => {
+        return (section as ActionToggle).title;
       });
 
-    const selectedTitles = selected?.map((section) => {
-      return (section as ActionToggle).title;
-    });
+      const selectedExpressions = propertyLabelExpressions.filter(
+        (expression) => {
+          return selectedTitles?.includes(expression.title);
+        }
+      );
+      const expressions = selectedExpressions.map((expression) => {
+        return expression.expression;
+      });
+      const expression = expressions.join("+ TextFormatting.NewLine+");
+      layer.labelingInfo = [];
 
-    const selectedExpressions = propertyLabelExpressions.filter(
-      (expression) => {
-        return selectedTitles?.includes(expression.title);
-      }
-    );
-    const expressions = selectedExpressions.map((expression) => {
-      return expression.expression;
-    });
-    const expression = expressions.join("+ TextFormatting.NewLine+");
-    layer.labelingInfo = [];
-
-    layer.labelingInfo = [
-      new LabelClass({
-        symbol: {
-          type: "text",
-          color: "black",
-          haloColor: "white",
-          haloSize: 1,
-          font: {
-            family: "AvenirNext LT Pro Regular",
-            style: "normal",
-            weight: "bold",
+      layer.labelingInfo = [
+        new LabelClass({
+          symbol: {
+            type: "text",
+            color: "black",
+            haloColor: "white",
+            haloSize: 1,
+            font: {
+              family: "AvenirNext LT Pro Regular",
+              style: "normal",
+              weight: "bold",
+            },
           },
-        },
-        labelExpressionInfo: {
-          expression: expression,
-        },
-        maxScale: 0,
-        minScale: 5000,
-      }),
-    ];
-  }, []);
+          labelExpressionInfo: {
+            expression: expression,
+          },
+          maxScale: 0,
+          minScale: 5000,
+        }),
+      ];
+    },
+    []
+  );
 
   const handleResetLayers = useCallback(() => {
     if (!mapElement.current || !mapElement.current.map) return;
@@ -142,7 +154,13 @@ export const useLayerList = (
         })(),
         layerService.addAllMissingSiblingsAfterLayerList(),
       ]);
-
+      setTimeout(() => {
+        const filter = layerListElement.current?.shadowRoot?.querySelector("calcite-list")?.shadowRoot?.querySelector("calcite-filter")?.shadowRoot?.querySelector("calcite-input")?.shadowRoot?.querySelector("input");
+        if (filter) {
+          filter.style.fontSize = "16px";
+        }
+        
+      }, 500);
       webMapRef.current = freshWebMap;
 
       // 2. Batch reorder operations
@@ -191,6 +209,7 @@ export const useLayerList = (
   }, [mapElement, webMap, webMapId]);
 
   return {
+    layerListElement,
     listItemCreatedFunction,
     handleTriggerAction,
     handleResetLayers,

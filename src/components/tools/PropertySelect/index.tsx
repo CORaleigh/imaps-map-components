@@ -107,7 +107,6 @@ const PropertySelect: React.FC<PropertySelectProps> = ({
           <calcite-label>
             Buffer Distance
             <calcite-input-number
-              scale="l"
               min={0}
               max={5280}
               clearable

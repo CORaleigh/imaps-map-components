@@ -126,11 +126,20 @@ export const usePropertySearch = (
     event.target.sources = sources;
     if (searchParams.get("pin")) {
       event.target.search(searchParams.get("pin")!);
-
     } else if (searchParams.get("search")) {
       event.target.search(searchParams.get("search")!);
-
     }
+
+    setTimeout(() => {
+      const input = searchElement.current.shadowRoot
+        ?.querySelector("calcite-autocomplete")
+        ?.shadowRoot?.querySelector("calcite-input")
+        ?.shadowRoot?.querySelector("input");
+      if (input) {
+        input.style.fontSize = "16px";
+        searchElement.current.allPlaceholder = "Address, owner, PIN or REID";
+      }
+    }, 500);
   };
 
   const handleTableReady = useCallback(
@@ -281,7 +290,6 @@ export const usePropertySearch = (
       }
     >
   ) => {
-
     if (event.detail.name === "size") {
       event.target.style.maxHeight = "500px";
       event.target.style.height = `${(event.target.size + 2) * 40 + 100}px`;

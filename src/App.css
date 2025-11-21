@@ -3,8 +3,8 @@ html,
 body {
   height: 100%;
   margin: 0;
-  --calcite-shell-panel-min-width: 365px;
-  --calcite-shell-panel-width: 365px;
+  --calcite-shell-panel-min-width: 390px;
+  --calcite-shell-panel-width: 390px;
   --calcite-shell-panel-max-width: 50vw;
   --calcite-z-index-header: unset;
 }
