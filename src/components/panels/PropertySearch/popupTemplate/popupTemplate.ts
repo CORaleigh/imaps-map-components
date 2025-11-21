@@ -8,7 +8,7 @@ import * as centroidOperator from "@arcgis/core/geometry/operators/centroidOpera
 import CustomContent from "@arcgis/core/popup/content/CustomContent";
 import FeatureLayer from "@arcgis/core/layers/FeatureLayer";
 import { getPopupContent } from "./popupContent";
-import { getTableByTitle } from "../table";
+import { getTableByTitle } from "../../../../utils/layerHelper";
 
 export const createTemplate = (
   mapElement: HTMLArcgisMapElement | null,

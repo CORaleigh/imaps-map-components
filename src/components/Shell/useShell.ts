@@ -89,7 +89,6 @@ export const useShell = (): UseShellProps => {
       return newTheme;
     });
   }, []);
-  
 
   useEffect(() => {
     const body = document.querySelector("body");

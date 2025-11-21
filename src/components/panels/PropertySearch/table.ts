@@ -4,15 +4,9 @@ import TableTemplate from "@arcgis/core/widgets/FeatureTable/support/TableTempla
 import Color from "@arcgis/core/Color";
 
 import Field from "@arcgis/core/layers/support/Field";
+import { getTableByTitle } from "../../../utils/layerHelper";
 
-export const getTableByTitle = (
-  mapElement: HTMLArcgisMapElement,
-  name: string
-) => {
-  return mapElement.view.map?.allTables.find(
-    (layer: __esri.Layer) => layer.title === name
-  );
-};
+
 
 export const createTableLayer = async (mapElement: HTMLArcgisMapElement) => {
   if (!mapElement || !mapElement.view.map) return;

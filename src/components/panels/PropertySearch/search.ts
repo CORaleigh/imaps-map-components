@@ -246,19 +246,20 @@ const searchResultSelected = async (
     if (relatedCondos) {
       return relatedCondos;
     } else {
-      const condoResult = searchCondos(where, oids, mapElement);
+      const condoResult = searchCondos(where, mapElement, oids);
       return condoResult;
     }
   } else {
-    const condoResult = await searchCondos(where, oids, mapElement);
+    const condoResult = await searchCondos(where, mapElement, oids);
     return condoResult;
   }
 };
 
-const searchCondos = async (
+export const searchCondos = async (
   where: string,
-  oids: number[],
-  mapElement: HTMLArcgisMapElement
+
+  mapElement: HTMLArcgisMapElement,
+  oids?: number[]
 ): Promise<__esri.Graphic[]> => {
   const params: {
     outFields: string[];

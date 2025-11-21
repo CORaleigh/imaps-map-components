@@ -11,10 +11,14 @@ import Basemap from "@arcgis/core/Basemap";
 import type { TargetedEvent } from "@arcgis/map-components";
 import { layerService } from "../utils/mapLayerService";
 import * as reactiveUtils from "@arcgis/core/core/reactiveUtils.js";
-import { getLayerByTitle } from "../components/panels/PropertySearch/Services/config";
+
 import Collection from "@arcgis/core/core/Collection";
 import FeatureLayer from "@arcgis/core/layers/FeatureLayer";
 import * as centroidOperator from "@arcgis/core/geometry/operators/centroidOperator.js";
+
+import { searchCondos } from "../components/panels/PropertySearch/search";
+import { getLayerByTitle } from "../utils/layerHelper";
+import { useCondoHistory } from "./useCondoHistory";
 
 export type MapMode =
   | "identify"
@@ -46,6 +50,8 @@ export interface MapContextType {
   setWebMap: (webMap: WebMap) => void;
   mapReady: boolean;
   setMapReady: (ready: boolean) => void;
+  searchReady: boolean;
+  setSearchReady: (ready: boolean) => void;
   geometry: __esri.Geometry | null;
   setGeometry: (geom: __esri.Geometry | null) => void;
   condos: __esri.Graphic[];
@@ -65,17 +71,17 @@ const MapContext = createContext<MapContextType | undefined>(undefined);
 export const MapProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
 
   /** -------------------- Refs -------------------- **/
   const mapElement = useRef<HTMLArcgisMapElement>(null!);
   const webMapId = useRef<string>("95092428774c4b1fb6a3b6f5fed9fbc4");
   const initialized = useRef<boolean>(false);
-  const prevSelectedRef = useRef<__esri.Graphic | null>(null);
 
   /** -------------------- State -------------------- **/
   const [webMap, setWebMap] = useState<WebMap | null>(null);
   const [mapReady, setMapReady] = useState(false);
+  const [searchReady, setSearchReady] = useState(false);
   const [geometry, setGeometry] = useState<__esri.Geometry | null>(null);
   const [condos, setCondos] = useState<__esri.Graphic[]>([]);
   const [selectedCondo, setSelectedCondo] = useState<__esri.Graphic | null>(
@@ -91,7 +97,14 @@ export const MapProvider: React.FC<{ children: React.ReactNode }> = ({
     autoCloseDuration: "fast",
     kind: "brand",
   });
-
+  useCondoHistory({
+    selectedCondo,
+    setSelectedCondo,
+    setCondos,
+    mapElementRef: mapElement,
+    searchCondos,
+    searchReady
+  });
   /** -------------------- Callbacks / Functions -------------------- **/
 
   // Persist basemap in localStorage
@@ -130,7 +143,6 @@ export const MapProvider: React.FC<{ children: React.ReactNode }> = ({
   const customizePopup = async () => {
     const propertyLayer = getLayerByTitle(mapElement.current, "Property");
     if (propertyLayer && propertyLayer instanceof FeatureLayer) {
-      
       await mapElement.current.whenLayerView(propertyLayer);
       if (propertyLayer.popupTemplate) {
         propertyLayer.popupTemplate.actions = new Collection([
@@ -145,26 +157,35 @@ export const MapProvider: React.FC<{ children: React.ReactNode }> = ({
     await reactiveUtils.whenOnce(() => mapElement.current.popup?.actions);
 
     mapElement.current.popup?.on("trigger-action", (event) => {
-    
       const popup = mapElement.current.popup;
-      
+
       if (event.action.title === "Select" && popup && popup.selectedFeature) {
-        
-        setGeometry(centroidOperator.execute(popup.selectedFeature.geometry as __esri.Polygon));
+        setGeometry(
+          centroidOperator.execute(
+            popup.selectedFeature.geometry as __esri.Polygon
+          )
+        );
         popup.close();
       }
     });
   };
   // Called once the map view is ready
-  const viewReady = useCallback(async () => {
-    const view = mapElement.current.view;
-    if (!view) return;
+const viewReady = useCallback(async () => {
+  const view = mapElement.current.view;
+  if (!view) return;
 
-    layerService.attachView(view);
-    await layerService.restorePersistedState();
-    persistBasemap();
-    customizePopup();
-  }, [persistBasemap]);
+  layerService.attachView(view);
+  await layerService.restorePersistedState();
+
+  // 🔥 Wait for view.map to exist before calling persistBasemap
+  reactiveUtils.when(
+    () => !!view.map,
+    () => {
+      persistBasemap();
+      customizePopup();
+    }
+  );
+}, [persistBasemap]);
   // Handle custom actions like identify / streetview
   const handleCustomActionClick = useCallback(
     (action: "identify" | "streetview" | null) => {
@@ -219,47 +240,21 @@ export const MapProvider: React.FC<{ children: React.ReactNode }> = ({
       mapElement.current.map = webmap;
       setWebMap(webmapTemplate);
 
-      mapElement.current.view.when(() => {
-        viewReady();
+      await mapElement.current.view.when();
+      viewReady();
 
-        const storedExtent = localStorage.getItem(
-          `imaps_${webMapId.current}_extent`
-        );
-        if (storedExtent) {
-          mapElement.current.view.extent = JSON.parse(storedExtent);
-        }
+      const storedExtent = localStorage.getItem(
+        `imaps_${webMapId.current}_extent`
+      );
+      if (storedExtent) {
+        mapElement.current.view.extent = JSON.parse(storedExtent);
+      }
 
-        setMapReady(true);
-      });
+      setMapReady(true);
     }
 
     initMap();
   }, [searchParams, viewReady]);
-  useEffect(() => {
-    const prevSelected = prevSelectedRef.current;
-
-    if (selectedCondo && selectedCondo.getAttribute("PIN_NUM")) {
-      const pin = selectedCondo.getAttribute("PIN_NUM");
-      setSearchParams((prev) => {
-        const params = new URLSearchParams(prev);
-        console.log(params);
-        params.set("pin", pin);
-        params.delete("search");
-        return params;
-      });
-    } else if (prevSelected) {
-      // Only clear if we had a selectedCondo before
-      setSearchParams((prev) => {
-        const params = new URLSearchParams(prev);
-        params.delete("pin");
-        params.delete("search");
-
-        return params;
-      });
-    }
-
-    prevSelectedRef.current = selectedCondo;
-  }, [selectedCondo, setSearchParams]);
 
   /** -------------------- Provider -------------------- **/
   return (
@@ -270,6 +265,8 @@ export const MapProvider: React.FC<{ children: React.ReactNode }> = ({
         setWebMap,
         mapReady,
         setMapReady,
+        searchReady,
+        setSearchReady,
         geometry,
         setGeometry,
         condos,

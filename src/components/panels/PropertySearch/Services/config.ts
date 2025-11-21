@@ -9,11 +9,7 @@ interface Layer {
   layer: __esri.FeatureLayer | undefined;
 }
 
-export const getLayerByTitle = (mapElement: HTMLArcgisMapElement, name: string) => {
-  return mapElement.view.map?.allLayers.find(
-    (layer: __esri.Layer) => layer.title === name && layer.type !== "group"
-  );
-};
+
 
 export const SERVICE_DEFS: Service[] = [
   {

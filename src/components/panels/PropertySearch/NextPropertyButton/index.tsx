@@ -1,6 +1,7 @@
 import React from "react";
 import "@esri/calcite-components/components/calcite-button";
-import { getTableByTitle } from "../table";
+import { getTableByTitle } from "../../../../utils/layerHelper";
+
 interface NextPropertyButtonProps {
   mapElement: React.RefObject<HTMLArcgisMapElement>;
   tableElement: React.RefObject<HTMLArcgisFeatureTableElement>;

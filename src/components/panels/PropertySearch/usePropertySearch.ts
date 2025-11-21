@@ -10,7 +10,7 @@ import {
   searchRelatedCondos,
   wildcardSearch,
 } from "./search";
-import { createTableLayer, getTableByTitle, getTableTemplate } from "./table";
+import { createTableLayer, getTableTemplate } from "./table";
 import { useMap } from "../../../context/useMap";
 import { createTemplate, getPhotos } from "./popupTemplate/popupTemplate";
 import Collection from "@arcgis/core/core/Collection";
@@ -22,6 +22,7 @@ import * as reactiveUtils from "@arcgis/core/core/reactiveUtils.js";
 import { useSearchParams } from "react-router-dom";
 import { executeArcade } from "./popupTemplate/popupContent";
 import { arcadeExpressionInfos } from "./popupTemplate/arcadeExpressions";
+import { getTableByTitle } from "../../../utils/layerHelper";
 
 export interface UsePropertySearchProps {
   mapElement: React.RefObject<HTMLArcgisMapElement>;
@@ -109,6 +110,7 @@ export const usePropertySearch = (
     geometry,
     webMapId,
     setGeometry,
+    setSearchReady
   } = useMap();
 
   const [siteAddress, setSiteAddress] = useState<string>("");
@@ -125,7 +127,7 @@ export const usePropertySearch = (
     if (!sources) return;
     event.target.sources = sources;
     if (searchParams.get("pin")) {
-      event.target.search(searchParams.get("pin")!);
+      //event.target.search(searchParams.get("pin")!);
     } else if (searchParams.get("search")) {
       event.target.search(searchParams.get("search")!);
     }
@@ -168,7 +170,7 @@ export const usePropertySearch = (
 
       grid?.appendChild(style);
       await mapElement.current.whenLayerView(tableLayerRef.current);
-
+      setSearchReady(true);
       reactiveUtils.watch(
         () => tableElement.current.visibleColumns,
         (columns) => {
@@ -179,6 +181,7 @@ export const usePropertySearch = (
         }
       );
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [mapElement, webMapId]
   );
 
