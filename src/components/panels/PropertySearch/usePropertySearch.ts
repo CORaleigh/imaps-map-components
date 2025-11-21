@@ -125,7 +125,7 @@ export const usePropertySearch = (
     event.target.sources = sources;
     const params = new URLSearchParams(window.location.search);
     const pin = params.get("pin");
-    const search = params.get("pin");
+    const search = params.get("search");
     if (!pin && search) {
       event.target.search(search);
     }
