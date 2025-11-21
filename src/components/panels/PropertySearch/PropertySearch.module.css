@@ -4,6 +4,10 @@
   height: calc(100dvh - 65px);
 }
 
+#propertySearch  {
+  --calcite-font-size--1: 16px;
+}
+
 #propertySearch calcite-tabs {
   flex: 1; /* Takes remaining space */
   overflow: auto;

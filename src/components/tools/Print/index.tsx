@@ -48,6 +48,7 @@ const Print: React.FC<PrintProps> = ({ mapElement, closed, onToolClose }) => {
   } = usePrint(mapElement, closed);
   return (
     <calcite-panel
+      id={styles.printPanel}
       heading="Print"
       closable
       oncalcitePanelClose={() => onToolClose()}

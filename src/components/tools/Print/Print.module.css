@@ -1,4 +1,7 @@
 
+#printPanel {
+  --calcite-font-size--1: 16px;
+}
 :global(.arcgis-print__export-title) {
   font-weight: 700;
   font-size: var(--calcite-font-size);

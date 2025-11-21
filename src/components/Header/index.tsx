@@ -8,21 +8,20 @@ import "@esri/calcite-components/components/calcite-tooltip";
 
 import { useHeader } from "./useHeader";
 import { useMap } from "../../context/useMap";
-import Disclaimer from "../Disclaimer";
-import { useDisclaimer } from "../Disclaimer/useDisclaimer";
 
 interface HeaderProps {
   theme: "dark" | "light";
   appSize: "small" | "medium" | "large";
+  onOpenDisclaimer: () => void;
 }
 
 const Header: React.FC<HeaderProps> = ({
   theme,
-  appSize
+  appSize,
+  onOpenDisclaimer
 }) => {
   const { webMapId } = useMap();
-  const { open, checkbox, handleDialogClose, handleDialogOpen } =
-    useDisclaimer();
+
 
   const { links, handleDropdownOpen, handleClearStorage } = useHeader(
     webMapId.current
@@ -54,7 +53,7 @@ const Header: React.FC<HeaderProps> = ({
             slot="trigger"
           ></calcite-action>
           <calcite-dropdown-group groupTitle="About" selectionMode="none">
-            <calcite-dropdown-item onClick={handleDialogOpen}>
+            <calcite-dropdown-item onClick={onOpenDisclaimer}>
               Disclaimer
             </calcite-dropdown-item>
           </calcite-dropdown-group>
@@ -93,7 +92,6 @@ const Header: React.FC<HeaderProps> = ({
       >
         Menu
       </calcite-tooltip>
-      <Disclaimer open={open} checkbox={checkbox} onClose={handleDialogClose}></Disclaimer>
     </>
   );
 };

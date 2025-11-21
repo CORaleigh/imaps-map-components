@@ -4,4 +4,5 @@
     var(--calcite-color-foreground-1)
   );
   padding: var(--calcite-internal-panel-default-space);
+  --calcite-font-size--1: 16px;
 }

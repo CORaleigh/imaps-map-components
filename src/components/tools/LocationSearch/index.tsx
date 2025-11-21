@@ -30,6 +30,7 @@ const LocationSearch: React.FC<LocationSearchProps> = ({
 
   return (
     <calcite-panel
+      id={styles.locationSearch}
       heading="Location Search"
       closable
       oncalcitePanelClose={() => onToolClose()}

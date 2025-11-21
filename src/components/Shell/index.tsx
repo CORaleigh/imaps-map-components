@@ -15,6 +15,8 @@ import { lazyWithPreload } from "../../utils/lazyLoad";
 import Header from "../Header";
 
 import MapView from "../MapView";
+import { useDisclaimer } from "../Disclaimer/useDisclaimer";
+import Disclaimer from "../Disclaimer";
 
 // -------------------- Panels --------------------
 interface PanelProps {
@@ -67,6 +69,8 @@ const Shell: React.FC = () => {
     mapElement,
     mapReady,
   } = useShell();
+  const { open, checkbox, handleDialogClose, handleDialogOpen } =
+    useDisclaimer();
   // -------------------- Prefetch all lazy panels/tools --------------------
   useEffect(() => {
     const panels = [PropertySearch, LayerList, Legend, Basemaps, Bookmarks];
@@ -76,7 +80,7 @@ const Shell: React.FC = () => {
   return (
     <>
       <calcite-shell className={appSize} contentBehind={appSize === "small"}>
-        <Header theme={theme} appSize={appSize}></Header>
+        <Header theme={theme} appSize={appSize} onOpenDisclaimer={handleDialogOpen}></Header>
         {!mapReady && <calcite-scrim loading></calcite-scrim>}
 
         <calcite-shell-panel
@@ -312,6 +316,11 @@ const Shell: React.FC = () => {
           Coordinates
         </calcite-tooltip>
       </calcite-shell>
+      <Disclaimer
+        open={open}
+        checkbox={checkbox}
+        onClose={handleDialogClose}
+      ></Disclaimer>
     </>
   );
 };

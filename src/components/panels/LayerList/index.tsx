@@ -6,6 +6,7 @@ import "@arcgis/map-components/components/arcgis-layer-list";
 import { useLayerList } from "./useLayerList";
 import React from "react";
 import TipManager from "../../TipsManager";
+import styles from "./LayerList.module.css";
 
 interface LayerListProps {
   mapElement: React.RefObject<HTMLArcgisMapElement>;
@@ -28,6 +29,7 @@ const LayerList: React.FC<LayerListProps> = ({
   return (
     <>
       <calcite-panel
+        id={styles.layerList}
         heading="Layer List"
         closable
         oncalcitePanelClose={() => onPanelClose()}
