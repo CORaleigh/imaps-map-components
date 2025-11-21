@@ -400,6 +400,7 @@ class LayerService {
 
     const state: PersistState = JSON.parse(raw);
     // Use Promise.all for parallel async operations
+    
     await Promise.all(state.layers.map((lp) => this.applyLayerSettings(lp)));
   }
 
@@ -426,9 +427,10 @@ class LayerService {
     this.clearPersistedCache(); // Invalidate cache after persist
   }
 
-  restorePersistedState() {
+  async restorePersistedState() {
+    
     if (!this.view?.map) return;
-
+  
     const raw = localStorage.getItem(this.persistKey);
     if (!raw) return;
 
@@ -442,6 +444,10 @@ class LayerService {
     for (const lp of state.layers) {
       const layer = layerMap.get(lp.id);
       if (!layer) continue;
+      console.log(layer.title, layer.loaded)
+      if (!layer.loaded) {
+        await layer.load();
+      }
 
       layer.visible = lp.visible;
       layer.opacity = lp.opacity;
@@ -457,6 +463,20 @@ class LayerService {
           }
         }
       }
+    if (layer instanceof MapImageLayer && layer.sublayers && lp.sublayers) {
+      const sublayersArray = layer.sublayers.toArray();
+
+      for (let idx = 0; idx < sublayersArray.length; idx++) {
+        const sl = sublayersArray[idx];
+        const slPersist = lp.sublayers[idx];
+        if (!slPersist) continue;
+
+        sl.visible = slPersist.visible;
+        console.log(sl.visible, layer.title, idx)
+        // MapImageLayer sublayers DO have opacity, but it's on the layer object
+        if (slPersist.opacity != null) sl.opacity = slPersist.opacity;
+      }
+    }      
     }
   }
 
@@ -486,6 +506,7 @@ class LayerService {
   }
 
   async applyLayerSettings(lp: LayerPersist) {
+    
     if (!this.view?.map) return;
 
     const layer = this.view.map.allLayers.find((l) => l.title === lp.id);

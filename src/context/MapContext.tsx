@@ -171,8 +171,8 @@ export const MapProvider: React.FC<{ children: React.ReactNode }> = ({
   const viewReady = useCallback(async () => {
     const view = mapElement.current.view;
     if (!view) return;
+    await layerService.attachView(view);
 
-    layerService.attachView(view);
     await layerService.restorePersistedState();
 
     persistBasemap();
@@ -227,6 +227,7 @@ export const MapProvider: React.FC<{ children: React.ReactNode }> = ({
       console.log("creating web map");
       const { webmap, webmapTemplate } =
         await layerService.createWebMapWithRequiredAndPersisted(mapId);
+   
       console.log("web map created");
 
       webMapId.current = mapId;
