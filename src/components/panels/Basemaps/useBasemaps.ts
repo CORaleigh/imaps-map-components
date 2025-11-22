@@ -71,7 +71,10 @@ export const useBasemaps = (
       gallery.activeBasemap = selected;
       if (gallery.source === imageSource) {
         setSelectedTab("images");
-        setTimeout(() => sortImageBasemaps(), 1000);
+        await reactiveUtils.whenOnce(
+          () => imagesGallery.current?.source.basemaps.length
+        );
+        sortImageBasemaps();
       }
       if (gallery.source === esriGallery.current?.source) {
         setSelectedTab("esri");
@@ -115,7 +118,10 @@ export const useBasemaps = (
       imagesGallery.current.source instanceof PortalBasemapsSource
     ) {
       await refreshImageBasemaps();
-      setTimeout(() => sortImageBasemaps(), 1000);
+      await reactiveUtils.whenOnce(
+        () => imagesGallery.current?.source.basemaps.length
+      );
+      sortImageBasemaps();
     }
   };
 
@@ -144,14 +150,17 @@ export const useBasemaps = (
           }
           wasInRaleigh.current = inRaleigh;
           await refreshImageBasemaps();
-          setTimeout(() => sortImageBasemaps(), 1000);
+          await reactiveUtils.whenOnce(
+            () => imagesGallery.current?.source.basemaps.length
+          );
+          sortImageBasemaps();
           const countywide = (
             imagesGallery.current.activeBasemap as __esri.Basemap
           ).portalItem?.tags?.includes("countywide");
           if (!inRaleigh && !countywide && isImageSelected) {
             imagesGallery.current.activeBasemap =
               imagesGallery.current.source.basemaps.at(0);
-            setTimeout(() => sortImageBasemaps(), 1000);
+
             setAlert({
               show: true,
               message: `Map extent outside of Raleigh, switching to latest county imagery (${imagesGallery.current.activeBasemap?.portalItem?.title})`,
