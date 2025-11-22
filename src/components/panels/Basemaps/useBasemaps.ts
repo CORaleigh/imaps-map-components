@@ -71,10 +71,7 @@ export const useBasemaps = (
       gallery.activeBasemap = selected;
       if (gallery.source === imageSource) {
         setSelectedTab("images");
-        await reactiveUtils.whenOnce(
-          () => imagesGallery.current?.source.basemaps.length
-        );
-        sortImageBasemaps();
+        setTimeout(() => sortImageBasemaps(), 1000);
       }
       if (gallery.source === esriGallery.current?.source) {
         setSelectedTab("esri");
@@ -118,10 +115,7 @@ export const useBasemaps = (
       imagesGallery.current.source instanceof PortalBasemapsSource
     ) {
       await refreshImageBasemaps();
-      await reactiveUtils.whenOnce(
-        () => imagesGallery.current?.source.basemaps.length
-      );
-      sortImageBasemaps();
+      setTimeout(() => sortImageBasemaps(), 1000);
     }
   };
 
@@ -150,10 +144,7 @@ export const useBasemaps = (
           }
           wasInRaleigh.current = inRaleigh;
           await refreshImageBasemaps();
-          await reactiveUtils.whenOnce(
-            () => imagesGallery.current?.source.basemaps.length
-          );
-          sortImageBasemaps();
+          setTimeout(() => sortImageBasemaps(), 1000);
           const countywide = (
             imagesGallery.current.activeBasemap as __esri.Basemap
           ).portalItem?.tags?.includes("countywide");
