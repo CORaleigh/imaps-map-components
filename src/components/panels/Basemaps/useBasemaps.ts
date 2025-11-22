@@ -1,6 +1,6 @@
 import PortalBasemapsSource from "@arcgis/core/widgets/BasemapGallery/support/PortalBasemapsSource.js";
 import type { TargetedEvent } from "@arcgis/map-components";
-import { useEffect, useRef, type RefObject } from "react";
+import { useEffect, useRef, useState, type RefObject } from "react";
 import * as reactiveUtils from "@arcgis/core/core/reactiveUtils.js";
 import * as intersectsOperator from "@arcgis/core/geometry/operators/intersectsOperator.js";
 import { raleighBoundary } from "./boundary";
@@ -12,6 +12,7 @@ export interface UseBasemapsProps {
   mapsGallery: RefObject<HTMLArcgisBasemapGalleryElement | null>;
   imagesGallery: RefObject<HTMLArcgisBasemapGalleryElement | null>;
   esriGallery: RefObject<HTMLArcgisBasemapGalleryElement | null>;
+  selectedTab: "basemap" | "images" | "esri";
   handleGalleryReady: (
     event: TargetedEvent<HTMLArcgisBasemapGalleryElement, void>
   ) => void;
@@ -27,7 +28,10 @@ export const useBasemaps = (
   const mapsGallery = useRef<HTMLArcgisBasemapGalleryElement>(null);
   const imagesGallery = useRef<HTMLArcgisBasemapGalleryElement>(null);
   const esriGallery = useRef<HTMLArcgisBasemapGalleryElement>(null);
-
+  const wasInRaleigh = useRef<boolean>(false);
+  const [selectedTab, setSelectedTab] = useState<"basemap" | "images" | "esri">(
+    "basemap"
+  );
   const { setAlert } = useMap();
 
   const mapsSource = new PortalBasemapsSource({
@@ -48,7 +52,6 @@ export const useBasemaps = (
         raleighBoundary,
         mapElement.current.extent
       );
-
       return inRaleigh;
     },
   });
@@ -66,6 +69,13 @@ export const useBasemaps = (
 
     if (selected) {
       gallery.activeBasemap = selected;
+      if (gallery.source === imageSource) {
+        setSelectedTab("images");
+        setTimeout(() => sortImageBasemaps(), 1000);
+      }
+      if (gallery.source === esriGallery.current?.source) {
+        setSelectedTab("esri");
+      }
     }
   };
 
@@ -77,7 +87,6 @@ export const useBasemaps = (
   const refreshImageBasemaps = async () => {
     if (imagesGallery.current?.source instanceof PortalBasemapsSource) {
       await imagesGallery.current?.source.refresh();
-      sortImageBasemaps();
     }
   };
 
@@ -85,7 +94,6 @@ export const useBasemaps = (
     source: PortalBasemapsSource,
     activeBasemap: __esri.Basemap
   ) => {
-    source.basemaps.forEach((b) => console.log(b.portalItem?.title));
     return (
       source.basemaps.find(
         (b) => b.portalItem?.title === activeBasemap.portalItem?.title
@@ -96,50 +104,18 @@ export const useBasemaps = (
     event: TargetedEvent<HTMLCalciteTabNavElement, void>
   ) => {
     if (!imagesGallery.current) return;
+    setSelectedTab(
+      event.target.selectedTitle.getAttribute("label") as
+        | "basemap"
+        | "images"
+        | "esri"
+    );
     if (
       event.target.selectedTitle.getAttribute("label") === "images" &&
       imagesGallery.current.source instanceof PortalBasemapsSource
     ) {
       await refreshImageBasemaps();
-      reactiveUtils.watch(
-        () => mapElement.current.stationary,
-        async (stationary) => {
-          if (!imagesGallery.current) return;
-          if (stationary) {
-            const isImageSelected = imageBasemapSelected(
-              imagesGallery.current.source as PortalBasemapsSource,
-              mapElement.current.basemap as __esri.Basemap
-            );
-
-            await refreshImageBasemaps();
-            const inRaleigh = intersectsOperator.execute(
-              raleighBoundary,
-              mapElement.current.extent
-            );
-
-            const countywide = (
-              imagesGallery.current.activeBasemap as __esri.Basemap
-            ).portalItem?.tags?.includes("countywide");
-            if (!inRaleigh && !countywide && isImageSelected) {
-              imagesGallery.current.activeBasemap =
-                imagesGallery.current.source.basemaps.at(0);
-              setTimeout(() => {
-                sortImageBasemaps();
-              }, 1000);
-              setAlert({
-                show: true,
-                message: `Map extent outside of Raleigh, switching to latest county imagery (${imagesGallery.current.activeBasemap?.portalItem?.title})`,
-                id: Date.now(),
-                title: "Basemap Not Available",
-                autoCloseDuration: "fast",
-                autoClose: true,
-                kind: "warning",
-                icon: "imagery-layer",
-              });
-            }
-          }
-        }
-      );
+      setTimeout(() => sortImageBasemaps(), 1000);
     }
   };
 
@@ -147,6 +123,51 @@ export const useBasemaps = (
     if (!mapElement.current || initializedRef.current) return;
     // Initialize basemap logic only once
     initializedRef.current = true;
+
+    reactiveUtils.watch(
+      () => mapElement.current.stationary,
+      async (stationary) => {
+        if (!imagesGallery.current) return;
+        if (stationary) {
+          const isImageSelected = imageBasemapSelected(
+            imagesGallery.current.source as PortalBasemapsSource,
+            mapElement.current.basemap as __esri.Basemap
+          );
+          const inRaleigh = intersectsOperator.execute(
+            raleighBoundary,
+            mapElement.current.extent
+          );
+
+          if (wasInRaleigh.current === inRaleigh) {
+            wasInRaleigh.current = inRaleigh;
+            return;
+          }
+          wasInRaleigh.current = inRaleigh;
+          await refreshImageBasemaps();
+          setTimeout(() => sortImageBasemaps(), 1000);
+          const countywide = (
+            imagesGallery.current.activeBasemap as __esri.Basemap
+          ).portalItem?.tags?.includes("countywide");
+          if (!inRaleigh && !countywide && isImageSelected) {
+            imagesGallery.current.activeBasemap =
+              imagesGallery.current.source.basemaps.at(0);
+            setTimeout(() => sortImageBasemaps(), 1000);
+            setAlert({
+              show: true,
+              message: `Map extent outside of Raleigh, switching to latest county imagery (${imagesGallery.current.activeBasemap?.portalItem?.title})`,
+              id: Date.now(),
+              title: "Basemap Not Available",
+              autoCloseDuration: "fast",
+              autoClose: true,
+              kind: "warning",
+              icon: "imagery-layer",
+            });
+          }
+        }
+      }
+    );
+    // return () => handle.remove(); // cleanup
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mapElement]);
 
   return {
@@ -155,6 +176,7 @@ export const useBasemaps = (
     mapsGallery,
     imagesGallery,
     esriGallery,
+    selectedTab,
     handleGalleryReady,
     handleTabChange,
   };

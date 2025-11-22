@@ -25,6 +25,7 @@ const Basemaps: React.FC<BasemapsProps> = ({
     mapsGallery,
     imagesGallery,
     esriGallery,
+    selectedTab,
     handleGalleryReady,
     handleTabChange,
   } = useBasemaps(mapElement);
@@ -49,17 +50,29 @@ const Basemaps: React.FC<BasemapsProps> = ({
             slot="title-group"
             oncalciteTabChange={handleTabChange}
           >
-            <calcite-tab-title selected iconStart="basemap" label="basemap">
+            <calcite-tab-title
+              selected={selectedTab === "basemap"}
+              iconStart="basemap"
+              label="basemap"
+            >
               Maps
             </calcite-tab-title>
-            <calcite-tab-title iconStart="image-layer" label="images">
+            <calcite-tab-title
+              selected={selectedTab === "images"}
+              iconStart="image-layer"
+              label="images"
+            >
               Images
             </calcite-tab-title>
-            <calcite-tab-title iconStart="arcgis-online" label="esri">
+            <calcite-tab-title
+              selected={selectedTab === "esri"}
+              iconStart="arcgis-online"
+              label="esri"
+            >
               Esri
             </calcite-tab-title>
           </calcite-tab-nav>
-          <calcite-tab selected>
+          <calcite-tab selected={selectedTab === "basemap"}>
             <arcgis-basemap-gallery
               ref={mapsGallery}
               className={styles.basemapGallery}
@@ -68,7 +81,7 @@ const Basemaps: React.FC<BasemapsProps> = ({
               onarcgisReady={handleGalleryReady}
             ></arcgis-basemap-gallery>
           </calcite-tab>
-          <calcite-tab>
+          <calcite-tab selected={selectedTab === "images"}>
             <arcgis-basemap-gallery
               ref={imagesGallery}
               className={styles.basemapGallery}
@@ -79,6 +92,7 @@ const Basemaps: React.FC<BasemapsProps> = ({
           </calcite-tab>
           <calcite-tab>
             <arcgis-basemap-gallery
+              selected={selectedTab === "esri"}
               ref={esriGallery}
               className={styles.basemapGallery}
               referenceElement={mapElement.current}
@@ -98,4 +112,3 @@ export default React.memo(
     prev.closed === next.closed &&
     prev.onPanelClose === next.onPanelClose
 );
- 
