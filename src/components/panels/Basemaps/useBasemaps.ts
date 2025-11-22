@@ -59,7 +59,6 @@ export const useBasemaps = (
     const gallery = event.target;
     await reactiveUtils.whenOnce(() => gallery.source.basemaps.length > 0);
 
-    console.log(gallery.source.basemaps.length);
     const selected = gallery.source.basemaps.find(
       (basemap) =>
         basemap.portalItem?.title === mapElement.current.map?.basemap?.title
@@ -81,12 +80,25 @@ export const useBasemaps = (
       sortImageBasemaps();
     }
   };
+
+  const imageBasemapSelected = (
+    source: PortalBasemapsSource,
+    activeBasemap: __esri.Basemap
+  ) => {
+    source.basemaps.forEach((b) => console.log(b.portalItem?.title));
+    return (
+      source.basemaps.find(
+        (b) => b.portalItem?.title === activeBasemap.portalItem?.title
+      ) !== undefined
+    );
+  };
   const handleTabChange = async (
     event: TargetedEvent<HTMLCalciteTabNavElement, void>
   ) => {
+    if (!imagesGallery.current) return;
     if (
       event.target.selectedTitle.getAttribute("label") === "images" &&
-      imagesGallery.current?.source instanceof PortalBasemapsSource
+      imagesGallery.current.source instanceof PortalBasemapsSource
     ) {
       await refreshImageBasemaps();
       reactiveUtils.watch(
@@ -94,16 +106,21 @@ export const useBasemaps = (
         async (stationary) => {
           if (!imagesGallery.current) return;
           if (stationary) {
+            const isImageSelected = imageBasemapSelected(
+              imagesGallery.current.source as PortalBasemapsSource,
+              mapElement.current.basemap as __esri.Basemap
+            );
+
             await refreshImageBasemaps();
             const inRaleigh = intersectsOperator.execute(
               raleighBoundary,
               mapElement.current.extent
             );
+
             const countywide = (
               imagesGallery.current.activeBasemap as __esri.Basemap
             ).portalItem?.tags?.includes("countywide");
-
-            if (!inRaleigh && !countywide) {
+            if (!inRaleigh && !countywide && isImageSelected) {
               imagesGallery.current.activeBasemap =
                 imagesGallery.current.source.basemaps.at(0);
               setTimeout(() => {

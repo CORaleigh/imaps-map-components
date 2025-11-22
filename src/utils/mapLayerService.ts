@@ -444,7 +444,6 @@ class LayerService {
     for (const lp of state.layers) {
       const layer = layerMap.get(lp.id);
       if (!layer) continue;
-      console.log(layer.title, layer.loaded)
       if (!layer.loaded) {
         await layer.load();
       }
