@@ -159,7 +159,6 @@ export const useLayerList = (
         if (filter) {
           filter.style.fontSize = "16px";
         }
-        
       }, 500);
       webMapRef.current = freshWebMap;
 

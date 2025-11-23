@@ -50,6 +50,7 @@ const LayerList: React.FC<LayerListProps> = ({
 
         {loaded && (
           <arcgis-layer-list
+            id={styles.layerList}
             ref={layerListElement}
             referenceElement={mapElement.current}
             showFilter

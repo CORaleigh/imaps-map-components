@@ -54,6 +54,9 @@ export const useBasemaps = (
       );
       return inRaleigh;
     },
+    updateBasemapsCallback: (items: __esri.Basemap[]) => {
+      return items.reverse();
+    },
   });
 
   const handleGalleryReady = async (
@@ -71,7 +74,6 @@ export const useBasemaps = (
       gallery.activeBasemap = selected;
       if (gallery.source === imageSource) {
         setSelectedTab("images");
-        setTimeout(() => sortImageBasemaps(), 1000);
       }
       if (gallery.source === esriGallery.current?.source) {
         setSelectedTab("esri");
@@ -79,11 +81,6 @@ export const useBasemaps = (
     }
   };
 
-  const sortImageBasemaps = () => {
-    imagesGallery.current?.source.basemaps.sort((a, b) =>
-      (b.portalItem?.title ?? "").localeCompare(a.portalItem?.title ?? "")
-    );
-  };
   const refreshImageBasemaps = async () => {
     if (imagesGallery.current?.source instanceof PortalBasemapsSource) {
       await imagesGallery.current?.source.refresh();
@@ -115,7 +112,6 @@ export const useBasemaps = (
       imagesGallery.current.source instanceof PortalBasemapsSource
     ) {
       await refreshImageBasemaps();
-      setTimeout(() => sortImageBasemaps(), 1000);
     }
   };
 
@@ -144,7 +140,7 @@ export const useBasemaps = (
           }
           wasInRaleigh.current = inRaleigh;
           await refreshImageBasemaps();
-          setTimeout(() => sortImageBasemaps(), 1000);
+
           const countywide = (
             imagesGallery.current.activeBasemap as __esri.Basemap
           ).portalItem?.tags?.includes("countywide");
