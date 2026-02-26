@@ -48,7 +48,8 @@ export interface Alert {
   kind: "brand" | "warning" | "danger";
   autoClose: boolean;
   autoCloseDuration: "fast" | "slow" | "medium";
-  icon?: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  icon?: any;
 }
 export interface MapContextType {
   mapElement: React.RefObject<HTMLArcgisMapElement>;
