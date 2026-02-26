@@ -3,40 +3,46 @@ import Collection from "@arcgis/core/core/Collection";
 import LayerSearchSource from "@arcgis/core/widgets/Search/LayerSearchSource";
 import * as reactiveUtils from "@arcgis/core/core/reactiveUtils.js";
 
+import type Graphic from "@arcgis/core/Graphic";
+import type Layer from "@arcgis/core/layers/Layer";
+import type FeatureLayer from "@arcgis/core/layers/FeatureLayer";
+import type Geometry from "@arcgis/core/geometry/Geometry";
+import type {
+  GetResultsParameters,
+  GetSuggestionsParameters,
+  SearchResponse,
+  SearchResult,
+} from "@arcgis/core/widgets/Search/types";
+import type GraphicsLayer from "@arcgis/core/layers/GraphicsLayer";
+
 const getTableByTitle = (
   mapElement: HTMLArcgisMapElement,
-  name: string
-): __esri.FeatureLayer => {
+  name: string,
+): FeatureLayer => {
   return mapElement.view.map?.allTables.find(
-    (layer: __esri.Layer) => layer.title === name
-  ) as __esri.FeatureLayer;
+    (layer: Layer) => layer.title === name,
+  ) as FeatureLayer;
 };
 
 const getLayerByTitle = (
   mapElement: HTMLArcgisMapElement,
-  name: string
-): __esri.FeatureLayer => {
+  name: string,
+): FeatureLayer => {
   return mapElement.view.map?.allLayers.find(
-    (layer: __esri.Layer) => layer.title === name && layer.type === "feature"
-  ) as __esri.FeatureLayer;
+    (layer: Layer) => layer.title === name && layer.type === "feature",
+  ) as FeatureLayer;
 };
 
 export const getSearchSources = async (
   mapElement: HTMLArcgisMapElement | null,
-  arcgisSearch: HTMLArcgisSearchElement | null
+  arcgisSearch: HTMLArcgisSearchElement | null,
 ): Promise<Collection | null> => {
   if (!mapElement || !arcgisSearch) return null;
 
-  const condoTable = getTableByTitle(
-    mapElement,
-    "Condos"
-  ) as __esri.FeatureLayer;
-  const addressTable = getTableByTitle(
-    mapElement,
-    "Addresses"
-  ) as __esri.FeatureLayer;
+  const condoTable = getTableByTitle(mapElement, "Condos") as FeatureLayer;
+  const addressTable = getTableByTitle(mapElement, "Addresses") as FeatureLayer;
 
-  const sources = new Collection<__esri.LayerSearchSource>([
+  const sources = new Collection<LayerSearchSource>([
     createLayerSource(
       "example: 222 W HARGETT ST",
       "Site Address",
@@ -48,7 +54,7 @@ export const getSearchSources = async (
         searchFields: ["ADDRESS"],
         resultFields: ["ADDRESS", "REA_REID", "OBJECTID"],
         startsWith: true,
-      }
+      },
     ),
     createLayerSource(
       "example: SMITH, JOHN",
@@ -61,7 +67,7 @@ export const getSearchSources = async (
         searchFields: ["OWNER"],
         resultFields: ["OWNER", "OBJECTID"],
         startsWith: true,
-      }
+      },
     ),
     createLayerSource("PIN", "PIN", condoTable, arcgisSearch, {
       outFields: ["PIN_NUM"],
@@ -88,7 +94,7 @@ export const getSearchSources = async (
         searchFields: ["STREET"],
         resultFields: ["STREET", "REA_REID", "OBJECTID"],
         startsWith: true,
-      }
+      },
     ),
   ]);
 
@@ -107,18 +113,17 @@ interface LayerSourceOptions {
 const createLayerSource = (
   placeholder: string,
   name: string,
-  layer: __esri.FeatureLayer,
+  layer: FeatureLayer,
   arcgisSearch: HTMLArcgisSearchElement,
-  options: LayerSourceOptions
-): __esri.LayerSearchSource => {
+  options: LayerSourceOptions,
+): LayerSearchSource => {
   const { outFields, orderByFields, searchFields, resultFields, startsWith } =
     options;
 
   const getResults = async (
-    params: __esri.GetResultsHandlerParams
-  ): Promise<__esri.SearchResult[]> => {
-    if (!params?.suggestResult?.text) return [];
-
+    params: GetResultsParameters,
+  ): Promise<SearchResult[] | null | undefined> => {
+    if (!params?.suggestResult?.text) return Promise.resolve(null);
     const term = params.suggestResult.text
       .toUpperCase()
       .replace(/'/g, "''")
@@ -129,15 +134,15 @@ const createLayerSource = (
       outFields: resultFields,
     });
 
-    return results.features.map((feature: __esri.Graphic) => ({
-      feature,
-      name,
-    })) as __esri.SearchResult[];
+    return Promise.resolve(
+      results.features.map((feature: Graphic) => ({
+        feature,
+        name,
+      })) as unknown as SearchResult[],
+    );
   };
 
-  const getSuggestions = async (
-    params: __esri.GetSuggestionsParametersParams
-  ) => {
+  const getSuggestions = async (params: GetSuggestionsParameters) => {
     if (!params?.suggestTerm) return [];
 
     const term = params.suggestTerm
@@ -162,7 +167,7 @@ const createLayerSource = (
       where: whereArray.join(" OR "),
     });
 
-    return results.features.map((feature: __esri.Graphic) => ({
+    return results.features.map((feature: Graphic) => ({
       key: feature.getAttribute(outFields[0]),
       text: feature.getAttribute(outFields[0]),
       sourceIndex: params.sourceIndex,
@@ -170,40 +175,40 @@ const createLayerSource = (
   };
 
   return new LayerSearchSource({
-    layer,
-    placeholder,
-    name,
+    layer: layer,
+    placeholder: placeholder,
+    name: name,
     maxSuggestions: 6,
-    getResults,
-    getSuggestions,
+    getResults: getResults,
+    getSuggestions: getSuggestions,
   });
 };
 
 export const searchForCondosFromSearch = async (
-  event: __esri.SearchViewModelSearchCompleteEvent,
+  event: CustomEvent<SearchResponse>,
   search: HTMLArcgisSearchElement,
   mapElement: HTMLArcgisMapElement,
-  webMapId: string
-): Promise<__esri.Graphic[]> => {
+  webMapId: string,
+): Promise<Graphic[]> => {
   search.blur();
   reactiveUtils
     .whenOnce(() => mapElement.view.popup?.visible)
     .then(() => mapElement.view.popup?.close());
 
-  if (event.numResults) {
-    const selectedResult = event.results.find(
-      (result) => result.results.length
+  if (event.detail.numResults) {
+    const selectedResult = event.detail.results.find(
+      (result) => result.results?.length,
     );
-    if (!selectedResult || !selectedResult.results[0]) return [];
+    if (!selectedResult) return [];
     const result = await searchResultSelected(
-      (selectedResult.source as LayerSearchSource).layer as __esri.FeatureLayer,
+      (selectedResult.source as LayerSearchSource).layer as FeatureLayer,
       selectedResult.source.name,
-      selectedResult.results as unknown as __esri.SearchResult[],
-      event.searchTerm,
-      mapElement
+      selectedResult.results,
+      event.detail.searchTerm,
+      mapElement,
     );
 
-    setSearchHistory(event.searchTerm, webMapId);
+    setSearchHistory(event.detail.searchTerm, webMapId);
     return result;
   } else {
     return [];
@@ -211,11 +216,11 @@ export const searchForCondosFromSearch = async (
 };
 
 const searchResultSelected = async (
-  layer: __esri.FeatureLayer,
+  layer: FeatureLayer,
   source: string,
-  results: __esri.SearchResult[],
+  results: SearchResult[] | undefined,
   term: string,
-  mapElement: HTMLArcgisMapElement
+  mapElement: HTMLArcgisMapElement,
 ) => {
   const condoTable = getTableByTitle(mapElement, "Condos");
   const addressTable = getTableByTitle(mapElement, "Addresses");
@@ -226,9 +231,15 @@ const searchResultSelected = async (
   if (!layer && ["Site Address", "Street Name"].includes(source)) {
     layer = addressTable;
   }
-  const oids: number[] = results.map((r: __esri.SearchResult) => {
-    return r.feature.getAttribute("OBJECTID");
+
+  if (!results) return [];
+  const oids: number[] = results.map((result) => {
+    return result.feature.getAttribute("OBJECTID") as number;
   });
+
+  // const oids: number[] = results.results.map((r: Graphic) => {
+  //   return r.feature.getAttribute("OBJECTID");
+  // });
 
   let where = "";
 
@@ -241,7 +252,7 @@ const searchResultSelected = async (
       oids,
       layer,
       "ADDRESSES_CONDO",
-      mapElement
+      mapElement,
     );
     if (relatedCondos) {
       return relatedCondos;
@@ -259,8 +270,8 @@ export const searchCondos = async (
   where: string,
 
   mapElement: HTMLArcgisMapElement,
-  oids?: number[]
-): Promise<__esri.Graphic[]> => {
+  oids?: number[],
+): Promise<Graphic[]> => {
   const params: {
     outFields: string[];
     returnDistinctValues: boolean;
@@ -276,11 +287,11 @@ export const searchCondos = async (
 
   const result = await condoTable.queryFeatures(params);
   oids = [];
-  result.features.forEach((feature: __esri.Graphic) => {
+  result.features.forEach((feature: Graphic) => {
     oids.push(feature.getAttribute("OBJECTID"));
   });
 
-  const properties: __esri.Graphic[] = await getProperty(mapElement, oids);
+  const properties: Graphic[] = await getProperty(mapElement, oids);
   result.features.forEach((feature) => {
     const geometry = properties.find((property) => {
       return (
@@ -296,9 +307,9 @@ export const searchCondos = async (
 
 export const searchRelatedCondos = async (
   oids: number[],
-  layer: __esri.FeatureLayer,
+  layer: FeatureLayer,
   relationshipName: string,
-  mapElement: HTMLArcgisMapElement
+  mapElement: HTMLArcgisMapElement,
 ) => {
   const condoTable = getTableByTitle(mapElement, "Condos");
 
@@ -318,10 +329,10 @@ export const searchRelatedCondos = async (
 
     const result = await layer.queryRelatedFeatures(params);
     oids = [];
-    const features: __esri.Graphic[] = [];
+    const features: Graphic[] = [];
     const reids: string[] = [];
     for (const key in result) {
-      result[key]?.features.forEach((feature: __esri.Graphic) => {
+      result[key]?.features.forEach((feature: Graphic) => {
         if (!reids.includes(feature.getAttribute("REID"))) {
           oids.push(feature.getAttribute("OBJECTID"));
           reids.push(feature.getAttribute("REID"));
@@ -330,8 +341,8 @@ export const searchRelatedCondos = async (
         }
       });
     }
-    const properties: __esri.Graphic[] = await getProperty(mapElement, oids);
-    features.forEach((feature: __esri.Graphic) => {
+    const properties: Graphic[] = await getProperty(mapElement, oids);
+    features.forEach((feature: Graphic) => {
       const geometry = properties.find((property) => {
         return (
           property.getAttribute("PIN_NUM") === feature.getAttribute("PIN_NUM")
@@ -350,8 +361,8 @@ export const searchRelatedCondos = async (
 export const getProperty = async (
   mapElement: HTMLArcgisMapElement,
   oids?: number[],
-  geometry?: __esri.Geometry
-): Promise<__esri.Graphic[]> => {
+  geometry?: Geometry,
+): Promise<Graphic[]> => {
   const condoTable = getTableByTitle(mapElement, "Condos");
   const propertyLayer = getLayerByTitle(mapElement, "Property");
   if (oids) {
@@ -368,7 +379,7 @@ export const getProperty = async (
     oids = [];
 
     for (const key in result) {
-      result[key]?.features.forEach((feature: __esri.Graphic) => {
+      result[key]?.features.forEach((feature: Graphic) => {
         oids?.push(feature.getAttribute("OBJECTID"));
       });
     }
@@ -398,8 +409,8 @@ export const getProperty = async (
 export const clearAddressPoints = (mapElement: HTMLArcgisMapElement) => {
   if (mapElement.map?.findLayerById("address-graphics")) {
     const addressGraphics = mapElement.map.findLayerById(
-      "address-graphics"
-    ) as __esri.GraphicsLayer;
+      "address-graphics",
+    ) as GraphicsLayer;
     addressGraphics.removeAll();
   }
 };
@@ -430,16 +441,16 @@ const setSearchHistory = (term: string, webMapId: string) => {
   }
   localStorage.setItem(
     `imaps_${webMapId}_history`,
-    JSON.stringify(historyItems)
+    JSON.stringify(historyItems),
   );
 };
 
 const searchByField = async (
   mapElement: HTMLArcgisMapElement,
   field: string,
-  condoTable: __esri.FeatureLayer,
-  term: string
-): Promise<__esri.Graphic[]> => {
+  condoTable: FeatureLayer,
+  term: string,
+): Promise<Graphic[]> => {
   const oids: number[] = [];
   const where = `${field} like '${field == "OWNER" ? "%" : ""}${term}%'`;
   const result = await condoTable.queryFeatures({
@@ -470,8 +481,8 @@ export const wildcardSearch = async (
   mapElement: HTMLArcgisMapElement,
   searchElement: HTMLArcgisSearchElement,
   searchFields: string[],
-  term: string
-): Promise<__esri.Graphic[]> => {
+  term: string,
+): Promise<Graphic[]> => {
   setTimeout(() => {
     const notice = searchElement.shadowRoot?.querySelector("calcite-notice");
 
@@ -487,7 +498,7 @@ export const wildcardSearch = async (
       mapElement,
       field,
       condoTable,
-      term.toUpperCase()
+      term.toUpperCase(),
     );
   });
   const results = await Promise.all(promises);

@@ -3,6 +3,11 @@ import { useState, useCallback, useEffect } from "react";
 
 import type { TargetedEvent } from "@arcgis/map-components";
 
+import type SimpleFillSymbol from "@arcgis/core/symbols/SimpleFillSymbol";
+import type SimpleLineSymbol from "@arcgis/core/symbols/SimpleLineSymbol";
+import type SimpleMarkerSymbol from "@arcgis/core/symbols/SimpleMarkerSymbol";
+import type TextSymbol from "@arcgis/core/symbols/TextSymbol";
+
 export interface UsePointSymbolPicker {
   size: number;
 
@@ -13,16 +18,16 @@ export interface UsePointSymbolPicker {
 
 export const usePointSymbolPicker = (
   symbol:
-    | __esri.SimpleFillSymbol
-    | __esri.SimpleLineSymbol
-    | __esri.SimpleMarkerSymbol
-    | __esri.TextSymbol,
+    | SimpleFillSymbol
+    | SimpleLineSymbol
+    | SimpleMarkerSymbol
+    | TextSymbol,
   onSymbolChange: (
     symbol:
-      | __esri.SimpleFillSymbol
-      | __esri.SimpleLineSymbol
-      | __esri.SimpleMarkerSymbol
-      | __esri.TextSymbol
+      | SimpleFillSymbol
+      | SimpleLineSymbol
+      | SimpleMarkerSymbol
+      | TextSymbol
   ) => void
 ): UsePointSymbolPicker => {
   const [size, setSize] = useState(12);

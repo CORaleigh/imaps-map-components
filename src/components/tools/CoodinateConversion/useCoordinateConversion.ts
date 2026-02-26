@@ -1,8 +1,5 @@
 // hooks/useCoordinateConversion.ts
-import type {
-  ArcgisMapCustomEvent,
-  TargetedEvent,
-} from "@arcgis/map-components";
+import type { TargetedEvent } from "@arcgis/map-components";
 import { useRef, useEffect, useState, useCallback } from "react";
 import * as coordinateFormatter from "@arcgis/core/geometry/coordinateFormatter.js";
 import * as webMercatorUtils from "@arcgis/core/geometry/support/webMercatorUtils.js";
@@ -13,6 +10,11 @@ import GraphicsLayer from "@arcgis/core/layers/GraphicsLayer";
 import PictureMarkerSymbol from "@arcgis/core/symbols/PictureMarkerSymbol";
 import Graphic from "@arcgis/core/Graphic";
 import Point from "@arcgis/core/geometry/Point";
+import type { ArcgisMap } from "@arcgis/map-components/components/arcgis-map";
+import type {
+  ClickEvent,
+  PointerMoveEvent,
+} from "@arcgis/core/views/input/types";
 
 export interface ConversionFormat {
   id: string;
@@ -40,10 +42,10 @@ export interface UseCoordinateConversionProps {
   handleChangeMode: () => void;
   handleShowSettings: () => void;
   handleFormatChange: (
-    event: TargetedEvent<HTMLCalciteSelectElement, void>
+    event: TargetedEvent<HTMLCalciteSelectElement, void>,
   ) => void;
   handleSearchInput: (
-    event: TargetedEvent<HTMLCalciteInputTextElement, void>
+    event: TargetedEvent<HTMLCalciteInputTextElement, void>,
   ) => void;
   handleSearchClick: () => void;
   handleCopyToClipboard: () => void;
@@ -51,7 +53,7 @@ export interface UseCoordinateConversionProps {
 
 export const useCoordinateConversion = (
   mapElement: React.RefObject<HTMLArcgisMapElement>,
-  isOpen: boolean
+  isOpen: boolean,
 ): UseCoordinateConversionProps => {
   const formats: ConversionFormat[] = [
     {
@@ -95,7 +97,7 @@ export const useCoordinateConversion = (
 
   const { setMapMode } = useMap();
   const initializedRef = useRef<boolean>(false);
-  const graphicsLayer = useRef<__esri.GraphicsLayer>(undefined);
+  const graphicsLayer = useRef<GraphicsLayer>(undefined);
   const inputRef = useRef<HTMLCalciteInputTextElement>(null);
   const [display, setDisplay] = useState("");
   const [showSearch, setShowSearch] = useState(false);
@@ -103,15 +105,15 @@ export const useCoordinateConversion = (
   const [expanded, setExpanded] = useState(false);
   const [mode, setMode] = useState<"move" | "click">("move");
   const [selectedFormat, setSelectedFormat] = useState<ConversionFormat>(
-    formats[0]
+    formats[0],
   );
   const [validity, setValidity] = useState<Validity | undefined>(undefined);
 
   const pointerMoveHandlerRef = useRef<
-    ((event: ArcgisMapCustomEvent<__esri.ViewPointerMoveEvent>) => void) | null
+    ((event: TargetedEvent<ArcgisMap, PointerMoveEvent>) => void) | null
   >(null);
   const clickHandlerRef = useRef<
-    ((event: ArcgisMapCustomEvent<__esri.ViewClickEvent>) => void) | null
+    ((event: TargetedEvent<ArcgisMap, ClickEvent>) => void) | null
   >(null);
   const selectedFormatRef = useRef<ConversionFormat>(selectedFormat);
 
@@ -122,15 +124,15 @@ export const useCoordinateConversion = (
 
   const handleShowSearch = useCallback(
     () => setShowSearch((prev) => !prev),
-    []
+    [],
   );
   const handleShowSettings = useCallback(
     () => setShowSettings((prev) => !prev),
-    []
+    [],
   );
   const handleChangeMode = useCallback(
     () => setMode((prev) => (prev === "move" ? "click" : "move")),
-    []
+    [],
   );
   const handleFormatChange = useCallback(
     (event: TargetedEvent<HTMLCalciteSelectElement, void>) => {
@@ -140,14 +142,14 @@ export const useCoordinateConversion = (
       setValidity({ valid: true, message: "" });
       setSelectedFormat(event.target.selectedOption.value);
     },
-    []
+    [],
   );
 
   const handleSearchInput = (
-    event: TargetedEvent<HTMLCalciteInputTextElement, void>
+    event: TargetedEvent<HTMLCalciteInputTextElement, void>,
   ) => {
     const nativeInput = event.target.shadowRoot?.querySelector(
-      "input"
+      "input",
     ) as HTMLInputElement;
 
     const valid = nativeInput?.checkValidity();
@@ -159,7 +161,7 @@ export const useCoordinateConversion = (
 
     const input = (
       document.querySelector(
-        "#coord-conversion calcite-input-text"
+        "#coord-conversion calcite-input-text",
       ) as HTMLCalciteInputTextElement
     ).value;
 
@@ -170,7 +172,7 @@ export const useCoordinateConversion = (
     }
 
     // Process input based on selected format
-    let mapPoint: __esri.Point | null = null;
+    let mapPoint: Point | null = null;
     switch (selectedFormatRef.current.id) {
       case "dd": {
         const [latStr, lonStr] = input.trim().split(/\s+/);
@@ -201,8 +203,8 @@ export const useCoordinateConversion = (
         await projectOperator.load();
         mapPoint = projectOperator.execute(
           mapPoint,
-          new SpatialReference({ wkid: mapEl.spatialReference.wkid })
-        ) as __esri.Point;
+          new SpatialReference({ wkid: mapEl.spatialReference.wkid }),
+        ) as Point;
         break;
       }
       case "usng": {
@@ -241,7 +243,7 @@ export const useCoordinateConversion = (
         width: 20,
       });
       graphicsLayer.current?.add(
-        new Graphic({ geometry: mapPoint, symbol: marker })
+        new Graphic({ geometry: mapPoint, symbol: marker }),
       );
 
       // Zoom to point
@@ -261,13 +263,13 @@ export const useCoordinateConversion = (
 
   // Conversion function used by both pointer move and click
   const convertMapPoint = useCallback(
-    async (mapPoint: __esri.Point): Promise<string> => {
+    async (mapPoint: Point): Promise<string> => {
       switch (selectedFormatRef.current.id) {
         case "dd": {
           const dd = coordinateFormatter.toLatitudeLongitude(
             mapPoint,
             "dd",
-            6
+            6,
           )!;
           const [latStr, lonStr] = dd.trim().split(/\s+/);
           const lat = parseFloat(latStr);
@@ -279,7 +281,7 @@ export const useCoordinateConversion = (
           const dms = coordinateFormatter.toLatitudeLongitude(
             mapPoint,
             "dms",
-            3
+            3,
           )!;
           return formatDMSString(dms);
         }
@@ -289,15 +291,15 @@ export const useCoordinateConversion = (
           await projectOperator.load();
           const sp = projectOperator.execute(
             mapPoint,
-            new SpatialReference({ wkid: 2264 })
-          ) as __esri.Point;
+            new SpatialReference({ wkid: 2264 }),
+          ) as Point;
           return `${sp.x.toFixed(0)}E ${sp.y.toFixed(0)}N`;
         }
         default:
           return "";
       }
     },
-    []
+    [],
   );
 
   // Format DMS string from "35 50 44.618N 078 39 15.710W" → "35°50'44.618"N 78°39'15.710"W"
@@ -334,11 +336,11 @@ export const useCoordinateConversion = (
 
     if (!pointerMoveHandlerRef.current) {
       pointerMoveHandlerRef.current = async (
-        event: ArcgisMapCustomEvent<__esri.ViewPointerMoveEvent>
+        event: TargetedEvent<ArcgisMap, PointerMoveEvent>,
       ) => {
         const mapPoint = webMercatorUtils.webMercatorToGeographic(
-          mapEl.toMap({ x: event.detail.x, y: event.detail.y })
-        ) as __esri.Point;
+          mapEl.toMap({ x: event.detail.x, y: event.detail.y }),
+        ) as Point;
 
         await coordinateFormatter.load();
         setDisplay(await convertMapPoint(mapPoint));
@@ -347,11 +349,11 @@ export const useCoordinateConversion = (
 
     if (!clickHandlerRef.current) {
       clickHandlerRef.current = async (
-        event: ArcgisMapCustomEvent<__esri.ViewClickEvent>
+        event: TargetedEvent<ArcgisMap, ClickEvent>,
       ) => {
         const mapPoint = webMercatorUtils.webMercatorToGeographic(
-          mapEl.toMap({ x: event.detail.x, y: event.detail.y })
-        ) as __esri.Point;
+          mapEl.toMap({ x: event.detail.x, y: event.detail.y }),
+        ) as Point;
         graphicsLayer.current?.removeAll();
         const marker: PictureMarkerSymbol = new PictureMarkerSymbol({
           url: "pin.svg",
@@ -360,7 +362,7 @@ export const useCoordinateConversion = (
         });
 
         graphicsLayer.current?.add(
-          new Graphic({ geometry: mapPoint, symbol: marker })
+          new Graphic({ geometry: mapPoint, symbol: marker }),
         );
         await coordinateFormatter.load();
         setDisplay(await convertMapPoint(mapPoint));
@@ -370,7 +372,7 @@ export const useCoordinateConversion = (
     // Remove old listeners
     mapEl.removeEventListener(
       "arcgisViewPointerMove",
-      pointerMoveHandlerRef.current
+      pointerMoveHandlerRef.current,
     );
     mapEl.removeEventListener("arcgisViewClick", clickHandlerRef.current);
 
@@ -378,7 +380,7 @@ export const useCoordinateConversion = (
     if (mode === "move") {
       mapEl.addEventListener(
         "arcgisViewPointerMove",
-        pointerMoveHandlerRef.current
+        pointerMoveHandlerRef.current,
       );
       graphicsLayer.current?.removeAll();
       setMapMode("identify");
@@ -392,7 +394,7 @@ export const useCoordinateConversion = (
     return () => {
       mapEl.removeEventListener(
         "arcgisViewPointerMove",
-        pointerMoveHandlerRef.current!
+        pointerMoveHandlerRef.current!,
       );
       mapEl.removeEventListener("arcgisViewClick", clickHandlerRef.current!);
     };
@@ -425,7 +427,7 @@ export const useCoordinateConversion = (
     formats,
     selectedFormat,
     validity,
-    inputRef,   
+    inputRef,
     handleShowSearch,
     handleChangeMode,
     handleShowSettings,

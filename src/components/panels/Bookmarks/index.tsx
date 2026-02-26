@@ -5,6 +5,7 @@ import * as reactiveUtils from "@arcgis/core/core/reactiveUtils.js";
 import { useMap } from "../../../context/useMap";
 import styles from "./Bookmarks.module.css";
 import TipManager from "../../TipsManager";
+import type Bookmark from "@arcgis/core/webmap/Bookmark";
 
 interface BookmarksProps {
   mapElement: React.RefObject<HTMLArcgisMapElement>;
@@ -49,7 +50,7 @@ const Bookmarks: React.FC<BookmarksProps> = ({
           }
           reactiveUtils.watch(
             () =>
-              bookmarks.bookmarks.toArray().map((b: __esri.Bookmark) => b.name), // or id
+              bookmarks.bookmarks.toArray().map((b:Bookmark) => b.name), // or id
             () => {
               localStorage.setItem(
                 `imaps_${webMapId.current}_bookmarks`,

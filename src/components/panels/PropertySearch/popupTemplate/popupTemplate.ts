@@ -9,17 +9,24 @@ import CustomContent from "@arcgis/core/popup/content/CustomContent";
 import FeatureLayer from "@arcgis/core/layers/FeatureLayer";
 import { getPopupContent } from "./popupContent";
 import { getTableByTitle } from "../../../../utils/layerHelper";
+import type Graphic from "@arcgis/core/Graphic";
+import type MediaInfo from "@arcgis/core/popup/content/mixins/MediaInfo";
+import type Field from "@arcgis/core/layers/support/Field";
+import type { PopupTemplateContentCreator, PopupTemplateCreatorEvent } from "@arcgis/core/popup/types";
+import type Layer from "@arcgis/core/layers/Layer";
+import type FeatureSet from "@arcgis/core/rest/support/FeatureSet";
+import type Polygon from "@arcgis/core/geometry/Polygon";
 
 export const createTemplate = (
   mapElement: HTMLArcgisMapElement | null,
-  feature: __esri.Graphic,
-  photos: __esri.MediaInfo[]
+  feature: Graphic,
+  photos: MediaInfo[]
 ) => {
   if (!mapElement) return;
   const condoTable = getTableByTitle(
     mapElement,
     "Condos"
-  ) as __esri.FeatureLayer;
+  ) as FeatureLayer;
   if (condoTable) {
     const popupTemplate = new PopupTemplate({
       expressionInfos: arcadeExpressionInfos,
@@ -47,9 +54,9 @@ export const createTemplate = (
   }
 };
 
-const getFieldInfos = (condoTable: __esri.FeatureLayer): FieldInfo[] => {
+const getFieldInfos = (condoTable: FeatureLayer): FieldInfo[] => {
   let fieldConfigs: FieldInfo[] = [];
-  condoTable.fields.forEach((field: __esri.Field) => {
+  condoTable.fields.forEach((field: Field) => {
     fieldConfigs.push(
       new FieldInfo({
         fieldName: field.name,
@@ -93,17 +100,17 @@ const getFieldInfos = (condoTable: __esri.FeatureLayer): FieldInfo[] => {
 };
 
 export const getPhotos = async (
-  feature: __esri.Graphic,
+  feature: Graphic,
   mapElement: HTMLArcgisMapElement | null
-): Promise<__esri.MediaInfo[]> => {
+): Promise<MediaInfo[]> => {
   if (!mapElement) return [];
   
   const photosTable = getTableByTitle(
     mapElement,
     "Photos"
-  ) as __esri.FeatureLayer;
+  ) as FeatureLayer;
   // const relationship = (
-  //   condosTable as __esri.FeatureLayer
+  //   condosTable as FeatureLayer
   // )?.relationships?.find((r) => {
   //   return r.name === "CONDO_PHOTOS";
   // });
@@ -117,7 +124,7 @@ export const getPhotos = async (
 
   //for (const key in result) {
     //feature.setAttribute("OBJECTID", key);
-    result?.features.reverse().forEach((feature: __esri.Graphic) => {
+    result?.features.reverse().forEach((feature: Graphic) => {
       mediaInfos.push(
         new ImageMediaInfo({
           title: "",
@@ -139,7 +146,7 @@ export const getPhotos = async (
         title: "",
         caption: "",
         value: {
-          sourceURL: photo,
+          sourceURL: photo as string,
         },
       })
     );
@@ -147,13 +154,13 @@ export const getPhotos = async (
   return mediaInfos;
 };
 
-export const getDurhamPhoto = async (feature: __esri.Graphic) => {
+export const getDurhamPhoto = async (feature: Graphic) => {
   const photo = await executeArcade(
     `if ($feature.CITY_DECODE == "RALEIGH - DURHAM COUNTY") { 
             return Concatenate("https://image-cdn.spatialest.com/image/durham-images/lrg/",$feature.REID,".JPG");}`,
     feature
   );
-  const request = new Request(photo);
+  const request = new Request(photo as string);
   try {
     const response = await fetch(request);
     if (response.ok) {
@@ -164,7 +171,7 @@ export const getDurhamPhoto = async (feature: __esri.Graphic) => {
   }
 };
 
-const executeArcade = async (expression: string, feature: __esri.Graphic) => {
+const executeArcade = async (expression: string, feature: Graphic) => {
   const executor = await arcade.createArcadeExecutor(expression, {
     variables: [
       {
@@ -194,7 +201,7 @@ export const createEnvironmentalButtons = (
   return new CustomContent({
     outFields: ["PIN_NUM"],
     creator: async (
-      event?: __esri.PopupTemplateCreatorEvent
+      event?: PopupTemplateCreatorEvent
     ): Promise<HTMLElement> => {
       return wellCreator(event, mapElement);
     },
@@ -202,12 +209,12 @@ export const createEnvironmentalButtons = (
 };
 
 const wellCreator = async (
-  event: __esri.PopupTemplateCreatorEvent | undefined,
+  event: PopupTemplateCreatorEvent | undefined,
   mapElement: HTMLArcgisMapElement
 ): Promise<HTMLElement> => {
-  let layer: __esri.Layer | undefined = mapElement?.map?.allLayers
+  let layer: Layer | undefined = mapElement?.map?.allLayers
     .toArray()
-    .find((layer: __esri.Layer) => {
+    .find((layer: Layer) => {
       return layer?.title?.includes("Wells");
     });
 
@@ -219,7 +226,7 @@ const wellCreator = async (
     });
   }
 
-  const featureSet: __esri.FeatureSet = await (
+  const featureSet: FeatureSet = await (
     layer as FeatureLayer
   ).queryFeatures({
     where: `PIN_NUM = '${event?.graphic.attributes["PIN_NUM"]}'`,
@@ -250,8 +257,8 @@ const wellCreator = async (
     },
   });
 
-  const septicFeatureSet: __esri.FeatureSet = await (
-    layer as __esri.FeatureLayer
+  const septicFeatureSet: FeatureSet = await (
+    layer as FeatureLayer
   ).queryFeatures({
     where: `PIN_NUM = '${event?.graphic.attributes["PIN_NUM"]}'`,
     returnGeometry: false,
@@ -276,7 +283,7 @@ export const createLinkButtons = () => {
   return new CustomContent({
     outFields: ["*"],
     creator: async (
-      event?: __esri.PopupTemplateCreatorEvent
+      event?: PopupTemplateCreatorEvent
     ): Promise<HTMLElement> => {
       try {
         const div = document.createElement("div");
@@ -292,9 +299,9 @@ export const createLinkButtons = () => {
 
         const btn = createButton("link", "Google Maps");
         btn.onclick = () => {
-          const latitude = centroidOperator.execute(graphic.geometry as __esri.Polygon)
+          const latitude = centroidOperator.execute(graphic.geometry as Polygon)
             ?.latitude;
-          const longitude = centroidOperator.execute(graphic.geometry as __esri.Polygon)
+          const longitude = centroidOperator.execute(graphic.geometry as Polygon)
             ?.longitude;
           if (latitude && longitude) {
             const url = `https://www.google.com/maps/@${
@@ -316,7 +323,7 @@ export const createLinkButtons = () => {
           graphic // Use the defined graphic
         );
         tax.onclick = () => {
-          window.open(taxUrl, "taxwindow");
+          window.open(taxUrl as string, "taxwindow");
         };
         tax.textContent = "Tax Page";
         div.append(tax);
@@ -336,7 +343,7 @@ export const createDurhamButton = () => {
   return new CustomContent({
     outFields: ["*"],
     creator: async (
-      event?: __esri.PopupTemplateCreatorEvent
+      event?: PopupTemplateCreatorEvent
     ): Promise<HTMLElement> => {
       const div = document.createElement("div");
       div.setAttribute(
@@ -358,7 +365,7 @@ export const createDurhamButton = () => {
       if (durham) {
         const durhamBtn = createButton("home", "Durham County");
         durhamBtn.onclick = () => {
-          window.open(durham, "durham");
+          window.open(durham as string, "durham");
         };
         div.append(durhamBtn);
       }
@@ -376,7 +383,7 @@ export const createDeedButtons = () => {
 };
 
 // Explicitly typing deedCreator as PopupTemplateContentCreator
-const deedCreator: __esri.PopupTemplateContentCreator = async (e) => {
+const deedCreator: PopupTemplateContentCreator = async (e) => {
   const div = document.createElement("div");
   div.setAttribute(
     "style",
@@ -386,8 +393,8 @@ const deedCreator: __esri.PopupTemplateContentCreator = async (e) => {
   let deed: string | null = null;
   let bom: string | null = null;
 
-  const graphic = e?.graphic as __esri.Graphic;
-  const layer = graphic.layer as __esri.FeatureLayer;
+  const graphic = e?.graphic as Graphic;
+  const layer = graphic.layer as FeatureLayer;
   const cityDecode = graphic.getAttribute("CITY_DECODE");
   const reid = graphic.getAttribute("REID");
 

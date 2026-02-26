@@ -5,6 +5,8 @@ import Layer from "@arcgis/core/layers/Layer";
 import GroupLayer from "@arcgis/core/layers/GroupLayer";
 import MapImageLayer from "@arcgis/core/layers/MapImageLayer";
 import * as reactiveUtils from "@arcgis/core/core/reactiveUtils.js";
+import type FeatureLayer from "@arcgis/core/layers/FeatureLayer";
+import type SearchLayer from "@arcgis/core/webdoc/applicationProperties/SearchLayer";
 
 export interface LayerPersist {
   id: string;
@@ -101,7 +103,7 @@ class LayerService {
     const searchIds =
       this.webmapTemplate.applicationProperties?.viewing?.search?.layers
         .toArray()
-        .map((layer: __esri.SearchLayer) => layer.id);
+        .map((layer: SearchLayer) => layer.id);
     const isSearchable = (id: string) => searchIds?.includes(id);
     
     // Add top-level layers: required or persisted-visible only
@@ -308,7 +310,7 @@ class LayerService {
         const templateOrder: string[] = [];
         this.webmapTemplate.allLayers.forEach((layer) => {
           // Only include top-level layers (those whose parent is the map)
-          const parent = (layer as __esri.Layer).parent;
+          const parent = (layer as Layer).parent;
           if (parent && parent.declaredClass === "esri.WebMap") {
             if (!templateOrder.includes(layer.title || "")) {
               templateOrder.push(layer.title || "");
@@ -556,17 +558,17 @@ class LayerService {
     }
   }
 
-  getOrLoadLayer(title: string): __esri.FeatureLayer | undefined {
+  getOrLoadLayer(title: string): FeatureLayer | undefined {
     if (!this.map || !this.webmapTemplate) return undefined;
 
     const existing = this.map.allLayers.find((l) => l.title === title) as
-      | __esri.FeatureLayer
+      | FeatureLayer
       | undefined;
     if (existing) return existing;
 
     const templateLayer = this.webmapTemplate.allLayers.find(
       (l) => l.title === title
-    ) as __esri.FeatureLayer | undefined;
+    ) as FeatureLayer | undefined;
 
     if (!templateLayer) return undefined;
 

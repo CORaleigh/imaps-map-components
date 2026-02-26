@@ -1,13 +1,16 @@
 import React from "react";
 import "@esri/calcite-components/components/calcite-button";
 import { getTableByTitle } from "../../../../utils/layerHelper";
+import type FeatureLayer from "@arcgis/core/layers/FeatureLayer";
+import type Graphic from "@arcgis/core/Graphic";
 
 interface NextPropertyButtonProps {
   mapElement: React.RefObject<HTMLArcgisMapElement>;
   tableElement: React.RefObject<HTMLArcgisFeatureTableElement>;
-  icon: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  icon: any;
   text: "Next" | "Previous";
-  onNextProperty: (feature: __esri.Graphic) => void;
+  onNextProperty: (feature: Graphic) => void;
 }
 
 function NextPropertyButton(props: NextPropertyButtonProps) {
@@ -26,7 +29,7 @@ function NextPropertyButton(props: NextPropertyButtonProps) {
             }
           );
           const fs = await (
-            props.tableElement.current.layer as __esri.FeatureLayer
+            props.tableElement.current.layer as FeatureLayer
           ).queryFeatures({
             where: "1=1",
             orderByFields: orderByFields,
@@ -64,7 +67,7 @@ function NextPropertyButton(props: NextPropertyButtonProps) {
           );
           
           const results = await (
-            condoTable as __esri.FeatureLayer
+            condoTable as FeatureLayer
           ).queryFeatures({
             where: `REID = '${reids[index]}'`,
             outFields: ["*"],

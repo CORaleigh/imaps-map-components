@@ -1,17 +1,20 @@
 import React from "react";
 import "@esri/calcite-components/components/calcite-panel";
 import { useFillSymbolPicker } from "./useFillSymbolPicker";
+import type SimpleFillSymbol from "@arcgis/core/symbols/SimpleFillSymbol";
+import type SimpleLineSymbol from "@arcgis/core/symbols/SimpleLineSymbol";
+import type SimpleMarkerSymbol from "@arcgis/core/symbols/SimpleMarkerSymbol";
 
 interface FillSymbolPickerProps {
   symbol:
-    | __esri.SimpleFillSymbol
-    | __esri.SimpleLineSymbol
-    | __esri.SimpleMarkerSymbol;
+    | SimpleFillSymbol
+    | SimpleLineSymbol
+    | SimpleMarkerSymbol;
   onSymbolChange: (
     symbol:
-      | __esri.SimpleFillSymbol
-      | __esri.SimpleLineSymbol
-      | __esri.SimpleMarkerSymbol
+      | SimpleFillSymbol
+      | SimpleLineSymbol
+      | SimpleMarkerSymbol
   ) => void;
 }
 

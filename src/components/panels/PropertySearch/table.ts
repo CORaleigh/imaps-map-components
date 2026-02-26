@@ -5,6 +5,9 @@ import Color from "@arcgis/core/Color";
 
 import Field from "@arcgis/core/layers/support/Field";
 import { getTableByTitle } from "../../../utils/layerHelper";
+import type FieldInfo from "@arcgis/core/popup/FieldInfo";
+import type FeatureLayerView from "@arcgis/core/views/layers/FeatureLayerView";
+import type { LayerLayerviewCreateEvent } from "@arcgis/core/layers/Layer";
 
 
 
@@ -83,10 +86,10 @@ export const createTableLayer = async (mapElement: HTMLArcgisMapElement) => {
 
   copyTable.on(
     "layerview-create",
-    (event: __esri.LayerLayerviewCreateEvent) => {
+    (event: LayerLayerviewCreateEvent) => {
       if (event.layerView.layer.type === "feature") {
-        const layerView: __esri.FeatureLayerView =
-          event.layerView as __esri.FeatureLayerView;
+        const layerView: FeatureLayerView =
+          event.layerView as FeatureLayerView;
         layerView.highlightOptions = {
           color: new Color("red"),
           fillOpacity: 0.5,
@@ -100,7 +103,7 @@ export const createTableLayer = async (mapElement: HTMLArcgisMapElement) => {
 };
 
 export const getTableTemplate = (
-  layer: __esri.FeatureLayer,
+  layer: FeatureLayer,
   webMapId: string
 ): TableTemplate => {
   const tableTemplate: TableTemplate = new TableTemplate({
@@ -114,7 +117,7 @@ export const getTableTemplate = (
   showColumns.forEach((columnName) => {
     const field = layer?.popupTemplate?.fieldInfos?.find((column) => {
       return column.fieldName === columnName;
-    }) as __esri.FieldInfo;
+    }) as FieldInfo;
     if (field.fieldName === "SITE_ADDRESS") {
       field.label = "Address";
     }

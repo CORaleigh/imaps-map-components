@@ -1,12 +1,15 @@
+import type Graphic from "@arcgis/core/Graphic";
+import type FeatureLayer from "@arcgis/core/layers/FeatureLayer";
+
 export interface Service {
   title: string;
-  graphics: __esri.Graphic[];
+  graphics: Graphic[];
   layers: Layer[];
 }
 
 interface Layer {
   title: string;
-  layer: __esri.FeatureLayer | undefined;
+  layer: FeatureLayer | undefined;
 }
 
 

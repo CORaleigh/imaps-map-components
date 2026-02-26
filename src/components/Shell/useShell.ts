@@ -6,6 +6,13 @@ import { useAppSize, type AppSize } from "../../utils/useAppSize";
 import Extent from "@arcgis/core/geometry/Extent";
 import type { MapMode } from "../../context/MapContext";
 import { constraints } from "../../utils/constraints";
+import type { HoldEvent } from "@arcgis/core/views/input/types";
+
+import MapViewConstraints from "@arcgis/core/views/2d/MapViewConstraints.js";
+import type SceneView from "@arcgis/core/views/SceneView";
+import type MapView from "@arcgis/core/views/MapView";
+
+
 export type PanelType =
   | "propertySearch"
   | "bookmarks"
@@ -38,20 +45,17 @@ export interface UseShellProps {
   handleToolActionClick: (panel: ToolType) => void;
   handleCustomActionClick: (action: "identify" | "streetview" | null) => void;
   handleViewReady: (event: TargetedEvent<HTMLArcgisMapElement, void>) => void;
-  handleViewHold: (
-    event: TargetedEvent<HTMLArcgisMapElement, __esri.ViewHoldEvent>
-  ) => void;
+  handleViewHold: (event: CustomEvent<HoldEvent>) => void;
   handleGoToHome: (
-    view: __esri.MapView | __esri.SceneView,
-    goToParameters: __esri.GoToParameters
-  ) => void;
+  view: MapView | SceneView,
+  goToParams: unknown) => Promise<unknown>;
   handleCoordinateExpandChange: (
     event: TargetedEvent<
       HTMLArcgisExpandElement,
       {
         name: "expanded";
       }
-    >
+    >,
   ) => void;
   mapReady: boolean;
 }
@@ -71,7 +75,7 @@ export const useShell = (): UseShellProps => {
   } = useMap();
 
   const [theme, setTheme] = useState<"light" | "dark">(
-    localStorage.getItem("imaps_theme_mode") === "dark" ? "dark" : "light"
+    localStorage.getItem("imaps_theme_mode") === "dark" ? "dark" : "light",
   );
   const [activePanel, setActivePanel] = useState<PanelType>("propertySearch");
   const [activeTool, setActiveTool] = useState<ToolType>(null);
@@ -95,24 +99,24 @@ export const useShell = (): UseShellProps => {
 
     if (body) {
       body.classList.remove(
-        theme === "light" ? "calcite-mode-dark" : "calcite-mode-light"
+        theme === "light" ? "calcite-mode-dark" : "calcite-mode-light",
       );
       body.classList.add(
-        theme === "light" ? "calcite-mode-light" : "calcite-mode-dark"
+        theme === "light" ? "calcite-mode-light" : "calcite-mode-dark",
       );
     }
   }, [theme]);
   const handlePanelActionClick = useCallback(
     (panel: PanelType) => {
       setOpenedPanels((prev) =>
-        prev.includes(panel) ? prev : [...prev, panel]
+        prev.includes(panel) ? prev : [...prev, panel],
       );
       setActivePanel(panel === activePanel ? null : panel);
       if (appSize !== "large" && panel) {
         setActiveTool(null);
       }
     },
-    [activePanel, appSize]
+    [activePanel, appSize],
   );
 
   const handlePanelClose = useCallback(() => {
@@ -127,7 +131,7 @@ export const useShell = (): UseShellProps => {
         setActivePanel(null);
       }
     },
-    [activeTool, appSize]
+    [activeTool, appSize],
   );
 
   const handleToolClose = useCallback(() => {
@@ -135,12 +139,12 @@ export const useShell = (): UseShellProps => {
   }, []);
 
   const handleViewReady = async (
-    event: TargetedEvent<HTMLArcgisMapElement, void>
+    event: TargetedEvent<HTMLArcgisMapElement, void>,
   ) => {
-    event.target.constraints = constraints as __esri.View2DConstraints;
+    event.target.constraints = constraints as MapViewConstraints;
 
     const storedExtent = localStorage.getItem(
-      `imaps_${webMapId.current}_extent`
+      `imaps_${webMapId.current}_extent`,
     );
     if (storedExtent) {
       event.target.view.extent = JSON.parse(storedExtent);
@@ -151,13 +155,11 @@ export const useShell = (): UseShellProps => {
     event.target.addEventListener("arcgisViewChange", handleViewChange);
   };
   const handleViewHold = useCallback(
-    async (
-      event: TargetedEvent<HTMLArcgisMapElement, __esri.ViewHoldEvent>
-    ) => {
+    async (event: CustomEvent<HoldEvent>) => {
       setGeometry(event.detail.mapPoint);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
+    [],
   );
   const handleViewChange = useCallback(
     (event: TargetedEvent<HTMLArcgisMapElement, void>) => {
@@ -165,28 +167,26 @@ export const useShell = (): UseShellProps => {
       if (!event.target.extent) return;
       localStorage.setItem(
         `imaps_${webMapId.current}_extent`,
-        JSON.stringify(event.target.extent.toJSON())
+        JSON.stringify(event.target.extent.toJSON()),
       );
     },
-    [webMapId]
+    [webMapId],
   );
-  const handleGoToHome = (
-    view: __esri.MapView | __esri.SceneView,
-    goToParameters: __esri.GoToParameters
-  ) => {
-    console.log(goToParameters);
-    view.goTo(
-      new Extent({
-        xmin: -8810106.471332055,
-        ymin: 4207611.929668259,
-        xmax: -8689947.462867815,
-        ymax: 4333580.152282169,
-        spatialReference: {
-          wkid: 102100,
-        },
-      })
-    );
-  };
+const handleGoToHome = (
+  view: MapView | SceneView
+) => {
+  return view.goTo(
+    new Extent({
+      xmin: -8810106.471332055,
+      ymin: 4207611.929668259,
+      xmax: -8689947.462867815,
+      ymax: 4333580.152282169,
+      spatialReference: {
+        wkid: 102100,
+      },
+    })
+  );
+};
 
   const handleCoordinateExpandChange = (
     event: TargetedEvent<
@@ -194,7 +194,7 @@ export const useShell = (): UseShellProps => {
       {
         name: "expanded";
       }
-    >
+    >,
   ) => {
     setCoordinateConversionOpen(event.target.expanded);
   };

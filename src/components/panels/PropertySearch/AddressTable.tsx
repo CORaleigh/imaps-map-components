@@ -5,17 +5,16 @@ import React, { type RefObject } from "react";
 
 import styles from "./PropertySearch.module.css";
 import type { TargetedEvent } from "@arcgis/map-components";
+import type Graphic from "@arcgis/core/Graphic";
+import type { TableInteractionCellClickEvent } from "@arcgis/core/widgets/FeatureTable/Grid/types";
 
 interface AddressTableProps {
   addressTableElement: RefObject<HTMLArcgisFeatureTableElement>;
   mapElement: RefObject<HTMLArcgisMapElement>;
-  feature: __esri.Graphic;
+  feature: Graphic;
   onReady: (event: TargetedEvent<HTMLArcgisFeatureTableElement, void>) => void;
   onCellClick: (
-    event: TargetedEvent<
-      HTMLArcgisFeatureTableElement,
-      __esri.FeatureTableCellClickEvent
-    >
+    event: CustomEvent<TableInteractionCellClickEvent>
   ) => void;
   onPropertyChange: (
     event: TargetedEvent<

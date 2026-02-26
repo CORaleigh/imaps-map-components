@@ -1,19 +1,23 @@
 import React from "react";
 import "@esri/calcite-components/components/calcite-panel";
 import { usePointSymbolPicker } from "./usePointSymbolPicker";
+import type SimpleFillSymbol from "@arcgis/core/symbols/SimpleFillSymbol";
+import type SimpleLineSymbol from "@arcgis/core/symbols/SimpleLineSymbol";
+import type SimpleMarkerSymbol from "@arcgis/core/symbols/SimpleMarkerSymbol";
+import type TextSymbol from "@arcgis/core/symbols/TextSymbol";
 
 interface PointSymbolPickerProps {
   symbol:
-    | __esri.SimpleFillSymbol
-    | __esri.SimpleLineSymbol
-    | __esri.SimpleMarkerSymbol
-    | __esri.TextSymbol;
+    | SimpleFillSymbol
+    | SimpleLineSymbol
+    | SimpleMarkerSymbol
+    | TextSymbol;
   onSymbolChange: (
     symbol:
-      | __esri.SimpleFillSymbol
-      | __esri.SimpleLineSymbol
-      | __esri.SimpleMarkerSymbol
-      | __esri.TextSymbol
+      | SimpleFillSymbol
+      | SimpleLineSymbol
+      | SimpleMarkerSymbol
+      | TextSymbol
   ) => void;
 }
 

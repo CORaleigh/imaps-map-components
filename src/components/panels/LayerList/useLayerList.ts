@@ -15,26 +15,30 @@ import { layerService } from "../../../utils/mapLayerService";
 import { useMap } from "../../../context/useMap";
 import LabelClass from "@arcgis/core/layers/support/LabelClass";
 
-import type { TargetedEvent } from "@arcgis/map-components";
 import type ActionToggle from "@arcgis/core/support/actions/ActionToggle";
 import GroupLayer from "@arcgis/core/layers/GroupLayer";
 import WebMap from "@arcgis/core/WebMap";
+import type Layer from "@arcgis/core/layers/Layer";
+import type ActionButton from "@arcgis/core/support/actions/ActionButton";
+import type FeatureLayer from "@arcgis/core/layers/FeatureLayer";
+import type {
+  ListItemModifier,
+  ListItemModifierEvent,
+} from "@arcgis/core/widgets/LayerList/types.js";
+import type { LayerListViewModelTriggerActionEvent } from "@arcgis/core/widgets/LayerList/LayerListViewModel";
 
 export interface UseLayerListProps {
   layerListElement: RefObject<HTMLArcgisLayerListElement | null>;
-  listItemCreatedFunction: __esri.LayerListListItemCreatedHandler;
+  listItemCreatedFunction: ListItemModifier;
   handleTriggerAction: (
-    event: TargetedEvent<
-      HTMLArcgisLayerListElement,
-      __esri.LayerListTriggerActionEvent
-    >
+    event: CustomEvent<LayerListViewModelTriggerActionEvent>,
   ) => void;
   handleResetLayers: () => void;
   loaded: boolean;
 }
 
 export const useLayerList = (
-  mapElement: React.RefObject<HTMLArcgisMapElement>
+  mapElement: React.RefObject<HTMLArcgisMapElement>,
 ): UseLayerListProps => {
   const { webMap, webMapId } = useMap();
   const initializedRef = useRef(false);
@@ -42,7 +46,7 @@ export const useLayerList = (
   const webMapRef = useRef<WebMap>(undefined);
   const [loaded, setLoaded] = useState(false);
   const listItemCreatedFunction = useCallback(
-    (event: __esri.LayerListListItemCreatedHandlerEvent) => {
+    (event: ListItemModifierEvent) => {
       const item = event.item;
 
       if (item.visible && item.parent && item.layer?.type !== "sublayer") {
@@ -52,15 +56,10 @@ export const useLayerList = (
       createItemPanel(item);
       createLabelToggles(item);
     },
-    []
+    [],
   );
   const handleTriggerAction = useCallback(
-    (
-      event: TargetedEvent<
-        HTMLArcgisLayerListElement,
-        __esri.LayerListTriggerActionEvent
-      >
-    ) => {
+    (event: CustomEvent<LayerListViewModelTriggerActionEvent>) => {
       const item = event.detail.item;
       if (
         event.detail.action.type !== "toggle" ||
@@ -70,7 +69,7 @@ export const useLayerList = (
       )
         return;
       const action = event.detail.action;
-      const layer = item.layer as __esri.FeatureLayer;
+      const layer = item.layer as FeatureLayer;
       action.icon = action.value ? "toggle-on" : "toggle-off";
       requestAnimationFrame(() => {
         event.detail.item.actionsOpen = true;
@@ -81,20 +80,21 @@ export const useLayerList = (
 
       const selected = item.actionsSections
         .getItemAt(0)
-        ?.filter((toggle: ActionToggle | __esri.ActionButton) => {
+        ?.filter((toggle: ActionToggle | ActionButton) => {
           if (toggle.type !== "toggle") return false;
           toggle.icon = toggle.value ? "toggle-on" : "toggle-off";
           return toggle.value;
         });
 
-      const selectedTitles = selected?.map((section) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const selectedTitles = selected?.map((section: any) => {
         return (section as ActionToggle).title;
       });
 
       const selectedExpressions = propertyLabelExpressions.filter(
         (expression) => {
           return selectedTitles?.includes(expression.title);
-        }
+        },
       );
       const expressions = selectedExpressions.map((expression) => {
         return expression.expression;
@@ -123,14 +123,14 @@ export const useLayerList = (
         }),
       ];
     },
-    []
+    [],
   );
 
   const handleResetLayers = useCallback(() => {
     if (!mapElement.current || !mapElement.current.map) return;
     const map = mapElement.current.map;
 
-    map.allLayers.forEach((layer: __esri.Layer) => {
+    map.allLayers.forEach((layer: Layer) => {
       if (!map.basemap || !layer.title) return;
       if (
         map.basemap.baseLayers.includes(layer) ||
@@ -155,7 +155,11 @@ export const useLayerList = (
         layerService.addAllMissingSiblingsAfterLayerList(),
       ]);
       setTimeout(() => {
-        const filter = layerListElement.current?.shadowRoot?.querySelector("calcite-list")?.shadowRoot?.querySelector("calcite-filter")?.shadowRoot?.querySelector("calcite-input")?.shadowRoot?.querySelector("input");
+        const filter = layerListElement.current?.shadowRoot
+          ?.querySelector("calcite-list")
+          ?.shadowRoot?.querySelector("calcite-filter")
+          ?.shadowRoot?.querySelector("calcite-input")
+          ?.shadowRoot?.querySelector("input");
         if (filter) {
           filter.style.fontSize = "16px";
         }
@@ -164,24 +168,24 @@ export const useLayerList = (
 
       // 2. Batch reorder operations
       const reorderOperations: Array<{
-        parent: __esri.GroupLayer;
-        layer: __esri.Layer;
+        parent: GroupLayer;
+        layer: Layer;
         targetIndex: number;
       }> = [];
 
       mapElement.current.map?.allLayers.forEach((layer) => {
         if (layer.type !== "group" && layer.parent instanceof GroupLayer) {
           const currentIdx = layer.parent.layers.findIndex(
-            (l) => l.title === layer.title
+            (l) => l.title === layer.title,
           );
 
           const webLayer = webMapRef.current?.allLayers.find(
-            (l) => l.title === layer.title && l.type === layer.type
+            (l) => l.title === layer.title && l.type === layer.type,
           );
 
           if (webLayer && webLayer.parent instanceof GroupLayer) {
             const sourceIdx = webLayer.parent.layers.findIndex(
-              (l) => l.title === webLayer.title
+              (l) => l.title === webLayer.title,
             );
 
             if (currentIdx !== sourceIdx) {

@@ -14,7 +14,7 @@ import { useShell } from "./useShell";
 import { lazyWithPreload } from "../../utils/lazyLoad";
 import Header from "../Header";
 
-import MapView from "../MapView";
+import MapPanel from "../MapPanel";
 import { useDisclaimer } from "../Disclaimer/useDisclaimer";
 import Disclaimer from "../Disclaimer";
 
@@ -292,7 +292,7 @@ const Shell: React.FC = () => {
             </calcite-action-group>
           </calcite-action-bar>
         </calcite-shell-panel>
-        <MapView
+        <MapPanel
           mapElement={mapElement}
           activeTool={activeTool}
           mapMode={mapMode}
@@ -304,7 +304,7 @@ const Shell: React.FC = () => {
           onCustomActionClick={handleCustomActionClick}
           onGoHome={handleGoToHome}
           onToolClose={handleToolClose}
-        ></MapView>
+        ></MapPanel>
         <calcite-tooltip closeOnClick reference-element="overview-action">
           Overview
         </calcite-tooltip>

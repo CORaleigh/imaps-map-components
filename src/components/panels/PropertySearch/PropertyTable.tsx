@@ -6,6 +6,7 @@ import React, { type RefObject } from "react";
 
 import styles from "./PropertySearch.module.css";
 import type { TargetedEvent } from "@arcgis/map-components";
+import type { TableInteractionCellClickEvent } from "@arcgis/core/widgets/FeatureTable/Grid/types";
 
 interface PropertyTableProps {
   tableElement: RefObject<HTMLArcgisFeatureTableElement>;
@@ -13,10 +14,7 @@ interface PropertyTableProps {
   onReady: (event: TargetedEvent<HTMLArcgisFeatureTableElement, void>) => void;
 
   onCellClick: (
-    event: TargetedEvent<
-      HTMLArcgisFeatureTableElement,
-      __esri.FeatureTableCellClickEvent
-    >
+    event: CustomEvent<TableInteractionCellClickEvent>
   ) => void;
   onExportClick: () => void;
 }

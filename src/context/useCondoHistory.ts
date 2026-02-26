@@ -1,16 +1,17 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useRef } from "react";
 import { getTableByTitle } from "../utils/layerHelper";
+import type Graphic from "@arcgis/core/Graphic";
 
 interface UseCondoHistoryProps {
-  selectedCondo: __esri.Graphic | null;
-  setSelectedCondo: (c: __esri.Graphic | null) => void;
-  setCondos: (c: __esri.Graphic[]) => void;
+  selectedCondo: Graphic | null;
+  setSelectedCondo: (c: Graphic | null) => void;
+  setCondos: (c: Graphic[]) => void;
   mapElementRef: React.RefObject<HTMLArcgisMapElement>;
   searchCondos: (
     where: string,
     mapEl: HTMLArcgisMapElement
-  ) => Promise<__esri.Graphic[]>;
+  ) => Promise<Graphic[]>;
   searchReady: boolean;
 }
 

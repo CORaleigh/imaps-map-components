@@ -3,33 +3,30 @@ import { useState, useCallback, useEffect } from "react";
 
 import Color from "@arcgis/core/Color";
 import type { TargetedEvent } from "@arcgis/map-components";
+import type SimpleFillSymbol from "@arcgis/core/symbols/SimpleFillSymbol";
+import type SimpleLineSymbol from "@arcgis/core/symbols/SimpleLineSymbol";
+import type SimpleMarkerSymbol from "@arcgis/core/symbols/SimpleMarkerSymbol";
 
 export interface UseFillSymbolPicker {
   fillColor: string;
   fillTransparency: number;
   handleFillColorChange: (
-    event: TargetedEvent<HTMLCalciteColorPickerElement, void>
+    event: TargetedEvent<HTMLCalciteColorPickerElement, void>,
   ) => void;
 
   handleFillTransparencySliderInput: (
-    event: TargetedEvent<HTMLCalciteSliderElement, void>
+    event: TargetedEvent<HTMLCalciteSliderElement, void>,
   ) => void;
   handleFillTransparencyInput: (
-    event: TargetedEvent<HTMLCalciteInputNumberElement, void>
+    event: TargetedEvent<HTMLCalciteInputNumberElement, void>,
   ) => void;
 }
 
 export const useFillSymbolPicker = (
-  symbol:
-    | __esri.SimpleFillSymbol
-    | __esri.SimpleLineSymbol
-    | __esri.SimpleMarkerSymbol,
+  symbol: SimpleFillSymbol | SimpleLineSymbol | SimpleMarkerSymbol,
   onSymbolChange: (
-    symbol:
-      | __esri.SimpleFillSymbol
-      | __esri.SimpleLineSymbol
-      | __esri.SimpleMarkerSymbol
-  ) => void
+    symbol: SimpleFillSymbol | SimpleLineSymbol | SimpleMarkerSymbol,
+  ) => void,
 ): UseFillSymbolPicker => {
   const [fillColor, setFillColor] = useState("#FF0000");
   const [fillTransparency, setFillTransparency] = useState(50);
@@ -42,11 +39,10 @@ export const useFillSymbolPicker = (
       const color = new Color(hexColor);
       color.a = (100 - fillTransparency) / 100;
 
-      (symbol as __esri.SimpleFillSymbol | __esri.SimpleMarkerSymbol).color =
-        color;
+      (symbol as SimpleFillSymbol | SimpleMarkerSymbol).color = color;
       onSymbolChange(symbol);
     },
-    [fillTransparency, onSymbolChange, symbol]
+    [fillTransparency, onSymbolChange, symbol],
   );
 
   const handleFillTransparencySliderInput = useCallback(
@@ -63,7 +59,7 @@ export const useFillSymbolPicker = (
       symbol.color = color;
       onSymbolChange(symbol);
     },
-    [onSymbolChange, symbol]
+    [onSymbolChange, symbol],
   );
 
   const handleFillTransparencyInput = useCallback(
@@ -78,13 +74,13 @@ export const useFillSymbolPicker = (
       symbol.color = color!;
       onSymbolChange(symbol);
     },
-    [onSymbolChange, symbol]
+    [onSymbolChange, symbol],
   );
 
   useEffect(() => {
     if (symbol && symbol.color) {
       setFillColor(symbol.color.toHex());
-      setFillTransparency(100 - (symbol.color.a * 100));
+      setFillTransparency(100 - symbol.color.a * 100);
     }
   }, [symbol]);
 

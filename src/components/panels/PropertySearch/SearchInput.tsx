@@ -12,27 +12,26 @@ import React, { type RefObject } from "react";
 import styles from "./PropertySearch.module.css";
 import type { TargetedEvent } from "@arcgis/map-components";
 import { getSearchHistory } from "./search";
+import type { SearchResponse } from "@arcgis/core/widgets/Search/types";
+import type { ArcgisSearch } from "@arcgis/map-components/components/arcgis-search";
 
 interface SearchInputProps {
   searchElement: RefObject<HTMLArcgisSearchElement>;
   mapElement: RefObject<HTMLArcgisMapElement>;
   webMapId: RefObject<string>;
   onSearchReady: (event: TargetedEvent<HTMLArcgisSearchElement, void>) => void;
-  onSearchComplete: (
-    event: TargetedEvent<
-      HTMLArcgisSearchElement,
-      __esri.SearchViewModelSearchCompleteEvent
-    >
-  ) => void;
+  onSearchComplete: (event: CustomEvent<SearchResponse>) => void;
   onSuggestStart: (
     event: TargetedEvent<
-      HTMLArcgisSearchElement,
-      __esri.SearchViewModelSuggestStartEvent
-    >
+      ArcgisSearch,
+      {
+        searchTerm: string;
+      }
+    >,
   ) => void;
   onClear: () => void;
   onHistoryClick: (
-    event: React.MouseEvent<HTMLCalciteListItemElement, MouseEvent>
+    event: React.MouseEvent<HTMLCalciteListItemElement, MouseEvent>,
   ) => void;
 }
 

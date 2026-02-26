@@ -3,6 +3,10 @@ import { useState, useCallback, useEffect } from "react";
 
 import Color from "@arcgis/core/Color";
 import type { TargetedEvent } from "@arcgis/map-components";
+import type SimpleFillSymbol from "@arcgis/core/symbols/SimpleFillSymbol";
+import type SimpleLineSymbol from "@arcgis/core/symbols/SimpleLineSymbol";
+import type SimpleMarkerSymbol from "@arcgis/core/symbols/SimpleMarkerSymbol";
+import type TextSymbol from "@arcgis/core/symbols/TextSymbol";
 
 export interface UseTextSymbolPicker {
   color: string;
@@ -22,16 +26,16 @@ export interface UseTextSymbolPicker {
 
 export const useTextSymbolPicker = (
   symbol:
-    | __esri.SimpleFillSymbol
-    | __esri.SimpleLineSymbol
-    | __esri.SimpleMarkerSymbol
-    | __esri.TextSymbol,
+    | SimpleFillSymbol
+    | SimpleLineSymbol
+    | SimpleMarkerSymbol
+    | TextSymbol,
   onSymbolChange: (
     symbol:
-      | __esri.SimpleFillSymbol
-      | __esri.SimpleLineSymbol
-      | __esri.SimpleMarkerSymbol
-      | __esri.TextSymbol
+      | SimpleFillSymbol
+      | SimpleLineSymbol
+      | SimpleMarkerSymbol
+      | TextSymbol
   ) => void
 ): UseTextSymbolPicker => {
   const [color, setColor] = useState("#FF0000");
@@ -45,7 +49,7 @@ export const useTextSymbolPicker = (
       setColor(hexColor);
       const color = new Color(hexColor);
 
-      (symbol as __esri.SimpleFillSymbol | __esri.SimpleMarkerSymbol).color =
+      (symbol as SimpleFillSymbol | SimpleMarkerSymbol).color =
         color;
       onSymbolChange(symbol);
     },

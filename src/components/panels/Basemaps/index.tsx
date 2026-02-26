@@ -26,8 +26,10 @@ const Basemaps: React.FC<BasemapsProps> = ({
     imagesGallery,
     esriGallery,
     selectedTab,
+    blendSlider,
     handleGalleryReady,
     handleTabChange,
+    handleBlendChange
   } = useBasemaps(mapElement);
   return (
     <>
@@ -39,7 +41,15 @@ const Basemaps: React.FC<BasemapsProps> = ({
         className={styles.basemapsPanel}
       >
         <TipManager name="basemaps"></TipManager>
-
+        {selectedTab === "images" && (
+          <div slot="content-top">
+            <calcite-label layout="inline">
+              <calcite-switch oncalciteSwitchChange={handleBlendChange}></calcite-switch>
+              Blend
+            </calcite-label>
+             <calcite-slider ref={blendSlider} hidden></calcite-slider>
+          </div>
+        )}
         <calcite-tabs
           position="bottom"
           scale="l"

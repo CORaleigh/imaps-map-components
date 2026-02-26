@@ -12,6 +12,10 @@ import SpatialReference from "@arcgis/core/geometry/SpatialReference";
 
 import type { Layout } from "./printLayouts";
 import type { Format } from "./usePrint";
+import type { PrintResponse } from "@arcgis/core/rest/types";
+import type GraphicsLayer from "@arcgis/core/layers/GraphicsLayer";
+import type FeatureLayer from "@arcgis/core/layers/FeatureLayer";
+import type FieldInfo from "@arcgis/core/popup/FieldInfo";
 
 // -----------------------------
 // Types
@@ -60,7 +64,7 @@ export const getFileExtension = (format: string) => {
 
 export const isPrintResponse = (
   value: unknown
-): value is __esri.PrintResponse =>
+): value is PrintResponse =>
   typeof value === "object" && value !== null && "url" in value;
 
 // -----------------------------
@@ -111,7 +115,7 @@ export const prepareExport = async (
 
   const graphicsLayer = mapElement.map?.findLayerById(
     "print-graphic"
-  ) as __esri.GraphicsLayer;
+  ) as GraphicsLayer;
   const clusterLayer = mapElement.map?.findLayerById("selection-cluster");
 
   if (graphicsLayer) graphicsLayer.visible = false;
@@ -192,10 +196,10 @@ const getCustomElements = (
   return elements;
 };
 
-const formatAttributes = (graphic: __esri.Graphic): string => {
+const formatAttributes = (graphic: Graphic): string => {
   let text = "";
-  (graphic.layer as __esri.FeatureLayer)?.popupTemplate?.fieldInfos?.forEach(
-    (field) => {
+  (graphic.layer as FeatureLayer)?.popupTemplate?.fieldInfos?.forEach(
+    (field: FieldInfo) => {
       if (!field.fieldName) return;
       const value = graphic.getAttribute(field.fieldName);
       if (value == null) return;

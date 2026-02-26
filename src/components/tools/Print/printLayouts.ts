@@ -3,6 +3,7 @@ import request from "@arcgis/core/request";
 import TileInfo from "@arcgis/core/layers/support/TileInfo";
 import type { Template } from "./templates"; // adjust path if needed
 import { printTemplates } from "./templates"; // same
+import type LOD from "@arcgis/core/layers/support/LOD";
 
 export type Layout = {
   label: string;
@@ -126,8 +127,8 @@ export const roundScale = (mapScale: number): number => {
 export const getScales = (): MapScale[] => {
   const lods = TileInfo.create().lods ?? [];
   const scales = lods
-    .filter((lod: __esri.LOD) => lod.scale >= 300 && lod.scale < 614400)
-    .map((lod: __esri.LOD) => {
+    .filter((lod: LOD) => lod.scale >= 300 && lod.scale < 614400)
+    .map((lod: LOD) => {
       const s = roundScale(lod.scale);
       return {
         scale: s.toString(),

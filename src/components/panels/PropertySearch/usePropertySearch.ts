@@ -23,6 +23,12 @@ import { executeArcade } from "./popupTemplate/popupContent";
 import { arcadeExpressionInfos } from "./popupTemplate/arcadeExpressions";
 import { getTableByTitle } from "../../../utils/layerHelper";
 import { updateClusters } from "./clusterLayer";
+import type Graphic from "@arcgis/core/Graphic";
+import type { SearchResponse } from "@arcgis/core/widgets/Search/types";
+import type { TableInteractionCellClickEvent } from "@arcgis/core/widgets/FeatureTable/Grid/types";
+import type { ArcgisSearch } from "@arcgis/map-components/components/arcgis-search";
+import type Layer from "@arcgis/core/layers/Layer";
+import type { ObjectId } from "@arcgis/core/views/types";
 
 export interface UsePropertySearchProps {
   mapElement: React.RefObject<HTMLArcgisMapElement>;
@@ -31,32 +37,24 @@ export interface UsePropertySearchProps {
   searchElement: React.RefObject<HTMLArcgisSearchElement>;
   siteAddress: string;
   selectedTab: "list" | "info";
-  selectedCondo: __esri.Graphic | null;
-  condos: __esri.Graphic[];
+  selectedCondo: Graphic | null;
+  condos: Graphic[];
   webMapId: React.RefObject<string>;
   handleSearchReady: (
-    event: TargetedEvent<HTMLArcgisSearchElement, void>
+    event: TargetedEvent<HTMLArcgisSearchElement, void>,
   ) => void;
   handleTableReady: (
-    event: TargetedEvent<HTMLArcgisFeatureTableElement, void>
+    event: TargetedEvent<HTMLArcgisFeatureTableElement, void>,
   ) => void;
-  handleSearchComplete: (
-    event: TargetedEvent<
-      HTMLArcgisSearchElement,
-      __esri.SearchViewModelSearchCompleteEvent
-    >
-  ) => void;
+  handleSearchComplete: (event: CustomEvent<SearchResponse>) => void;
   handleTableCellClick: (
-    event: TargetedEvent<
-      HTMLArcgisFeatureTableElement,
-      __esri.FeatureTableCellClickEvent
-    >
+    event: CustomEvent<TableInteractionCellClickEvent>,
   ) => void;
   handleTabChange: (
-    event: TargetedEvent<HTMLCalciteTabNavElement, void>
+    event: TargetedEvent<HTMLCalciteTabNavElement, void>,
   ) => void;
   handleAddressTableReady: (
-    event: TargetedEvent<HTMLArcgisFeatureTableElement, void>
+    event: TargetedEvent<HTMLArcgisFeatureTableElement, void>,
   ) => void;
   handleAddressTableChange: (
     event: TargetedEvent<
@@ -69,37 +67,36 @@ export interface UsePropertySearchProps {
           | "effectiveSize"
           | "isQueryingOrSyncing";
       }
-    >
+    >,
   ) => void;
   handleAddressCellClick: (
-    event: TargetedEvent<
-      HTMLArcgisFeatureTableElement,
-      __esri.FeatureTableCellClickEvent
-    >
+    event: CustomEvent<TableInteractionCellClickEvent>,
   ) => void;
   handleClearClick: () => void;
   handleHistoryClick: (
-    event: React.MouseEvent<HTMLCalciteListItemElement>
+    event: React.MouseEvent<HTMLCalciteListItemElement>,
   ) => void;
   handleExport: () => void;
   handleExportAddresses: () => void;
   handleSuggestStart: (
     event: TargetedEvent<
-      HTMLArcgisSearchElement,
-      __esri.SearchViewModelSuggestStartEvent
-    >
+      ArcgisSearch,
+      {
+        searchTerm: string;
+      }
+    >,
   ) => void;
-  handleNextPropertySelected: (feature: __esri.Graphic) => void;
+  handleNextPropertySelected: (feature: Graphic) => void;
   handleTabClick: () => void;
 }
 export const usePropertySearch = (
-  mapElement: React.RefObject<HTMLArcgisMapElement>
+  mapElement: React.RefObject<HTMLArcgisMapElement>,
 ): UsePropertySearchProps => {
   const initializedRef = useRef(false);
   const tableElement = useRef<HTMLArcgisFeatureTableElement>(null!);
   const addressTableElement = useRef<HTMLArcgisFeatureTableElement>(null!);
   const searchElement = useRef<HTMLArcgisSearchElement>(null!);
-  const tableLayerRef = useRef<__esri.FeatureLayer>(undefined);
+  const tableLayerRef = useRef<FeatureLayer>(undefined);
   const {
     condos,
     setCondos,
@@ -115,7 +112,7 @@ export const usePropertySearch = (
 
   const [selectedTab, setSelectedTab] = useState<"list" | "info">("list");
   const handleSearchReady = async (
-    event: TargetedEvent<HTMLArcgisSearchElement, void>
+    event: TargetedEvent<HTMLArcgisSearchElement, void>,
   ) => {
     if (!mapElement.current) return;
     await mapElement.current.view.when();
@@ -176,30 +173,27 @@ export const usePropertySearch = (
         (columns) => {
           localStorage.setItem(
             `imaps_${webMapId.current}_visibleColumns`,
-            JSON.stringify(columns.map((column) => column.fieldName))
+            JSON.stringify(columns.map((column) => column.fieldName)),
           );
-        }
+        },
       );
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [mapElement, webMapId]
+    [mapElement, webMapId],
   );
 
   const handleTableCellClick = async (
-    event: TargetedEvent<
-      HTMLArcgisFeatureTableElement,
-      __esri.FeatureTableCellClickEvent
-    >
+    event: CustomEvent<TableInteractionCellClickEvent>,
   ) => {
     if (event.detail.feature) {
-      event.currentTarget.highlightIds = new Collection([
-        event.detail.feature.getObjectId(),
+      tableElement.current.highlightIds = new Collection([
+        event.detail.feature.getObjectId() as ObjectId,
       ]);
       const feature = event.detail.feature.clone();
       const propertyLayer = mapElement.current.map?.allLayers.find(
-        (layer: __esri.Layer) =>
-          layer.title === "Property" && layer.type === "feature"
-      ) as __esri.FeatureLayer;
+        (layer: Layer) =>
+          layer.title === "Property" && layer.type === "feature",
+      ) as FeatureLayer;
       if (propertyLayer) {
         const results = await propertyLayer.queryFeatures({
           where: `PIN_NUM = '${feature.getAttribute("PIN_NUM")}'`,
@@ -211,7 +205,7 @@ export const usePropertySearch = (
         }
         const condoTable = getTableByTitle(mapElement.current, "Condos");
         if (condoTable) {
-          feature.layer = condoTable as __esri.FeatureLayer;
+          feature.layer = condoTable as FeatureLayer;
         }
         setSelectedTab("info");
         updateFeature(feature);
@@ -220,7 +214,7 @@ export const usePropertySearch = (
   };
 
   const handleAddressTableReady = async (
-    event: TargetedEvent<HTMLArcgisFeatureTableElement, void>
+    event: TargetedEvent<HTMLArcgisFeatureTableElement, void>,
   ) => {
     console.log("address table ready");
 
@@ -261,7 +255,7 @@ export const usePropertySearch = (
         new GraphicsLayer({
           id: "address-graphics",
           listMode: "hide",
-        })
+        }),
       );
     }
     const grid =
@@ -291,7 +285,7 @@ export const usePropertySearch = (
           | "effectiveSize"
           | "isQueryingOrSyncing";
       }
-    >
+    >,
   ) => {
     if (event.detail.name === "size") {
       event.target.style.maxHeight = "500px";
@@ -303,16 +297,13 @@ export const usePropertySearch = (
   };
 
   const handleAddressCellClick = async (
-    event: TargetedEvent<
-      HTMLArcgisFeatureTableElement,
-      __esri.FeatureTableCellClickEvent
-    >
+    event: CustomEvent<TableInteractionCellClickEvent>,
   ) => {
-    event.target.highlightIds = new Collection([
+    addressTableElement.current.highlightIds = new Collection([
       event.detail.objectId as number,
     ]);
     const results = await (
-      event.target.layer as __esri.FeatureLayer
+      addressTableElement.current.layer as FeatureLayer
     ).queryFeatures({
       objectIds: [event.detail.objectId as number],
       outFields: [],
@@ -329,22 +320,17 @@ export const usePropertySearch = (
         clearAddressPoints(mapElement.current);
         (
           mapElement.current.map?.findLayerById(
-            "address-graphics"
-          ) as __esri.GraphicsLayer
+            "address-graphics",
+          ) as GraphicsLayer
         ).add(feature);
-        mapElement.current.goTo(feature);
+        mapElement.current.goTo({ target: feature });
       }
     }
   };
-  const handleSearchComplete = async (
-    event: TargetedEvent<
-      HTMLArcgisSearchElement,
-      __esri.SearchViewModelSearchCompleteEvent
-    >
-  ) => {
+  const handleSearchComplete = async (event: CustomEvent<SearchResponse>) => {
     if (mapElement.current) {
       if (event.detail.numResults === 0) {
-        if (event.target.searchTerm.length > 2) {
+        if (event.detail.searchTerm.length > 2) {
           const searchFields: string[] = [
             "SITE_ADDRESS",
             "OWNER",
@@ -356,7 +342,7 @@ export const usePropertySearch = (
             mapElement.current,
             searchElement.current,
             searchFields,
-            event.target.searchTerm
+            event.detail.searchTerm,
           );
 
           setCondos(results);
@@ -366,10 +352,10 @@ export const usePropertySearch = (
         }
       }
       const condos = await searchForCondosFromSearch(
-        event.detail,
-        event.target,
+        event,
+        searchElement.current,
         mapElement.current,
-        webMapId.current
+        webMapId.current,
       );
       setCondos(condos);
 
@@ -386,15 +372,15 @@ export const usePropertySearch = (
       setSelectedTab(
         event.target.selectedTitle.getAttribute("label") === "list"
           ? "list"
-          : "info"
+          : "info",
       );
     },
-    []
+    [],
   );
 
   const handleExport = async () => {
     tableElement.current.highlightIds = new Collection(
-      await tableLayerRef.current?.queryObjectIds({ where: "1=1" })
+      await tableLayerRef.current?.queryObjectIds({ where: "1=1" }),
     );
     tableElement.current.exportSelectionToCSV(false);
 
@@ -405,7 +391,7 @@ export const usePropertySearch = (
     addressTableElement.current.highlightIds = new Collection(
       await addressTableElement.current.layer?.queryObjectIds({
         geometry: addressTableElement.current.filterGeometry,
-      })
+      }),
     );
     addressTableElement.current.exportSelectionToCSV(false);
     addressTableElement.current.highlightIds = new Collection([]);
@@ -413,27 +399,30 @@ export const usePropertySearch = (
 
   const handleSuggestStart = (
     event: TargetedEvent<
-      HTMLArcgisSearchElement,
-      __esri.SearchViewModelSuggestStartEvent
-    >
+      ArcgisSearch,
+      {
+        searchTerm: string;
+      }
+    >,
   ) => {
     event.target.searchTerm = checkPin(event.target.searchTerm);
   };
 
   const updateFeature = useCallback(
-    async (feature: __esri.Graphic) => {
+    async (feature: Graphic) => {
       setSelectedTab("info");
       //check to see if the feature is coming from clicking on the list
-      const tableLayer = tableLayerRef.current as __esri.FeatureLayer;
+      const tableLayer = tableLayerRef.current as FeatureLayer;
       const updates = await tableLayer.queryFeatures({
         where: `1=1`,
         outFields: ["*"],
         returnGeometry: true,
       });
       const selectedFeatures = updates?.features.filter(
-        (selectedFeature) => selectedFeature.attributes["selected"] === "yes"
+        (selectedFeature: Graphic) =>
+          selectedFeature.attributes["selected"] === "yes",
       );
-      selectedFeatures?.forEach((selectedFeature) => {
+      selectedFeatures?.forEach((selectedFeature: Graphic) => {
         selectedFeature.setAttribute("selected", "no");
       });
 
@@ -445,11 +434,11 @@ export const usePropertySearch = (
       await tableLayer?.applyEdits({ updateFeatures: [feature] });
       await tableLayer?.refresh();
 
-      if (!(feature.layer as __esri.FeatureLayer).isTable) {
+      if (!(feature.layer as FeatureLayer).isTable) {
         const condoTable = getTableByTitle(
           mapElement.current,
-          "Condos"
-        ) as __esri.FeatureLayer;
+          "Condos",
+        ) as FeatureLayer;
         const condos = await condoTable.queryFeatures({
           where: `REID = '${feature.getAttribute("REID")}'`,
           outFields: ["OBJECTID"],
@@ -465,14 +454,14 @@ export const usePropertySearch = (
       feature.popupTemplate = createTemplate(
         mapElement.current,
         feature,
-        photos
+        photos,
       );
       clearAddressPoints(mapElement.current);
       if (!feature.geometry) {
         const property = await getProperty(
           mapElement.current,
           [feature.getObjectId() as number],
-          undefined
+          undefined,
         );
         tableLayerRef.current?.refresh();
         if (property.length) {
@@ -489,7 +478,7 @@ export const usePropertySearch = (
       setGeometry(null);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [geometry]
+    [geometry],
   );
 
   const handleClearClick = () => {
@@ -499,13 +488,13 @@ export const usePropertySearch = (
   };
 
   const handleHistoryClick = (
-    event: React.MouseEvent<HTMLCalciteListItemElement>
+    event: React.MouseEvent<HTMLCalciteListItemElement>,
   ) => {
     if (!searchElement.current) return;
     searchElement.current.search(event.currentTarget.label);
   };
 
-  const handleNextPropertySelected = (feature: __esri.Graphic) => {
+  const handleNextPropertySelected = (feature: Graphic) => {
     updateFeature(feature);
   };
   useEffect(() => {
@@ -519,19 +508,19 @@ export const usePropertySearch = (
         const results = await getProperty(
           mapElement.current,
           undefined,
-          geometry
+          geometry,
         );
 
         if (results.length) {
           const oids = results.map((result) =>
-            result.getObjectId()
+            result.getObjectId(),
           ) as number[];
-          const layer = results[0].layer as __esri.FeatureLayer;
+          const layer = results[0].layer as FeatureLayer;
           const data = await searchRelatedCondos(
             oids,
             layer,
             "PROPERTY_CONDO",
-            mapElement.current
+            mapElement.current,
           );
           setCondos(data);
         }
@@ -547,12 +536,12 @@ export const usePropertySearch = (
     //condosSelected(condos);
     const updateTableLayer = async () => {
       const deletes = await (
-        tableLayerRef.current as __esri.FeatureLayer
+        tableLayerRef.current as FeatureLayer
       ).queryFeatures({ where: "1=1" });
-      await (tableLayerRef.current as __esri.FeatureLayer).applyEdits({
+      await (tableLayerRef.current as FeatureLayer).applyEdits({
         deleteFeatures: deletes.features,
       });
-      (tableLayerRef.current as __esri.FeatureLayer).refresh();
+      (tableLayerRef.current as FeatureLayer).refresh();
       condos.forEach((condo) => {
         condos[0].setAttribute("OID", condos[0].getObjectId());
         condo.setAttribute("selected", "no");
@@ -561,7 +550,7 @@ export const usePropertySearch = (
         condos[0].setAttribute("selected", "yes");
       }
 
-      await (tableLayerRef.current as __esri.FeatureLayer).applyEdits({
+      await (tableLayerRef.current as FeatureLayer).applyEdits({
         addFeatures: condos,
       });
       updateClusters(condos, mapElement.current);
@@ -593,7 +582,7 @@ export const usePropertySearch = (
       })?.expression;
       if (!arcade) return;
       const address = await executeArcade(arcade, selectedCondo);
-      setSiteAddress(address);
+      setSiteAddress(address as string);
     })();
   }, [mapElement, selectedCondo, setSiteAddress]);
 

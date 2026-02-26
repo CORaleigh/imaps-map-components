@@ -1,6 +1,8 @@
+import type Polygon from "@arcgis/core/geometry/Polygon";
 import Graphic from "@arcgis/core/Graphic";
 import FeatureLayer from "@arcgis/core/layers/FeatureLayer";
 import FeatureReductionCluster from "@arcgis/core/layers/support/FeatureReductionCluster.js";
+import * as centroidOperator from "@arcgis/core/geometry/operators/centroidOperator.js";
 
 export const addClusterLayer = (mapElement: HTMLArcgisMapElement) => {
   const layer = new FeatureLayer({
@@ -69,11 +71,12 @@ export const updateClusters = async (
   const points: Graphic[] = [];
 
   properties.forEach((property) => {
-    const geometry = property.geometry as __esri.Polygon;
+    const geometry = property.geometry as Polygon;
+    const centroid = centroidOperator.execute(geometry);
     points.push(
       new Graphic({
         attributes: property.attributes,
-        geometry: geometry ? geometry.centroid : undefined,
+        geometry: centroid,
       })
     );
   });

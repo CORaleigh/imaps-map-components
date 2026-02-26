@@ -11,6 +11,7 @@ import {
 import { prepareExport, roundScale, type Export } from "./printService";
 import { useMap } from "../../../context/useMap";
 import { getPrintTemplate, hidePrintFrame, showPrintFrame } from "./printFrame";
+import type Graphic from "@arcgis/core/Graphic";
 
 interface PrintOptions {
   title: string;
@@ -43,7 +44,7 @@ export interface UsePrintProps {
   scales: MapScale[];
   layouts: Layout[];
   selectedTab: "layout" | "exports";
-  selectedCondo: __esri.Graphic | null;
+  selectedCondo: Graphic | null;
   handleTitleChange: (
     event: TargetedEvent<HTMLCalciteInputTextElement, void>
   ) => void;

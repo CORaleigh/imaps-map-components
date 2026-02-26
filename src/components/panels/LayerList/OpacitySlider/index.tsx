@@ -1,8 +1,9 @@
 import React from "react";
 import "@esri/calcite-components/components/calcite-slider";
 import type { TargetedEvent } from "@arcgis/map-components";
+import type Layer from "@arcgis/core/layers/Layer";
 interface Props {
-  layer: __esri.Layer;
+  layer: Layer;
   value: number;
 }
 export const OpacitySlider: React.FC<Props> = ({ layer, value }) => {

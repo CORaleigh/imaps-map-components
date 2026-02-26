@@ -6,10 +6,13 @@ import ActionToggle from "@arcgis/core/support/actions/ActionToggle.js";
 
 import type { TargetedEvent } from "@arcgis/map-components";
 import Collection from "@arcgis/core/core/Collection";
+import type Layer from "@arcgis/core/layers/Layer";
+import type ListItem from "@arcgis/core/widgets/LayerList/ListItem";
+import type MapImageLayer from "@arcgis/core/layers/MapImageLayer";
 export type LayerStorageInfo = {
   id: string | number;
   visible: boolean;
-  title: string | nullish;
+  title: string | null;
   opacity: number;
   visibleSublayerIds?: number[];
 };
@@ -51,7 +54,7 @@ export const layerListReady = (
   console.log(event);
 };
 
-export const createItemPanel = (item: __esri.ListItem) => {
+export const createItemPanel = (item: ListItem) => {
   if (
     item.layer &&
     item.layer?.type !== "group" &&
@@ -60,7 +63,7 @@ export const createItemPanel = (item: __esri.ListItem) => {
     let addSlider = true;
     if (item.layer.type === "sublayer") {
       if (item.layer.parent?.type === "map-image") {
-        const capabilities = (item.layer.parent as __esri.MapImageLayer)
+        const capabilities = (item.layer.parent as MapImageLayer)
           .capabilities.exportMap;
         if (capabilities) {
           addSlider = capabilities.supportsDynamicLayers;
@@ -73,7 +76,7 @@ export const createItemPanel = (item: __esri.ListItem) => {
       <Suspense fallback={""}>
         <OpacitySlider
           value={item.layer.opacity}
-          layer={item.layer as __esri.Layer}
+          layer={item.layer as Layer}
         />
       </Suspense>
     );
@@ -89,7 +92,7 @@ export const createItemPanel = (item: __esri.ListItem) => {
   }
 };
 
-export const createLabelToggles = (item: __esri.ListItem) => {
+export const createLabelToggles = (item: ListItem) => {
   if (!item.layer) return;
   if (item.layer.title === "Property" && item.layer.type === "feature") {
     item.actionsSections = new Collection([new Collection([])]);
@@ -108,7 +111,7 @@ export const createLabelToggles = (item: __esri.ListItem) => {
   }
 };
 
-export const watchLayerList = (item: __esri.ListItem, id: string) => {
+export const watchLayerList = (item: ListItem, id: string) => {
   reactiveUtils.watch(
     () => item.layer?.visible === true,
     (visible: boolean) => {
@@ -116,12 +119,12 @@ export const watchLayerList = (item: __esri.ListItem, id: string) => {
         if (item.layer.parent instanceof GroupLayer) {
           const parentVisible = visible
             ? true
-            : !(item.layer.parent as __esri.GroupLayer).layers?.filter(
+            : !(item.layer.parent as GroupLayer).layers?.filter(
                 (sublayer) => sublayer.visible
               ).length
             ? false
             : true;
-          (item.layer.parent as __esri.GroupLayer).visible = parentVisible;
+          (item.layer.parent as GroupLayer).visible = parentVisible;
           item.parent.open = parentVisible;
         }
 

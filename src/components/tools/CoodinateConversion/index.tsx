@@ -38,6 +38,7 @@ const CoodinateConversion: React.FC<CoodinateConversionProps> = ({
   return (
     <>
       <calcite-block
+        id="coord-conversion"
         className={styles.coordConversion}
         heading={display}
         label={display}
@@ -138,7 +139,10 @@ const CoodinateConversion: React.FC<CoodinateConversionProps> = ({
       <calcite-tooltip closeOnClick referenceElement="coordinate-search-action">
         Search Coordinate
       </calcite-tooltip>
-      <calcite-tooltip closeOnClick referenceElement="coordinate-settings-action">
+      <calcite-tooltip
+        closeOnClick
+        referenceElement="coordinate-settings-action"
+      >
         Settings
       </calcite-tooltip>
       <calcite-tooltip closeOnClick referenceElement="coordinate-mode-action">

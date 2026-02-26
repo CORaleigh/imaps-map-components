@@ -5,10 +5,12 @@ import {
   createLinkButtons,
   createEnvironmentalButtons,
 } from "./popupTemplate";
+import type Graphic from "@arcgis/core/Graphic";
+import type MediaInfo from "@arcgis/core/popup/content/mixins/MediaInfo";
 
 export const getPopupContent = (
-  feature: __esri.Graphic,
-  photos: __esri.MediaInfo[],
+  feature: Graphic,
+  photos: MediaInfo[],
   mapElement: HTMLArcgisMapElement
 ) => {
   return [
@@ -195,7 +197,7 @@ export const getPopupContent = (
 
 export const executeArcade = async (
   expression: string,
-  feature: __esri.Graphic
+  feature: Graphic
 ) => {
   const executor = await arcade.createArcadeExecutor(expression, {
     variables: [

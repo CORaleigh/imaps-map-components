@@ -3,10 +3,11 @@ import "@esri/calcite-components/components/calcite-accordion";
 import "@esri/calcite-components/components/calcite-accordion-item";
 import "@arcgis/map-components/components/arcgis-feature";
 import { useServices } from "./useServices";
+import type Graphic from "@arcgis/core/Graphic";
 
 interface ServicesProps {
   mapElement: HTMLArcgisMapElement;
-  selectedCondo: __esri.Graphic;
+  selectedCondo: Graphic;
 }
 
 const Services: React.FC<ServicesProps> = ({ mapElement, selectedCondo }) => {

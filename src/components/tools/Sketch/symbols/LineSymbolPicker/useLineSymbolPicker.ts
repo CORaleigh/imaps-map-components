@@ -4,6 +4,7 @@ import { useState, useCallback, useEffect } from "react";
 import Color from "@arcgis/core/Color";
 import type { TargetedEvent } from "@arcgis/map-components";
 import type SimpleFillSymbol from "@arcgis/core/symbols/SimpleFillSymbol";
+import type SimpleLineSymbol from "@arcgis/core/symbols/SimpleLineSymbol";
 import type SimpleMarkerSymbol from "@arcgis/core/symbols/SimpleMarkerSymbol";
 
 export interface UseLineSymbolPicker {
@@ -29,14 +30,14 @@ export interface UseLineSymbolPicker {
 
 export const useLineSymbolPicker = (
   symbol:
-    | __esri.SimpleFillSymbol
-    | __esri.SimpleLineSymbol
-    | __esri.SimpleMarkerSymbol,
+    | SimpleFillSymbol
+    | SimpleLineSymbol
+    | SimpleMarkerSymbol,
   onSymbolChange: (
     symbol:
-      | __esri.SimpleFillSymbol
-      | __esri.SimpleLineSymbol
-      | __esri.SimpleMarkerSymbol
+      | SimpleFillSymbol
+      | SimpleLineSymbol
+      | SimpleMarkerSymbol
   ) => void
 ): UseLineSymbolPicker => {
   const [lineColor, setLineColor] = useState("#FF0000");
@@ -122,7 +123,7 @@ export const useLineSymbolPicker = (
         symbol.type === "simple-line"
           ? symbol.color?.clone()
           : (
-              symbol as __esri.SimpleFillSymbol | __esri.SimpleMarkerSymbol
+              symbol as SimpleFillSymbol | SimpleMarkerSymbol
             ).outline?.color?.clone();
 
       color!.a = (100 - v) / 100;
@@ -154,7 +155,7 @@ export const useLineSymbolPicker = (
         symbol.type === "simple-line"
           ? symbol.color?.clone()
           : (
-              symbol as __esri.SimpleFillSymbol | __esri.SimpleMarkerSymbol
+              symbol as SimpleFillSymbol | SimpleMarkerSymbol
             ).outline?.color?.clone();
 
       color!.a = (100 - parseInt(v)) / 100;

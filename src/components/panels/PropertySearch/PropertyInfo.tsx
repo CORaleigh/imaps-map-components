@@ -8,13 +8,16 @@ import styles from "./PropertySearch.module.css";
 import NextPropertyButton from "./NextPropertyButton";
 import Services from "./Services";
 
+import type Graphic from "@arcgis/core/Graphic";
+
+
 interface PropertyInfoProps {
-  feature: __esri.Graphic;
-  condos: __esri.Graphic[];
+  feature: Graphic;
+  condos: Graphic[];
   mapElement: RefObject<HTMLArcgisMapElement>;
   tableElement: RefObject<HTMLArcgisFeatureTableElement>;
   title: string;
-  onNextProperty: (feature: __esri.Graphic) => void;
+  onNextProperty: (feature: Graphic) => void;
 }
 
 const PropertyInfo: React.FC<PropertyInfoProps> = ({

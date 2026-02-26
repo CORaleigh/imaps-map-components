@@ -8,41 +8,37 @@ import FeatureLayer from "@arcgis/core/layers/FeatureLayer";
 import * as intersectionOperator from "@arcgis/core/geometry/operators/intersectionOperator.js";
 import GraphicsLayer from "@arcgis/core/layers/GraphicsLayer";
 import Graphic from "@arcgis/core/Graphic";
+import type {
+  SearchViewModelEvents,
+  SearchViewModelSelectResultEvent,
+} from "@arcgis/core/widgets/Search/SearchViewModel";
 
 export interface UseLocationSearchProps {
   showIntersection: boolean;
-  intersectingStreets: __esri.Graphic[];
+  intersectingStreets: Graphic[];
   handleSearchReady: (
-    event: TargetedEvent<HTMLArcgisSearchElement, void>
+    event: TargetedEvent<HTMLArcgisSearchElement, void>,
   ) => void;
   handleSelectResult: (
-    event: TargetedEvent<
-      HTMLArcgisSearchElement,
-      __esri.SearchViewModelSelectResultEvent
-    >
+    event: CustomEvent<SearchViewModelSelectResultEvent>,
   ) => void;
   handleSearchClear: (
-    event: TargetedEvent<
-      HTMLArcgisSearchElement,
-      __esri.SearchViewModelSearchClearEvent
-    >
+    event: CustomEvent<SearchViewModelEvents["search-clear"]>,
   ) => void;
   handleIntersectingStreetChange: (
-    event: TargetedEvent<HTMLCalciteComboboxElement, void>
+    event: TargetedEvent<HTMLCalciteComboboxElement, void>,
   ) => void;
 }
 
 export const useLocationSearch = (
   mapElement: React.RefObject<HTMLArcgisMapElement>,
-  closed: boolean
+  closed: boolean,
 ): UseLocationSearchProps => {
   const initializedRef = useRef(false);
   const [showIntersection, setShowIntersection] = useState<boolean>(false);
-  const [intersectingStreets, setIntersectingStreets] = useState<
-    __esri.Graphic[]
-  >([]);
+  const [intersectingStreets, setIntersectingStreets] = useState<Graphic[]>([]);
   const intersectionLayer = useRef<FeatureLayer>(undefined);
-  const selectedStreet = useRef<__esri.Graphic>(undefined);
+  const selectedStreet = useRef<Graphic>(undefined);
   const graphicsLayer = useRef<GraphicsLayer>(undefined);
 
   const marker: PictureMarkerSymbol = new PictureMarkerSymbol({
@@ -62,13 +58,13 @@ export const useLocationSearch = (
           url: geocodeUrl,
           autoNavigate: true,
           resultSymbol: marker,
-        })
+        }),
       );
     }
   };
 
   const addIntersectionSource = async (
-    searchElement: HTMLArcgisSearchElement
+    searchElement: HTMLArcgisSearchElement,
   ) => {
     const config = await fetch("config.json");
     const data = await config.json();
@@ -94,7 +90,7 @@ export const useLocationSearch = (
   };
 
   const handleSearchReady = (
-    event: TargetedEvent<HTMLArcgisSearchElement, void>
+    event: TargetedEvent<HTMLArcgisSearchElement, void>,
   ) => {
     event.target.sources = event.target.allSources.filter((source) => {
       source.name = source.name.split(":")[0];
@@ -107,10 +103,7 @@ export const useLocationSearch = (
   };
 
   const handleSelectResult = async (
-    event: TargetedEvent<
-      HTMLArcgisSearchElement,
-      __esri.SearchViewModelSelectResultEvent
-    >
+    event: CustomEvent<SearchViewModelSelectResultEvent>,
   ) => {
     const source = event.detail.source.name;
     setShowIntersection(source === "Intersection");
@@ -119,7 +112,7 @@ export const useLocationSearch = (
       selectedStreet.current = event.detail.result.feature;
       const result = await intersectionLayer.current.queryFeatures({
         where: `CARTONAME <> '${event.detail.result.feature.getAttribute(
-          "CARTONAME"
+          "CARTONAME",
         )}'`,
         geometry: event.detail.result.feature.geometry,
         outFields: ["CARTONAME"],
@@ -131,7 +124,7 @@ export const useLocationSearch = (
   };
 
   const handleIntersectingStreetChange = (
-    event: TargetedEvent<HTMLCalciteComboboxElement, void>
+    event: TargetedEvent<HTMLCalciteComboboxElement, void>,
   ) => {
     if (
       !selectedStreet.current?.geometry ||
@@ -140,23 +133,20 @@ export const useLocationSearch = (
       return;
 
     const intersection = intersectionOperator.executeMany(
-      [event.target.selectedItems.at(0).value.geometry],
-      selectedStreet.current.geometry
+      [event.target.selectedItems.at(0)?.value.geometry],
+      selectedStreet.current.geometry,
     );
     if (intersection.length) {
-      mapElement.current.goTo(intersection.at(0));
+      mapElement.current.goTo({target: intersection.at(0)});
       graphicsLayer.current?.removeAll();
       graphicsLayer.current?.add(
-        new Graphic({ geometry: intersection.at(0), symbol: marker })
+        new Graphic({ geometry: intersection.at(0), symbol: marker }),
       );
     }
   };
 
   const handleSearchClear = (
-    event: TargetedEvent<
-      HTMLArcgisSearchElement,
-      __esri.SearchViewModelSearchClearEvent
-    >
+    event: CustomEvent<SearchViewModelEvents["search-clear"]>,
   ) => {
     console.log(event.detail);
     setShowIntersection(false);

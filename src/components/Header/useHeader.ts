@@ -28,9 +28,8 @@ export const useHeader = (webMapId: string): UseHeaderProps => {
     if (!groups.length || !items.length) return;
     const groupHeight = 41;
     const itemHeight = 36;
-    const height = (groupHeight * groups.length) + (itemHeight * items.length);
-    wrapper?.setAttribute("style", `min-height: ${height}px`)
-
+    const height = groupHeight * groups.length + itemHeight * items.length;
+    wrapper?.setAttribute("style", `min-height: ${height}px`);
   };
   const handleClearStorage = () => {
     localStorage.removeItem(`imaps_${webMapId}_basemap`);
@@ -41,21 +40,19 @@ export const useHeader = (webMapId: string): UseHeaderProps => {
 
     localStorage.removeItem(`imaps_theme_mode`);
     window.location.reload();
-
-
-  }
+  };
   useEffect(() => {
-    fetch("config.json")
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.links) {
-          links.current = data.links;
-        }
-      });
+    (async () => {
+      const res = await fetch("config.json");
+      const data = await res.json();
+      if (data.links) {
+        links.current = data.links;
+      }
+    })();
   }, []);
   return {
     links,
     handleDropdownOpen,
-    handleClearStorage
+    handleClearStorage,
   };
 };

@@ -4,6 +4,7 @@ import Graphic from "@arcgis/core/Graphic";
 import type { TargetedEvent } from "@arcgis/map-components";
 export type ToolType = "distance" | "area" | null;
 import * as reactiveUtils from "@arcgis/core/core/reactiveUtils.js";
+import type Extent from "@arcgis/core/geometry/Extent";
 
 export interface UseOverviewMapProps {
   overviewMapElement: RefObject<HTMLArcgisMapElement | null>;
@@ -14,7 +15,7 @@ export interface UseOverviewMapProps {
 
 const addGraphic = (
   overviewMap: HTMLArcgisMapElement,
-  mapExtent: __esri.Extent
+  mapExtent: Extent
 ) => {
   
   overviewMap.graphics.removeAll();
@@ -48,7 +49,7 @@ export const useOverviewMap = (
 
     reactiveUtils.watch(
       () => mapElement.current.view.extent,
-      async (mapExtent: __esri.Extent) => {
+      async (mapExtent: Extent) => {
         if (!overviewMapElement.current) return;
         await overviewMapElement.current.goTo(mapExtent.clone().expand(4));
         addGraphic(overviewMapElement.current, mapExtent);

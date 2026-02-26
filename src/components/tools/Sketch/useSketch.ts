@@ -8,6 +8,9 @@ import SimpleMarkerSymbol from "@arcgis/core/symbols/SimpleMarkerSymbol";
 import TextSymbol from "@arcgis/core/symbols/TextSymbol";
 import { useMap } from "../../../context/useMap";
 import type { MapMode } from "../../../context/MapContext";
+import type Graphic from "@arcgis/core/Graphic";
+import type GraphicsLayer from "@arcgis/core/layers/GraphicsLayer";
+import type { CreateEvent } from "@arcgis/core/widgets/Sketch/types";
 
 export interface UseSketchProps {
   mapMode: MapMode;
@@ -21,31 +24,31 @@ export interface UseSketchProps {
   handleToolClose: () => void;
   handlePointSymbolChange: (
     symbol:
-      | __esri.SimpleMarkerSymbol
-      | __esri.SimpleLineSymbol
-      | __esri.SimpleFillSymbol
-      | __esri.TextSymbol
+      | SimpleMarkerSymbol
+      | SimpleLineSymbol
+      | SimpleFillSymbol
+      | TextSymbol
   ) => void;
   handlePolylineSymbolChange: (
     symbol:
-      | __esri.SimpleMarkerSymbol
-      | __esri.SimpleLineSymbol
-      | __esri.SimpleFillSymbol
-      | __esri.TextSymbol
+      | SimpleMarkerSymbol
+      | SimpleLineSymbol
+      | SimpleFillSymbol
+      | TextSymbol
   ) => void;
   handlePolygonSymbolChange: (
     symbol:
-      | __esri.SimpleMarkerSymbol
-      | __esri.SimpleLineSymbol
-      | __esri.SimpleFillSymbol
-      | __esri.TextSymbol
+      | SimpleMarkerSymbol
+      | SimpleLineSymbol
+      | SimpleFillSymbol
+      | TextSymbol
   ) => void;
   handleTextSymbolChange: (
     symbol:
-      | __esri.SimpleMarkerSymbol
-      | __esri.SimpleLineSymbol
-      | __esri.SimpleFillSymbol
-      | __esri.TextSymbol
+      | SimpleMarkerSymbol
+      | SimpleLineSymbol
+      | SimpleFillSymbol
+      | TextSymbol
   ) => void;
   clearSketches: () => void;
   handleDeleteSelectedGraphics: () => void;
@@ -57,31 +60,31 @@ export const useSketch = (
 ): UseSketchProps => {
   const { mapMode, setMapMode } = useMap();
 
-  const mapNotesLayer = useRef<__esri.MapNotesLayer>(
+  const mapNotesLayer = useRef<MapNotesLayer>(
     new MapNotesLayer({
       id: "sketch-lauer",
       listMode: "hide",
     })
   );
 
-  const pointSketchVm = useRef<__esri.SketchViewModel>(null);
-  const lineSketchVm = useRef<__esri.SketchViewModel>(null);
-  const polygonSketchVm = useRef<__esri.SketchViewModel>(null);
-  const textSketchVm = useRef<__esri.SketchViewModel>(null);
+  const pointSketchVm = useRef<SketchViewModel>(null);
+  const lineSketchVm = useRef<SketchViewModel>(null);
+  const polygonSketchVm = useRef<SketchViewModel>(null);
+  const textSketchVm = useRef<SketchViewModel>(null);
 
-  const [pointSymbol, setPointSymbol] = useState<__esri.SimpleMarkerSymbol>(
+  const [pointSymbol, setPointSymbol] = useState<SimpleMarkerSymbol>(
     new SimpleMarkerSymbol({ color: "#FF0000", size: 8 })
   );
-  const [polylineSymbol, setLineSymbol] = useState<__esri.SimpleLineSymbol>(
+  const [polylineSymbol, setLineSymbol] = useState<SimpleLineSymbol>(
     new SimpleLineSymbol({ color: "#FF0000", width: 2 })
   );
-  const [polygonSymbol, setPolygonSymbol] = useState<__esri.SimpleFillSymbol>(
+  const [polygonSymbol, setPolygonSymbol] = useState<SimpleFillSymbol>(
     new SimpleFillSymbol({
       color: [255, 0, 0, 0.5],
       outline: { color: "#FF0000", width: 2 },
     })
   );
-  const [textSymbol, setTextSymbol] = useState<__esri.TextSymbol>(
+  const [textSymbol, setTextSymbol] = useState<TextSymbol>(
     new TextSymbol({
       color: "#000000",
       text: "",
@@ -89,7 +92,7 @@ export const useSketch = (
     })
   );
 
-  const selectedGraphics = useRef<__esri.Graphic[]>([]);
+  const selectedGraphics = useRef<Graphic[]>([]);
   const [selectedGraphicIds, setSelectedGraphicIds] = useState<string[]>([]);
   const [selectedGraphicsType, setSelectedGraphicsType] = useState<
     string | undefined
@@ -161,7 +164,7 @@ export const useSketch = (
     [mapElement, mapMode, setMapMode]
   );
 
-  const createSketchVm = (layer: __esri.GraphicsLayer | nullish) => {
+  const createSketchVm = (layer: GraphicsLayer | null | undefined) => {
     const sketchVm = new SketchViewModel({
       view: mapElement.current.view,
       layer: layer,
@@ -214,13 +217,12 @@ export const useSketch = (
     return sketchVm;
   };
 
-  const handleSketchCreate = (event: __esri.SketchViewModelCreateEvent) => {
-    // if (event.state === "start" || event.state === "active") {
+const handleSketchCreate = (event: CreateEvent) => {
     //   mapElement.current.popupDisabled = true;
     // }
     if (event.state === "complete") {
-      event.graphic.setAttribute("id", crypto.randomUUID());
-      switch (event.graphic.geometry?.type) {
+      event.graphic?.setAttribute("id", crypto.randomUUID());
+      switch (event.graphic?.geometry?.type) {
         case "point":
           if (mapMode === "point") {
             mapNotesLayer.current.pointLayer?.add(event.graphic);
@@ -244,55 +246,58 @@ export const useSketch = (
   };
   const handlePointSymbolChange = (
     symbol:
-      | __esri.SimpleMarkerSymbol
-      | __esri.SimpleLineSymbol
-      | __esri.SimpleFillSymbol
-      | __esri.TextSymbol
+      | SimpleMarkerSymbol
+      | SimpleLineSymbol
+      | SimpleFillSymbol
+      | TextSymbol
   ) => {
     if (!pointSketchVm.current) return;
-    pointSketchVm.current.pointSymbol = symbol as __esri.SimpleMarkerSymbol;
-    setPointSymbol(symbol as __esri.SimpleMarkerSymbol);
+    pointSketchVm.current.pointSymbol = symbol as SimpleMarkerSymbol;
+    setPointSymbol(symbol as SimpleMarkerSymbol);
     selectedGraphics.current.forEach((graphic) => {
-      graphic.symbol = { ...symbol };
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      graphic.symbol = { ...symbol } as any;
     });
   };
 
   const handlePolylineSymbolChange = (
     symbol:
-      | __esri.SimpleMarkerSymbol
-      | __esri.SimpleLineSymbol
-      | __esri.SimpleFillSymbol
-      | __esri.TextSymbol
+      | SimpleMarkerSymbol
+      | SimpleLineSymbol
+      | SimpleFillSymbol
+      | TextSymbol
   ) => {
     if (!lineSketchVm.current) return;
-    lineSketchVm.current.polylineSymbol = symbol as __esri.SimpleLineSymbol;
-    setLineSymbol(symbol as __esri.SimpleLineSymbol);
+    lineSketchVm.current.polylineSymbol = symbol as SimpleLineSymbol;
+    setLineSymbol(symbol as SimpleLineSymbol);
     selectedGraphics.current.forEach((graphic) => {
-      graphic.symbol = { ...symbol };
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      graphic.symbol = { ...symbol } as any;
     });
   };
 
   const handlePolygonSymbolChange = (
     symbol:
-      | __esri.SimpleMarkerSymbol
-      | __esri.SimpleLineSymbol
-      | __esri.SimpleFillSymbol
-      | __esri.TextSymbol
+      | SimpleMarkerSymbol
+      | SimpleLineSymbol
+      | SimpleFillSymbol
+      | TextSymbol
   ) => {
     if (!lineSketchVm.current) return;
     lineSketchVm.current.polygonSymbol = symbol as SimpleFillSymbol;
-    setPolygonSymbol(symbol as __esri.SimpleFillSymbol);
+    setPolygonSymbol(symbol as SimpleFillSymbol);
     selectedGraphics.current.forEach((graphic) => {
-      graphic.symbol = { ...symbol };
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      graphic.symbol = { ...symbol } as any;
     });
   };
 
   const handleTextSymbolChange = (
     symbol:
-      | __esri.SimpleMarkerSymbol
-      | __esri.SimpleLineSymbol
-      | __esri.SimpleFillSymbol
-      | __esri.TextSymbol
+      | SimpleMarkerSymbol
+      | SimpleLineSymbol
+      | SimpleFillSymbol
+      | TextSymbol
   ) => {
     if (!textSketchVm.current) return;
 
@@ -303,13 +308,13 @@ export const useSketch = (
     // update all selected graphics
     selectedGraphics.current.forEach((graphic) => {
       graphic.symbol = new TextSymbol({
-        text: (symbol as __esri.TextSymbol).text,
-        color: (symbol as __esri.TextSymbol).color,
-        font: (symbol as __esri.TextSymbol).font,
-        haloColor: (symbol as __esri.TextSymbol).haloColor,
-        haloSize: (symbol as __esri.TextSymbol).haloSize,
-        xoffset: (symbol as __esri.TextSymbol).xoffset,
-        yoffset: (symbol as __esri.TextSymbol).yoffset,
+        text: (symbol as TextSymbol).text,
+        color: (symbol as TextSymbol).color,
+        font: (symbol as TextSymbol).font,
+        haloColor: (symbol as TextSymbol).haloColor,
+        haloSize: (symbol as TextSymbol).haloSize,
+        xoffset: (symbol as TextSymbol).xoffset,
+        yoffset: (symbol as TextSymbol).yoffset,
       });
     });
   };
@@ -325,25 +330,25 @@ export const useSketch = (
     switch (selectedGraphicsType) {
       case "point":
         pointSketchVm.current?.removeGraphics(selectedGraphics.current);
-        (pointSketchVm.current?.layer as __esri.GraphicsLayer).removeMany(
+        (pointSketchVm.current?.layer as GraphicsLayer).removeMany(
           selectedGraphics.current
         );
         break;
       case "polyline":
         lineSketchVm.current?.removeGraphics(selectedGraphics.current);
-        (lineSketchVm.current?.layer as __esri.GraphicsLayer).removeMany(
+        (lineSketchVm.current?.layer as GraphicsLayer).removeMany(
           selectedGraphics.current
         );
         break;
       case "polygon":
         polygonSketchVm.current?.removeGraphics(selectedGraphics.current);
-        (polygonSketchVm.current?.layer as __esri.GraphicsLayer).removeMany(
+        (polygonSketchVm.current?.layer as GraphicsLayer).removeMany(
           selectedGraphics.current
         );
         break;
       case "text":
         textSketchVm.current?.removeGraphics(selectedGraphics.current);
-        (textSketchVm.current?.layer as __esri.GraphicsLayer).removeMany(
+        (textSketchVm.current?.layer as GraphicsLayer).removeMany(
           selectedGraphics.current
         );
         break;

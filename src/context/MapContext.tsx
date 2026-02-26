@@ -19,6 +19,12 @@ import { searchCondos } from "../components/panels/PropertySearch/search";
 import { getLayerByTitle } from "../utils/layerHelper";
 import { useCondoHistory } from "./useCondoHistory";
 import { addClusterLayer } from "../components/panels/PropertySearch/clusterLayer";
+import type Geometry from "@arcgis/core/geometry/Geometry";
+import type Graphic from "@arcgis/core/Graphic";
+import type ActionButton from "@arcgis/core/support/actions/ActionButton";
+import type Polygon from "@arcgis/core/geometry/Polygon";
+import type { ArcgisMap } from "@arcgis/map-components/components/arcgis-map";
+import type { ClickEvent } from "@arcgis/core/views/input/types";
 
 export type MapMode =
   | "identify"
@@ -52,12 +58,12 @@ export interface MapContextType {
   setMapReady: (ready: boolean) => void;
   searchReady: boolean;
   setSearchReady: (ready: boolean) => void;
-  geometry: __esri.Geometry | null;
-  setGeometry: (geom: __esri.Geometry | null) => void;
-  condos: __esri.Graphic[];
-  setCondos: (condos: __esri.Graphic[]) => void;
-  selectedCondo: __esri.Graphic | null;
-  setSelectedCondo: (condos: __esri.Graphic | null) => void;
+  geometry: Geometry | null;
+  setGeometry: (geom: Geometry | null) => void;
+  condos: Graphic[];
+  setCondos: (condos: Graphic[]) => void;
+  selectedCondo: Graphic | null;
+  setSelectedCondo: (condos: Graphic | null) => void;
   webMapId: React.RefObject<string>;
   mapMode: MapMode;
   setMapMode: (mode: MapMode) => void;
@@ -80,9 +86,9 @@ export const MapProvider: React.FC<{ children: React.ReactNode }> = ({
   const [webMap, setWebMap] = useState<WebMap | null>(null);
   const [mapReady, setMapReady] = useState(false);
   const [searchReady, setSearchReady] = useState(false);
-  const [geometry, setGeometry] = useState<__esri.Geometry | null>(null);
-  const [condos, setCondos] = useState<__esri.Graphic[]>([]);
-  const [selectedCondo, setSelectedCondo] = useState<__esri.Graphic | null>(
+  const [geometry, setGeometry] = useState<Geometry | null>(null);
+  const [condos, setCondos] = useState<Graphic[]>([]);
+  const [selectedCondo, setSelectedCondo] = useState<Graphic | null>(
     null
   );
   const [mapMode, setMapMode] = useState<MapMode>("identify");
@@ -112,7 +118,7 @@ export const MapProvider: React.FC<{ children: React.ReactNode }> = ({
 
     reactiveUtils.watch(
       () => view.map!.basemap!,
-      (basemap: __esri.Basemap) => {
+      (basemap: Basemap) => {
         localStorage.setItem(
           `imaps_${webMapId.current}_basemap`,
           JSON.stringify(basemap.toJSON())
@@ -131,7 +137,7 @@ export const MapProvider: React.FC<{ children: React.ReactNode }> = ({
 
   // Handle Google StreetView click
   const handleStreetViewMapClick = useCallback(
-    (event: TargetedEvent<HTMLArcgisMapElement, __esri.ViewClickEvent>) => {
+    (event: TargetedEvent<ArcgisMap, ClickEvent>) => {
       const cbll = `${event.detail.mapPoint.latitude},${event.detail.mapPoint.longitude}`;
       const url = `https://maps.google.com?layer=c&cbll=${cbll}&cbp=0,0,0,0,0`;
       window.open(url, "streetview");
@@ -148,7 +154,7 @@ export const MapProvider: React.FC<{ children: React.ReactNode }> = ({
             title: "Select",
             id: "property-select",
             icon: "search",
-          } as __esri.ActionButton,
+          } as ActionButton,
         ]);
       }
     }
@@ -160,7 +166,7 @@ export const MapProvider: React.FC<{ children: React.ReactNode }> = ({
       if (event.action.title === "Select" && popup && popup.selectedFeature) {
         setGeometry(
           centroidOperator.execute(
-            popup.selectedFeature.geometry as __esri.Polygon
+            popup.selectedFeature.geometry as Polygon
           )
         );
         popup.close();

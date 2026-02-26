@@ -13,3 +13,7 @@
   flex: 1; /* Takes remaining space */
   overflow: auto;
 }
+
+.basemapsPanel [slot="content-top"] {
+  width: 100%;
+}

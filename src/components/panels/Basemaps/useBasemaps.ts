@@ -1,10 +1,18 @@
 import PortalBasemapsSource from "@arcgis/core/widgets/BasemapGallery/support/PortalBasemapsSource.js";
 import type { TargetedEvent } from "@arcgis/map-components";
-import { useEffect, useRef, useState, type RefObject } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type RefObject,
+} from "react";
 import * as reactiveUtils from "@arcgis/core/core/reactiveUtils.js";
 import * as intersectsOperator from "@arcgis/core/geometry/operators/intersectsOperator.js";
+import VectorTileLayer from "@arcgis/core/layers/VectorTileLayer";
 import { raleighBoundary } from "./boundary";
 import { useMap } from "../../../context/useMap";
+import type Basemap from "@arcgis/core/Basemap";
 
 export interface UseBasemapsProps {
   mapsSource: PortalBasemapsSource;
@@ -13,11 +21,15 @@ export interface UseBasemapsProps {
   imagesGallery: RefObject<HTMLArcgisBasemapGalleryElement | null>;
   esriGallery: RefObject<HTMLArcgisBasemapGalleryElement | null>;
   selectedTab: "basemap" | "images" | "esri";
+  blendSlider: RefObject<HTMLCalciteSliderElement | null>;
   handleGalleryReady: (
     event: TargetedEvent<HTMLArcgisBasemapGalleryElement, void>
   ) => void;
   handleTabChange: (
     event: TargetedEvent<HTMLCalciteTabNavElement, void>
+  ) => void;
+  handleBlendChange: (
+    event: TargetedEvent<HTMLCalciteSwitchElement, void>
   ) => void;
 }
 
@@ -28,7 +40,9 @@ export const useBasemaps = (
   const mapsGallery = useRef<HTMLArcgisBasemapGalleryElement>(null);
   const imagesGallery = useRef<HTMLArcgisBasemapGalleryElement>(null);
   const esriGallery = useRef<HTMLArcgisBasemapGalleryElement>(null);
+  const blendSlider = useRef<HTMLCalciteSliderElement>(null);
   const wasInRaleigh = useRef<boolean>(false);
+  const blendLayer = useRef<VectorTileLayer | null>(null);
   const [selectedTab, setSelectedTab] = useState<"basemap" | "images" | "esri">(
     "basemap"
   );
@@ -45,7 +59,7 @@ export const useBasemaps = (
       url: "https://ral.maps.arcgis.com",
     },
     query: "id: 492386759d264d49948bf7f83957ddb9",
-    filterFunction: async (item: __esri.Basemap) => {
+    filterFunction: async (item: Basemap) => {
       await item.load();
       if (item.portalItem?.tags?.includes("countywide")) return true;
       const inRaleigh = intersectsOperator.execute(
@@ -54,7 +68,7 @@ export const useBasemaps = (
       );
       return inRaleigh;
     },
-    updateBasemapsCallback: (items: __esri.Basemap[]) => {
+    updateBasemapsCallback: (items: Basemap[]) => {
       return items.reverse();
     },
   });
@@ -89,7 +103,7 @@ export const useBasemaps = (
 
   const imageBasemapSelected = (
     source: PortalBasemapsSource,
-    activeBasemap: __esri.Basemap
+    activeBasemap: Basemap
   ) => {
     return (
       source.basemaps.find(
@@ -115,6 +129,38 @@ export const useBasemaps = (
     }
   };
 
+  const handleBlendChange = useCallback(
+    (event: TargetedEvent<HTMLCalciteSwitchElement, void>) => {
+      if (!blendSlider.current) return;
+      const checked = event.target.checked;
+      blendSlider.current.hidden = !checked;
+
+      const view = mapElement.current?.view;
+      if (!view) return;
+
+      // TURN BLEND ON
+      if (checked) {
+        if (!blendLayer.current) {
+          blendLayer.current = new VectorTileLayer({
+            portalItem: { id: "" },
+          });
+        }
+
+        mapElement.current.view.map?.basemap?.baseLayers.add(
+          blendLayer.current
+        );
+      }
+
+      // TURN BLEND OFF
+      else {
+        if (blendLayer.current) {
+          mapElement.current.view.map?.remove(blendLayer.current);
+        }
+      }
+    },
+    []
+  );
+
   useEffect(() => {
     if (!mapElement.current || initializedRef.current) return;
     // Initialize basemap logic only once
@@ -127,7 +173,7 @@ export const useBasemaps = (
         if (stationary) {
           const isImageSelected = imageBasemapSelected(
             imagesGallery.current.source as PortalBasemapsSource,
-            mapElement.current.basemap as __esri.Basemap
+            mapElement.current.basemap as Basemap
           );
           const inRaleigh = intersectsOperator.execute(
             raleighBoundary,
@@ -142,7 +188,7 @@ export const useBasemaps = (
           await refreshImageBasemaps();
 
           const countywide = (
-            imagesGallery.current.activeBasemap as __esri.Basemap
+            imagesGallery.current.activeBasemap as Basemap
           ).portalItem?.tags?.includes("countywide");
           if (!inRaleigh && !countywide && isImageSelected) {
             imagesGallery.current.activeBasemap =
@@ -173,7 +219,9 @@ export const useBasemaps = (
     imagesGallery,
     esriGallery,
     selectedTab,
+    blendSlider,
     handleGalleryReady,
     handleTabChange,
+    handleBlendChange,
   };
 };
