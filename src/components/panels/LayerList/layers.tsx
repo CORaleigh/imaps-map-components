@@ -4,7 +4,6 @@ import * as reactiveUtils from "@arcgis/core/core/reactiveUtils";
 import GroupLayer from "@arcgis/core/layers/GroupLayer";
 import ActionToggle from "@arcgis/core/support/actions/ActionToggle.js";
 
-import type { TargetedEvent } from "@arcgis/map-components";
 import Collection from "@arcgis/core/core/Collection";
 import type Layer from "@arcgis/core/layers/Layer";
 import type ListItem from "@arcgis/core/widgets/LayerList/ListItem";
@@ -49,7 +48,7 @@ export const propertyLabelExpressions: LabelExpression[] = [
 ];
 
 export const layerListReady = (
-  event: TargetedEvent<HTMLArcgisLayerListElement, void>
+  event: HTMLArcgisLayerListElement["arcgisReady"]
 ) => {
   console.log(event);
 };

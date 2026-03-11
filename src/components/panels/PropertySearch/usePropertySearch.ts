@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import type { TargetedEvent } from "@arcgis/map-components";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   checkPin,
@@ -24,9 +23,7 @@ import { arcadeExpressionInfos } from "./popupTemplate/arcadeExpressions";
 import { getTableByTitle } from "../../../utils/layerHelper";
 import { updateClusters } from "./clusterLayer";
 import type Graphic from "@arcgis/core/Graphic";
-import type { SearchResponse } from "@arcgis/core/widgets/Search/types";
-import type { TableInteractionCellClickEvent } from "@arcgis/core/widgets/FeatureTable/Grid/types";
-import type { ArcgisSearch } from "@arcgis/map-components/components/arcgis-search";
+
 import type Layer from "@arcgis/core/layers/Layer";
 import type { ObjectId } from "@arcgis/core/views/types";
 
@@ -40,37 +37,27 @@ export interface UsePropertySearchProps {
   selectedCondo: Graphic | null;
   condos: Graphic[];
   webMapId: React.RefObject<string>;
-  handleSearchReady: (
-    event: TargetedEvent<HTMLArcgisSearchElement, void>,
-  ) => void;
+  handleSearchReady: (event: HTMLArcgisSearchElement["arcgisReady"]) => void;
   handleTableReady: (
-    event: TargetedEvent<HTMLArcgisFeatureTableElement, void>,
+    event: HTMLArcgisFeatureTableElement["arcgisReady"],
   ) => void;
-  handleSearchComplete: (event: CustomEvent<SearchResponse>) => void;
+  handleSearchComplete: (
+    event: HTMLArcgisSearchElement["arcgisSearchComplete"],
+  ) => void;
   handleTableCellClick: (
-    event: CustomEvent<TableInteractionCellClickEvent>,
+    event: HTMLArcgisFeatureTableElement["arcgisCellClick"],
   ) => void;
   handleTabChange: (
-    event: TargetedEvent<HTMLCalciteTabNavElement, void>,
+    event: HTMLCalciteTabNavElement["calciteTabChange"],
   ) => void;
   handleAddressTableReady: (
-    event: TargetedEvent<HTMLArcgisFeatureTableElement, void>,
+    event: HTMLArcgisFeatureTableElement["arcgisReady"],
   ) => void;
   handleAddressTableChange: (
-    event: TargetedEvent<
-      HTMLArcgisFeatureTableElement,
-      {
-        name:
-          | "state"
-          | "size"
-          | "layerView"
-          | "effectiveSize"
-          | "isQueryingOrSyncing";
-      }
-    >,
+    event: HTMLArcgisFeatureTableElement["arcgisPropertyChange"],
   ) => void;
   handleAddressCellClick: (
-    event: CustomEvent<TableInteractionCellClickEvent>,
+    event: HTMLArcgisFeatureTableElement["arcgisCellClick"],
   ) => void;
   handleClearClick: () => void;
   handleHistoryClick: (
@@ -79,12 +66,7 @@ export interface UsePropertySearchProps {
   handleExport: () => void;
   handleExportAddresses: () => void;
   handleSuggestStart: (
-    event: TargetedEvent<
-      ArcgisSearch,
-      {
-        searchTerm: string;
-      }
-    >,
+    event: HTMLArcgisSearchElement["arcgisSuggestStart"],
   ) => void;
   handleNextPropertySelected: (feature: Graphic) => void;
   handleTabClick: () => void;
@@ -112,7 +94,7 @@ export const usePropertySearch = (
 
   const [selectedTab, setSelectedTab] = useState<"list" | "info">("list");
   const handleSearchReady = async (
-    event: TargetedEvent<HTMLArcgisSearchElement, void>,
+    event: HTMLArcgisSearchElement["arcgisReady"],
   ) => {
     if (!mapElement.current) return;
     await mapElement.current.view.when();
@@ -141,9 +123,12 @@ export const usePropertySearch = (
   };
 
   const handleTableReady = useCallback(
-    async (event: TargetedEvent<HTMLArcgisFeatureTableElement, void>) => {
-      (event.target as any).viewModel.messages.header = `0 properties selected`;
-      (event.target as any).viewModel.messages.noLayer = "";
+    async (event: HTMLArcgisFeatureTableElement["arcgisReady"]) => {
+      if ((event.target as any).viewModel.messages) {
+        (event.target as any).viewModel.messages.header = `0 properties selected`;
+        (event.target as any).viewModel.messages.noLayer = "";
+      }
+
       const layer = await createTableLayer(mapElement.current);
 
       if (!layer) return;
@@ -183,7 +168,7 @@ export const usePropertySearch = (
   );
 
   const handleTableCellClick = async (
-    event: CustomEvent<TableInteractionCellClickEvent>,
+    event: HTMLArcgisFeatureTableElement["arcgisCellClick"],
   ) => {
     if (event.detail.feature) {
       tableElement.current.highlightIds = new Collection([
@@ -214,7 +199,7 @@ export const usePropertySearch = (
   };
 
   const handleAddressTableReady = async (
-    event: TargetedEvent<HTMLArcgisFeatureTableElement, void>,
+    event: HTMLArcgisFeatureTableElement["arcgisReady"],
   ) => {
     console.log("address table ready");
 
@@ -275,17 +260,7 @@ export const usePropertySearch = (
     grid?.appendChild(style);
   };
   const handleAddressTableChange = (
-    event: TargetedEvent<
-      HTMLArcgisFeatureTableElement,
-      {
-        name:
-          | "state"
-          | "size"
-          | "layerView"
-          | "effectiveSize"
-          | "isQueryingOrSyncing";
-      }
-    >,
+    event: HTMLArcgisFeatureTableElement["arcgisPropertyChange"],
   ) => {
     if (event.detail.name === "size") {
       event.target.style.maxHeight = "500px";
@@ -297,7 +272,7 @@ export const usePropertySearch = (
   };
 
   const handleAddressCellClick = async (
-    event: CustomEvent<TableInteractionCellClickEvent>,
+    event: HTMLArcgisFeatureTableElement["arcgisCellClick"],
   ) => {
     addressTableElement.current.highlightIds = new Collection([
       event.detail.objectId as number,
@@ -327,7 +302,7 @@ export const usePropertySearch = (
       }
     }
   };
-  const handleSearchComplete = async (event: CustomEvent<SearchResponse>) => {
+  const handleSearchComplete = async (event: HTMLArcgisSearchElement["arcgisSearchComplete"]) => {
     if (mapElement.current) {
       if (event.detail.numResults === 0) {
         if (event.detail.searchTerm.length > 2) {
@@ -368,7 +343,7 @@ export const usePropertySearch = (
   }, []);
 
   const handleTabChange = useCallback(
-    (event: TargetedEvent<HTMLCalciteTabNavElement, void>) => {
+    (event: HTMLCalciteTabNavElement["calciteTabChange"]) => {
       setSelectedTab(
         event.target.selectedTitle.getAttribute("label") === "list"
           ? "list"
@@ -398,12 +373,7 @@ export const usePropertySearch = (
   };
 
   const handleSuggestStart = (
-    event: TargetedEvent<
-      ArcgisSearch,
-      {
-        searchTerm: string;
-      }
-    >,
+    event: HTMLArcgisSearchElement["arcgisSuggestStart"],
   ) => {
     event.target.searchTerm = checkPin(event.target.searchTerm);
   };

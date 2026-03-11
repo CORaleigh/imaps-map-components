@@ -1,7 +1,6 @@
 // hooks/useShell.ts
 import { useRef, useEffect, type RefObject } from "react";
 import Graphic from "@arcgis/core/Graphic";
-import type { TargetedEvent } from "@arcgis/map-components";
 export type ToolType = "distance" | "area" | null;
 import * as reactiveUtils from "@arcgis/core/core/reactiveUtils.js";
 import type Extent from "@arcgis/core/geometry/Extent";
@@ -9,7 +8,7 @@ import type Extent from "@arcgis/core/geometry/Extent";
 export interface UseOverviewMapProps {
   overviewMapElement: RefObject<HTMLArcgisMapElement | null>;
   handleOverviewReady: (
-    event: TargetedEvent<HTMLArcgisMapElement, void>
+    event: HTMLArcgisMapElement["arcgisViewReadyChange"]
   ) => void;
 }
 
@@ -41,7 +40,7 @@ export const useOverviewMap = (
   const overviewMapElement = useRef<HTMLArcgisMapElement | null>(null);
   const initializedRef = useRef(false);
   const handleOverviewReady =  async (
-    event: TargetedEvent<HTMLArcgisMapElement, void>
+    event: HTMLArcgisMapElement["arcgisViewReadyChange"]
   ) => {
     event.target.basemap = mapElement.current.basemap;
     await event.target.goTo(mapElement.current.extent.clone().expand(4));

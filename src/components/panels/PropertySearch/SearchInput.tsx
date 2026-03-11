@@ -10,24 +10,16 @@ import "@esri/calcite-components/components/calcite-list-item";
 import React, { type RefObject } from "react";
 
 import styles from "./PropertySearch.module.css";
-import type { TargetedEvent } from "@arcgis/map-components";
 import { getSearchHistory } from "./search";
-import type { SearchResponse } from "@arcgis/core/widgets/Search/types";
-import type { ArcgisSearch } from "@arcgis/map-components/components/arcgis-search";
 
 interface SearchInputProps {
   searchElement: RefObject<HTMLArcgisSearchElement>;
   mapElement: RefObject<HTMLArcgisMapElement>;
   webMapId: RefObject<string>;
-  onSearchReady: (event: TargetedEvent<HTMLArcgisSearchElement, void>) => void;
-  onSearchComplete: (event: CustomEvent<SearchResponse>) => void;
+  onSearchReady: (event: HTMLArcgisSearchElement["arcgisReady"]) => void;
+  onSearchComplete: (event: HTMLArcgisSearchElement["arcgisSearchComplete"]) => void;
   onSuggestStart: (
-    event: TargetedEvent<
-      ArcgisSearch,
-      {
-        searchTerm: string;
-      }
-    >,
+    event: HTMLArcgisSearchElement["arcgisSuggestStart"],
   ) => void;
   onClear: () => void;
   onHistoryClick: (

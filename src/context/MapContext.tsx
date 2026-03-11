@@ -7,7 +7,6 @@ import React, {
 } from "react";
 import WebMap from "@arcgis/core/WebMap";
 import Basemap from "@arcgis/core/Basemap";
-import type { TargetedEvent } from "@arcgis/map-components";
 import { layerService } from "../utils/mapLayerService";
 import * as reactiveUtils from "@arcgis/core/core/reactiveUtils.js";
 
@@ -23,8 +22,6 @@ import type Geometry from "@arcgis/core/geometry/Geometry";
 import type Graphic from "@arcgis/core/Graphic";
 import type ActionButton from "@arcgis/core/support/actions/ActionButton";
 import type Polygon from "@arcgis/core/geometry/Polygon";
-import type { ArcgisMap } from "@arcgis/map-components/components/arcgis-map";
-import type { ClickEvent } from "@arcgis/core/views/input/types";
 
 export type MapMode =
   | "identify"
@@ -89,9 +86,7 @@ export const MapProvider: React.FC<{ children: React.ReactNode }> = ({
   const [searchReady, setSearchReady] = useState(false);
   const [geometry, setGeometry] = useState<Geometry | null>(null);
   const [condos, setCondos] = useState<Graphic[]>([]);
-  const [selectedCondo, setSelectedCondo] = useState<Graphic | null>(
-    null
-  );
+  const [selectedCondo, setSelectedCondo] = useState<Graphic | null>(null);
   const [mapMode, setMapMode] = useState<MapMode>("identify");
   const [alert, setAlert] = useState<Alert>({
     id: Date.now(),
@@ -122,13 +117,13 @@ export const MapProvider: React.FC<{ children: React.ReactNode }> = ({
       (basemap: Basemap) => {
         localStorage.setItem(
           `imaps_${webMapId.current}_basemap`,
-          JSON.stringify(basemap.toJSON())
+          JSON.stringify(basemap.toJSON()),
         );
-      }
+      },
     );
 
     const storedBasemap = localStorage.getItem(
-      `imaps_${webMapId.current}_basemap`
+      `imaps_${webMapId.current}_basemap`,
     );
     if (storedBasemap) {
       const basemap = Basemap.fromJSON(JSON.parse(storedBasemap));
@@ -138,12 +133,12 @@ export const MapProvider: React.FC<{ children: React.ReactNode }> = ({
 
   // Handle Google StreetView click
   const handleStreetViewMapClick = useCallback(
-    (event: TargetedEvent<ArcgisMap, ClickEvent>) => {
+    (event: HTMLArcgisMapElement["arcgisViewClick"]) => {
       const cbll = `${event.detail.mapPoint.latitude},${event.detail.mapPoint.longitude}`;
       const url = `https://maps.google.com?layer=c&cbll=${cbll}&cbp=0,0,0,0,0`;
       window.open(url, "streetview");
     },
-    []
+    [],
   );
   const customizePopup = async () => {
     const propertyLayer = getLayerByTitle(mapElement.current, "Property");
@@ -166,9 +161,7 @@ export const MapProvider: React.FC<{ children: React.ReactNode }> = ({
 
       if (event.action.title === "Select" && popup && popup.selectedFeature) {
         setGeometry(
-          centroidOperator.execute(
-            popup.selectedFeature.geometry as Polygon
-          )
+          centroidOperator.execute(popup.selectedFeature.geometry as Polygon),
         );
         popup.close();
       }
@@ -191,7 +184,7 @@ export const MapProvider: React.FC<{ children: React.ReactNode }> = ({
     (action: "identify" | "streetview" | null) => {
       setMapMode(action);
     },
-    []
+    [],
   );
 
   /** -------------------- Effects -------------------- **/
@@ -234,7 +227,7 @@ export const MapProvider: React.FC<{ children: React.ReactNode }> = ({
       console.log("creating web map");
       const { webmap, webmapTemplate } =
         await layerService.createWebMapWithRequiredAndPersisted(mapId);
-   
+
       console.log("web map created");
 
       webMapId.current = mapId;
@@ -246,7 +239,7 @@ export const MapProvider: React.FC<{ children: React.ReactNode }> = ({
       viewReady();
 
       const storedExtent = localStorage.getItem(
-        `imaps_${webMapId.current}_extent`
+        `imaps_${webMapId.current}_extent`,
       );
       if (storedExtent) {
         mapElement.current.view.extent = JSON.parse(storedExtent);

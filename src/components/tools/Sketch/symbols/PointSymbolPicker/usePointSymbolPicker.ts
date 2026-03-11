@@ -1,7 +1,6 @@
 // hooks/useShell.ts
 import { useState, useCallback, useEffect } from "react";
 
-import type { TargetedEvent } from "@arcgis/map-components";
 
 import type SimpleFillSymbol from "@arcgis/core/symbols/SimpleFillSymbol";
 import type SimpleLineSymbol from "@arcgis/core/symbols/SimpleLineSymbol";
@@ -12,7 +11,7 @@ export interface UsePointSymbolPicker {
   size: number;
 
   handleSizeInput: (
-    event: TargetedEvent<HTMLCalciteInputNumberElement, void>
+    event: HTMLCalciteInputNumberElement["calciteInputNumberChange"]
   ) => void;
 }
 
@@ -33,7 +32,7 @@ export const usePointSymbolPicker = (
   const [size, setSize] = useState(12);
 
   const handleSizeInput = useCallback(
-    (event: TargetedEvent<HTMLCalciteInputNumberElement, void>) => {
+    (event: HTMLCalciteInputNumberElement["calciteInputNumberChange"]) => {
       if (symbol.type === "simple-marker" && symbol.size) {
         symbol.size = event.target.value;
         onSymbolChange(symbol);

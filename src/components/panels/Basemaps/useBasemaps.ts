@@ -1,5 +1,4 @@
 import PortalBasemapsSource from "@arcgis/core/widgets/BasemapGallery/support/PortalBasemapsSource.js";
-import type { TargetedEvent } from "@arcgis/map-components";
 import {
   useCallback,
   useEffect,
@@ -23,18 +22,18 @@ export interface UseBasemapsProps {
   selectedTab: "basemap" | "images" | "esri";
   blendSlider: RefObject<HTMLCalciteSliderElement | null>;
   handleGalleryReady: (
-    event: TargetedEvent<HTMLArcgisBasemapGalleryElement, void>
+    event: HTMLArcgisBasemapGalleryElement["arcgisReady"],
   ) => void;
   handleTabChange: (
-    event: TargetedEvent<HTMLCalciteTabNavElement, void>
+    event: HTMLCalciteTabNavElement["calciteTabChange"],
   ) => void;
   handleBlendChange: (
-    event: TargetedEvent<HTMLCalciteSwitchElement, void>
+    event: HTMLCalciteSwitchElement["calciteSwitchChange"],
   ) => void;
 }
 
 export const useBasemaps = (
-  mapElement: React.RefObject<HTMLArcgisMapElement>
+  mapElement: React.RefObject<HTMLArcgisMapElement>,
 ): UseBasemapsProps => {
   const initializedRef = useRef(false);
   const mapsGallery = useRef<HTMLArcgisBasemapGalleryElement>(null);
@@ -44,7 +43,7 @@ export const useBasemaps = (
   const wasInRaleigh = useRef<boolean>(false);
   const blendLayer = useRef<VectorTileLayer | null>(null);
   const [selectedTab, setSelectedTab] = useState<"basemap" | "images" | "esri">(
-    "basemap"
+    "basemap",
   );
   const { setAlert } = useMap();
 
@@ -64,7 +63,7 @@ export const useBasemaps = (
       if (item.portalItem?.tags?.includes("countywide")) return true;
       const inRaleigh = intersectsOperator.execute(
         raleighBoundary,
-        mapElement.current.extent
+        mapElement.current.extent,
       );
       return inRaleigh;
     },
@@ -74,14 +73,14 @@ export const useBasemaps = (
   });
 
   const handleGalleryReady = async (
-    event: TargetedEvent<HTMLArcgisBasemapGalleryElement, void>
+    event: HTMLArcgisBasemapGalleryElement["arcgisReady"],
   ) => {
     const gallery = event.target;
     await reactiveUtils.whenOnce(() => gallery.source.basemaps.length > 0);
 
     const selected = gallery.source.basemaps.find(
       (basemap) =>
-        basemap.portalItem?.title === mapElement.current.map?.basemap?.title
+        basemap.portalItem?.title === mapElement.current.map?.basemap?.title,
     );
 
     if (selected) {
@@ -103,23 +102,23 @@ export const useBasemaps = (
 
   const imageBasemapSelected = (
     source: PortalBasemapsSource,
-    activeBasemap: Basemap
+    activeBasemap: Basemap,
   ) => {
     return (
       source.basemaps.find(
-        (b) => b.portalItem?.title === activeBasemap.portalItem?.title
+        (b) => b.portalItem?.title === activeBasemap.portalItem?.title,
       ) !== undefined
     );
   };
   const handleTabChange = async (
-    event: TargetedEvent<HTMLCalciteTabNavElement, void>
+    event: HTMLCalciteTabNavElement["calciteTabChange"],
   ) => {
     if (!imagesGallery.current) return;
     setSelectedTab(
       event.target.selectedTitle.getAttribute("label") as
         | "basemap"
         | "images"
-        | "esri"
+        | "esri",
     );
     if (
       event.target.selectedTitle.getAttribute("label") === "images" &&
@@ -130,7 +129,7 @@ export const useBasemaps = (
   };
 
   const handleBlendChange = useCallback(
-    (event: TargetedEvent<HTMLCalciteSwitchElement, void>) => {
+    (event: HTMLCalciteSwitchElement["calciteSwitchChange"]) => {
       if (!blendSlider.current) return;
       const checked = event.target.checked;
       blendSlider.current.hidden = !checked;
@@ -147,7 +146,7 @@ export const useBasemaps = (
         }
 
         mapElement.current.view.map?.basemap?.baseLayers.add(
-          blendLayer.current
+          blendLayer.current,
         );
       }
 
@@ -158,7 +157,7 @@ export const useBasemaps = (
         }
       }
     },
-    []
+    [mapElement],
   );
 
   useEffect(() => {
@@ -173,11 +172,11 @@ export const useBasemaps = (
         if (stationary) {
           const isImageSelected = imageBasemapSelected(
             imagesGallery.current.source as PortalBasemapsSource,
-            mapElement.current.basemap as Basemap
+            mapElement.current.basemap as Basemap,
           );
           const inRaleigh = intersectsOperator.execute(
             raleighBoundary,
-            mapElement.current.extent
+            mapElement.current.extent,
           );
 
           if (wasInRaleigh.current === inRaleigh) {
@@ -206,7 +205,7 @@ export const useBasemaps = (
             });
           }
         }
-      }
+      },
     );
     // return () => handle.remove(); // cleanup
     // eslint-disable-next-line react-hooks/exhaustive-deps

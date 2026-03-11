@@ -6,7 +6,6 @@ import GraphicsLayer from "@arcgis/core/layers/GraphicsLayer";
 import Graphic from "@arcgis/core/Graphic";
 import * as geodesicBufferOperator from "@arcgis/core/geometry/operators/geodesicBufferOperator.js";
 import { useMap } from "../../../context/useMap";
-import type { TargetedEvent } from "@arcgis/map-components";
 import type { MapMode } from "../../../context/MapContext";
 import type Layer from "@arcgis/core/layers/Layer";
 import type FeatureLayerView from "@arcgis/core/views/layers/FeatureLayerView";
@@ -40,7 +39,7 @@ export interface UsePropertySelectProps {
   selectedCondo: Graphic | null;
   handleActionClick: (tool: MapMode) => void;
   handleBufferDistanceInput: (
-    event: TargetedEvent<HTMLCalciteInputNumberElement, void>
+    event: HTMLCalciteInputNumberElement["calciteInputNumberChange"]
   ) => void;
   handleClear: () => void;
   handleToolClose: () => void;
@@ -207,7 +206,7 @@ export const usePropertySelect = (
 
   // Handle buffer distance input
   const handleBufferDistanceInput = (
-    event: TargetedEvent<HTMLCalciteInputNumberElement, void>
+    event: HTMLCalciteInputNumberElement["calciteInputNumberChange"]
   ) => {
     const val = parseInt(event.target.value);
     setBufferDistance(val);

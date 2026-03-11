@@ -1,4 +1,3 @@
-import type { TargetedEvent } from "@arcgis/map-components";
 import { useEffect, useRef, useState, type RefObject } from "react";
 import { SERVICE_DEFS, type Service } from "./config";
 import { layerService } from "../../../../utils/mapLayerService";
@@ -10,7 +9,7 @@ export interface UseServicesProps {
   searching: Record<string, boolean>;
   accordionRef: RefObject<HTMLCalciteAccordionElement | null>;
   handleAccordionExpand: (
-    event: TargetedEvent<HTMLCalciteAccordionItemElement, void>
+    event: HTMLCalciteAccordionItemElement["calciteAccordionItemExpand"]
   ) => void;
 }
 
@@ -30,7 +29,7 @@ export const useServices = (
   const accordionRef = useRef<HTMLCalciteAccordionElement>(null);
 
   const handleAccordionExpand = async (
-    event: TargetedEvent<HTMLCalciteAccordionItemElement, void>
+    event: HTMLCalciteAccordionItemElement["calciteAccordionItemExpand"]
   ) => {
     const title = event.target.heading;
     const svcIndex = services.findIndex((s) => s.title === title);

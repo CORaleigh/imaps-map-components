@@ -2,7 +2,6 @@
 import { useState, useCallback, useEffect } from "react";
 
 import Color from "@arcgis/core/Color";
-import type { TargetedEvent } from "@arcgis/map-components";
 import type SimpleFillSymbol from "@arcgis/core/symbols/SimpleFillSymbol";
 import type SimpleLineSymbol from "@arcgis/core/symbols/SimpleLineSymbol";
 import type SimpleMarkerSymbol from "@arcgis/core/symbols/SimpleMarkerSymbol";
@@ -11,14 +10,14 @@ export interface UseFillSymbolPicker {
   fillColor: string;
   fillTransparency: number;
   handleFillColorChange: (
-    event: TargetedEvent<HTMLCalciteColorPickerElement, void>,
+    event: HTMLCalciteColorPickerElement["calciteColorPickerChange"],
   ) => void;
 
   handleFillTransparencySliderInput: (
-    event: TargetedEvent<HTMLCalciteSliderElement, void>,
+    event: HTMLCalciteSliderElement["calciteSliderChange"],
   ) => void;
   handleFillTransparencyInput: (
-    event: TargetedEvent<HTMLCalciteInputNumberElement, void>,
+    event: HTMLCalciteInputNumberElement["calciteInputNumberChange"],
   ) => void;
 }
 
@@ -32,7 +31,7 @@ export const useFillSymbolPicker = (
   const [fillTransparency, setFillTransparency] = useState(50);
 
   const handleFillColorChange = useCallback(
-    (event: TargetedEvent<HTMLCalciteColorPickerElement, void>) => {
+    (event: HTMLCalciteColorPickerElement["calciteColorPickerChange"]) => {
       if (!event.target.value) return;
       const hexColor = event.target.value.toString();
       setFillColor(hexColor);
@@ -46,7 +45,7 @@ export const useFillSymbolPicker = (
   );
 
   const handleFillTransparencySliderInput = useCallback(
-    (event: TargetedEvent<HTMLCalciteSliderElement, void>) => {
+    (event: HTMLCalciteSliderElement["calciteSliderChange"]) => {
       let v = event.target.value;
       if (Array.isArray(v)) v = v[0];
 
@@ -63,7 +62,7 @@ export const useFillSymbolPicker = (
   );
 
   const handleFillTransparencyInput = useCallback(
-    (event: TargetedEvent<HTMLCalciteInputNumberElement, void>) => {
+    (event: HTMLCalciteInputNumberElement["calciteInputNumberChange"]) => {
       const v = event.target.value;
       if (v == null) return;
 

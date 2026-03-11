@@ -1,4 +1,3 @@
-import type { TargetedEvent } from "@arcgis/map-components";
 import { useEffect, useRef } from "react";
 
 interface HeaderLink {
@@ -12,15 +11,14 @@ interface HeaderLinkGroup {
 export interface UseHeaderProps {
   links: React.RefObject<HeaderLinkGroup[]>;
   handleDropdownOpen: (
-    event: TargetedEvent<HTMLCalciteDropdownElement, void>
-  ) => void;
+    event: HTMLCalciteDropdownElement["calciteDropdownOpen"]) => void;
   handleClearStorage: () => void;
 }
 
 export const useHeader = (webMapId: string): UseHeaderProps => {
   const links = useRef<HeaderLinkGroup[]>([]);
   const handleDropdownOpen = (
-    event: TargetedEvent<HTMLCalciteDropdownElement, void>
+    event: HTMLCalciteDropdownElement["calciteDropdownOpen"]
   ) => {
     const wrapper = event.target.shadowRoot?.querySelector(".content");
     const groups = event.target.querySelectorAll("calcite-dropdown-group");

@@ -25,13 +25,12 @@ import type {
   ListItemModifier,
   ListItemModifierEvent,
 } from "@arcgis/core/widgets/LayerList/types.js";
-import type { LayerListViewModelTriggerActionEvent } from "@arcgis/core/widgets/LayerList/LayerListViewModel";
 
 export interface UseLayerListProps {
   layerListElement: RefObject<HTMLArcgisLayerListElement | null>;
   listItemCreatedFunction: ListItemModifier;
   handleTriggerAction: (
-    event: CustomEvent<LayerListViewModelTriggerActionEvent>,
+    event: HTMLArcgisLayerListElement["arcgisTriggerAction"],
   ) => void;
   handleResetLayers: () => void;
   loaded: boolean;
@@ -59,7 +58,7 @@ export const useLayerList = (
     [],
   );
   const handleTriggerAction = useCallback(
-    (event: CustomEvent<LayerListViewModelTriggerActionEvent>) => {
+    (event: HTMLArcgisLayerListElement["arcgisTriggerAction"]) => {
       const item = event.detail.item;
       if (
         event.detail.action.type !== "toggle" ||

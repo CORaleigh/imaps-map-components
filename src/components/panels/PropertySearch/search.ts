@@ -10,7 +10,6 @@ import type Geometry from "@arcgis/core/geometry/Geometry";
 import type {
   GetResultsParameters,
   GetSuggestionsParameters,
-  SearchResponse,
   SearchResult,
 } from "@arcgis/core/widgets/Search/types";
 import type GraphicsLayer from "@arcgis/core/layers/GraphicsLayer";
@@ -185,7 +184,7 @@ const createLayerSource = (
 };
 
 export const searchForCondosFromSearch = async (
-  event: CustomEvent<SearchResponse>,
+  event: HTMLArcgisSearchElement["arcgisSearchComplete"],
   search: HTMLArcgisSearchElement,
   mapElement: HTMLArcgisMapElement,
   webMapId: string,

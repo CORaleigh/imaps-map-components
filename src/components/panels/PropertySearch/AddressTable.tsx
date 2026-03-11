@@ -4,30 +4,18 @@ import "@arcgis/map-components/components/arcgis-feature";
 import React, { type RefObject } from "react";
 
 import styles from "./PropertySearch.module.css";
-import type { TargetedEvent } from "@arcgis/map-components";
 import type Graphic from "@arcgis/core/Graphic";
-import type { TableInteractionCellClickEvent } from "@arcgis/core/widgets/FeatureTable/Grid/types";
 
 interface AddressTableProps {
   addressTableElement: RefObject<HTMLArcgisFeatureTableElement>;
   mapElement: RefObject<HTMLArcgisMapElement>;
   feature: Graphic;
-  onReady: (event: TargetedEvent<HTMLArcgisFeatureTableElement, void>) => void;
+  onReady: (event: HTMLArcgisFeatureTableElement["arcgisReady"]) => void;
   onCellClick: (
-    event: CustomEvent<TableInteractionCellClickEvent>
+    event: HTMLArcgisFeatureTableElement["arcgisCellClick"],
   ) => void;
   onPropertyChange: (
-    event: TargetedEvent<
-      HTMLArcgisFeatureTableElement,
-      {
-        name:
-          | "state"
-          | "size"
-          | "layerView"
-          | "effectiveSize"
-          | "isQueryingOrSyncing";
-      }
-    >
+    event: HTMLArcgisFeatureTableElement["arcgisPropertyChange"],
   ) => void;
   onExportClick: () => void;
 }
@@ -72,5 +60,5 @@ const AddressTable: React.FC<AddressTableProps> = ({
 
 export default React.memo(
   AddressTable,
-  (prev, next) => prev.feature === next.feature
+  (prev, next) => prev.feature === next.feature,
 );

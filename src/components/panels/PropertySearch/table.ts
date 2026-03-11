@@ -13,6 +13,7 @@ import type { LayerLayerviewCreateEvent } from "@arcgis/core/layers/Layer";
 
 export const createTableLayer = async (mapElement: HTMLArcgisMapElement) => {
   if (!mapElement || !mapElement.view.map) return;
+  console.log(mapElement.view.ready);
   const table: FeatureLayer = getTableByTitle(
     mapElement,
     "Condos"

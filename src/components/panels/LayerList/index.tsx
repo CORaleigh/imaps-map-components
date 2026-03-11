@@ -42,6 +42,7 @@ const LayerList: React.FC<LayerListProps> = ({
           text="Reset Layers"
           icon="reset"
           slot="header-actions-end"
+          id="reset-layers-action"
           onClick={handleResetLayers}
         ></calcite-action>
         <calcite-tooltip closeOnClick reference-element="reset-layers-action">

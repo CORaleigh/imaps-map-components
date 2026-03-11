@@ -1,5 +1,4 @@
 // hooks/useCoordinateConversion.ts
-import type { TargetedEvent } from "@arcgis/map-components";
 import { useRef, useEffect, useState, useCallback } from "react";
 import * as coordinateFormatter from "@arcgis/core/geometry/coordinateFormatter.js";
 import * as webMercatorUtils from "@arcgis/core/geometry/support/webMercatorUtils.js";
@@ -10,11 +9,6 @@ import GraphicsLayer from "@arcgis/core/layers/GraphicsLayer";
 import PictureMarkerSymbol from "@arcgis/core/symbols/PictureMarkerSymbol";
 import Graphic from "@arcgis/core/Graphic";
 import Point from "@arcgis/core/geometry/Point";
-import type { ArcgisMap } from "@arcgis/map-components/components/arcgis-map";
-import type {
-  ClickEvent,
-  PointerMoveEvent,
-} from "@arcgis/core/views/input/types";
 
 export interface ConversionFormat {
   id: string;
@@ -42,10 +36,10 @@ export interface UseCoordinateConversionProps {
   handleChangeMode: () => void;
   handleShowSettings: () => void;
   handleFormatChange: (
-    event: TargetedEvent<HTMLCalciteSelectElement, void>,
+    event: HTMLCalciteSelectElement["calciteSelectChange"],
   ) => void;
   handleSearchInput: (
-    event: TargetedEvent<HTMLCalciteInputTextElement, void>,
+    event: HTMLCalciteInputTextElement["calciteInputTextInput"],
   ) => void;
   handleSearchClick: () => void;
   handleCopyToClipboard: () => void;
@@ -110,10 +104,10 @@ export const useCoordinateConversion = (
   const [validity, setValidity] = useState<Validity | undefined>(undefined);
 
   const pointerMoveHandlerRef = useRef<
-    ((event: TargetedEvent<ArcgisMap, PointerMoveEvent>) => void) | null
+    ((event: HTMLArcgisMapElement["arcgisViewPointerMove"]) => void) | null
   >(null);
   const clickHandlerRef = useRef<
-    ((event: TargetedEvent<ArcgisMap, ClickEvent>) => void) | null
+    ((event: HTMLArcgisMapElement["arcgisViewClick"]) => void) | null
   >(null);
   const selectedFormatRef = useRef<ConversionFormat>(selectedFormat);
 
@@ -135,7 +129,7 @@ export const useCoordinateConversion = (
     [],
   );
   const handleFormatChange = useCallback(
-    (event: TargetedEvent<HTMLCalciteSelectElement, void>) => {
+    (event: HTMLCalciteSelectElement["calciteSelectChange"]) => {
       if (inputRef.current) {
         inputRef.current.value = "";
       }
@@ -146,7 +140,7 @@ export const useCoordinateConversion = (
   );
 
   const handleSearchInput = (
-    event: TargetedEvent<HTMLCalciteInputTextElement, void>,
+    event: HTMLCalciteInputTextElement["calciteInputTextInput"],
   ) => {
     const nativeInput = event.target.shadowRoot?.querySelector(
       "input",
@@ -336,7 +330,7 @@ export const useCoordinateConversion = (
 
     if (!pointerMoveHandlerRef.current) {
       pointerMoveHandlerRef.current = async (
-        event: TargetedEvent<ArcgisMap, PointerMoveEvent>,
+        event: HTMLArcgisMapElement["arcgisViewPointerMove"],
       ) => {
         const mapPoint = webMercatorUtils.webMercatorToGeographic(
           mapEl.toMap({ x: event.detail.x, y: event.detail.y }),
@@ -349,7 +343,7 @@ export const useCoordinateConversion = (
 
     if (!clickHandlerRef.current) {
       clickHandlerRef.current = async (
-        event: TargetedEvent<ArcgisMap, ClickEvent>,
+        event: HTMLArcgisMapElement["arcgisViewClick"],
       ) => {
         const mapPoint = webMercatorUtils.webMercatorToGeographic(
           mapEl.toMap({ x: event.detail.x, y: event.detail.y }),

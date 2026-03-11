@@ -5,16 +5,14 @@ import "@arcgis/map-components/components/arcgis-feature-table";
 import React, { type RefObject } from "react";
 
 import styles from "./PropertySearch.module.css";
-import type { TargetedEvent } from "@arcgis/map-components";
-import type { TableInteractionCellClickEvent } from "@arcgis/core/widgets/FeatureTable/Grid/types";
 
 interface PropertyTableProps {
   tableElement: RefObject<HTMLArcgisFeatureTableElement>;
   mapElement: RefObject<HTMLArcgisMapElement>;
-  onReady: (event: TargetedEvent<HTMLArcgisFeatureTableElement, void>) => void;
+  onReady: (event: HTMLArcgisFeatureTableElement["arcgisReady"]) => void;
 
   onCellClick: (
-    event: CustomEvent<TableInteractionCellClickEvent>
+    event: HTMLArcgisFeatureTableElement["arcgisCellClick"]
   ) => void;
   onExportClick: () => void;
 }

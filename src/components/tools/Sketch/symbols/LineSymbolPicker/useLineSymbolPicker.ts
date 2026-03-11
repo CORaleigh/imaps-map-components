@@ -2,7 +2,6 @@
 import { useState, useCallback, useEffect } from "react";
 
 import Color from "@arcgis/core/Color";
-import type { TargetedEvent } from "@arcgis/map-components";
 import type SimpleFillSymbol from "@arcgis/core/symbols/SimpleFillSymbol";
 import type SimpleLineSymbol from "@arcgis/core/symbols/SimpleLineSymbol";
 import type SimpleMarkerSymbol from "@arcgis/core/symbols/SimpleMarkerSymbol";
@@ -12,19 +11,19 @@ export interface UseLineSymbolPicker {
   lineWidth: number;
   lineTransparency: number;
   handleLineColorChange: (
-    event: TargetedEvent<HTMLCalciteColorPickerElement, void>
+    event: HTMLCalciteColorPickerElement["calciteColorPickerChange"]
   ) => void;
   handleLineSliderInput: (
-    event: TargetedEvent<HTMLCalciteSliderElement, void>
+    event: HTMLCalciteSliderElement["calciteSliderChange"]
   ) => void;
   handleLineWidthInput: (
-    event: TargetedEvent<HTMLCalciteInputNumberElement, void>
+    event: HTMLCalciteInputNumberElement["calciteInputNumberChange"]
   ) => void;
   handleLineTransparencySliderInput: (
-    event: TargetedEvent<HTMLCalciteSliderElement, void>
+    event: HTMLCalciteSliderElement["calciteSliderChange"]
   ) => void;
   handleLineTransparencyInput: (
-    event: TargetedEvent<HTMLCalciteInputNumberElement, void>
+    event: HTMLCalciteInputNumberElement["calciteInputNumberChange"]
   ) => void;
 }
 
@@ -45,7 +44,7 @@ export const useLineSymbolPicker = (
   const [lineTransparency, setLineTransparency] = useState(0);
 
   const handleLineColorChange = useCallback(
-    (event: TargetedEvent<HTMLCalciteColorPickerElement, void>) => {
+    (event: HTMLCalciteColorPickerElement["calciteColorPickerChange"]) => {
       if (!event.target.value) return;
       const hexColor = event.target.value.toString();
       setLineColor(hexColor);
@@ -70,7 +69,7 @@ export const useLineSymbolPicker = (
   );
 
   const handleLineSliderInput = (
-    event: TargetedEvent<HTMLCalciteSliderElement, void>
+    event: HTMLCalciteSliderElement["calciteSliderChange"]
   ) => {
     if (!event.target.value) return;
     const width = parseFloat(event.target.value.toString());
@@ -89,7 +88,7 @@ export const useLineSymbolPicker = (
   };
 
   const handleLineWidthInput = (
-    event: TargetedEvent<HTMLCalciteInputNumberElement, void>
+    event: HTMLCalciteInputNumberElement["calciteInputNumberChange"]
   ) => {
     if (!event.target.value) return;
     const width = parseFloat(event.target.value.toString());
@@ -111,7 +110,7 @@ export const useLineSymbolPicker = (
   };
 
   const handleLineTransparencySliderInput = useCallback(
-    (event: TargetedEvent<HTMLCalciteSliderElement, void>) => {
+    (event: HTMLCalciteSliderElement["calciteSliderChange"]) => {
       let v = event.target.value;
       if (Array.isArray(v)) v = v[0];
 
@@ -146,7 +145,7 @@ export const useLineSymbolPicker = (
   );
 
   const handleLineTransparencyInput = useCallback(
-    (event: TargetedEvent<HTMLCalciteInputNumberElement, void>) => {
+    (event: HTMLCalciteInputNumberElement["calciteInputNumberChange"]) => {
       const v = event.target.value;
       if (v == null) return;
 

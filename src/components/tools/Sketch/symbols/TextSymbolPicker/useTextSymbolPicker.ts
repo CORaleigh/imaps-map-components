@@ -2,7 +2,6 @@
 import { useState, useCallback, useEffect } from "react";
 
 import Color from "@arcgis/core/Color";
-import type { TargetedEvent } from "@arcgis/map-components";
 import type SimpleFillSymbol from "@arcgis/core/symbols/SimpleFillSymbol";
 import type SimpleLineSymbol from "@arcgis/core/symbols/SimpleLineSymbol";
 import type SimpleMarkerSymbol from "@arcgis/core/symbols/SimpleMarkerSymbol";
@@ -13,14 +12,14 @@ export interface UseTextSymbolPicker {
   size: number;
   text: string;
   handleColorChange: (
-    event: TargetedEvent<HTMLCalciteColorPickerElement, void>
+    event: HTMLCalciteColorPickerElement["calciteColorPickerChange"]
   ) => void;
 
   handleSizeInput: (
-    event: TargetedEvent<HTMLCalciteInputNumberElement, void>
+    event: HTMLCalciteInputNumberElement["calciteInputNumberChange"]
   ) => void;
   handleTextInput: (
-    event: TargetedEvent<HTMLCalciteTextAreaElement, void>
+    event: HTMLCalciteTextAreaElement["calciteTextAreaChange"]
   ) => void;
 }
 
@@ -43,7 +42,7 @@ export const useTextSymbolPicker = (
   const [text, setText] = useState("");
 
   const handleColorChange = useCallback(
-    (event: TargetedEvent<HTMLCalciteColorPickerElement, void>) => {
+    (event: HTMLCalciteColorPickerElement["calciteColorPickerChange"]) => {
       if (!event.target.value) return;
       const hexColor = event.target.value.toString();
       setColor(hexColor);
@@ -57,7 +56,7 @@ export const useTextSymbolPicker = (
   );
 
   const handleSizeInput = useCallback(
-    (event: TargetedEvent<HTMLCalciteInputNumberElement, void>) => {
+    (event: HTMLCalciteInputNumberElement["calciteInputNumberChange"]) => {
       if (symbol.type === "text" && symbol.font.size) {
         symbol.font.size = event.target.value;
         onSymbolChange(symbol);
@@ -67,7 +66,7 @@ export const useTextSymbolPicker = (
   );
 
   const handleTextInput = useCallback(
-    (event: TargetedEvent<HTMLCalciteTextAreaElement, void>) => {
+    (event: HTMLCalciteTextAreaElement["calciteTextAreaChange"]) => {
   
       if (symbol.type === "text") {
         symbol.text = event.target.value;

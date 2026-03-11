@@ -1,17 +1,14 @@
 // hooks/useShell.ts
-import type { TargetedEvent } from "@arcgis/map-components";
 import { useState, useCallback, useEffect } from "react";
 import { useMap } from "../../context/useMap";
 import { useAppSize, type AppSize } from "../../utils/useAppSize";
 import Extent from "@arcgis/core/geometry/Extent";
 import type { MapMode } from "../../context/MapContext";
 import { constraints } from "../../utils/constraints";
-import type { HoldEvent } from "@arcgis/core/views/input/types";
 
 import MapViewConstraints from "@arcgis/core/views/2d/MapViewConstraints.js";
 import type SceneView from "@arcgis/core/views/SceneView";
 import type MapView from "@arcgis/core/views/MapView";
-
 
 export type PanelType =
   | "propertySearch"
@@ -44,18 +41,16 @@ export interface UseShellProps {
   handlePanelActionClick: (panel: PanelType) => void;
   handleToolActionClick: (panel: ToolType) => void;
   handleCustomActionClick: (action: "identify" | "streetview" | null) => void;
-  handleViewReady: (event: TargetedEvent<HTMLArcgisMapElement, void>) => void;
-  handleViewHold: (event: CustomEvent<HoldEvent>) => void;
+  handleViewReady: (
+    event: HTMLArcgisMapElement["arcgisViewReadyChange"],
+  ) => void;
+  handleViewHold: (event: HTMLArcgisMapElement["arcgisViewHold"]) => void;
   handleGoToHome: (
-  view: MapView | SceneView,
-  goToParams: unknown) => Promise<unknown>;
+    view: MapView | SceneView,
+    goToParams: unknown,
+  ) => Promise<unknown>;
   handleCoordinateExpandChange: (
-    event: TargetedEvent<
-      HTMLArcgisExpandElement,
-      {
-        name: "expanded";
-      }
-    >,
+    event: HTMLArcgisExpandElement["arcgisPropertyChange"],
   ) => void;
   mapReady: boolean;
 }
@@ -139,7 +134,7 @@ export const useShell = (): UseShellProps => {
   }, []);
 
   const handleViewReady = async (
-    event: TargetedEvent<HTMLArcgisMapElement, void>,
+    event: HTMLArcgisMapElement["arcgisViewReadyChange"],
   ) => {
     event.target.constraints = constraints as MapViewConstraints;
 
@@ -155,14 +150,14 @@ export const useShell = (): UseShellProps => {
     event.target.addEventListener("arcgisViewChange", handleViewChange);
   };
   const handleViewHold = useCallback(
-    async (event: CustomEvent<HoldEvent>) => {
+    async (event: HTMLArcgisMapElement["arcgisViewHold"]) => {
       setGeometry(event.detail.mapPoint);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [],
   );
   const handleViewChange = useCallback(
-    (event: TargetedEvent<HTMLArcgisMapElement, void>) => {
+    (event: HTMLArcgisMapElement["arcgisViewChange"]) => {
       //if (!mapReady) return;
       if (!event.target.extent) return;
       localStorage.setItem(
@@ -172,29 +167,23 @@ export const useShell = (): UseShellProps => {
     },
     [webMapId],
   );
-const handleGoToHome = (
-  view: MapView | SceneView
-) => {
-  return view.goTo(
-    new Extent({
-      xmin: -8810106.471332055,
-      ymin: 4207611.929668259,
-      xmax: -8689947.462867815,
-      ymax: 4333580.152282169,
-      spatialReference: {
-        wkid: 102100,
-      },
-    })
-  );
-};
+  const handleGoToHome = (view: MapView | SceneView) => {
+    return view.goTo(
+      new Extent({
+        xmin: -8810106.471332055,
+        ymin: 4207611.929668259,
+        xmax: -8689947.462867815,
+        ymax: 4333580.152282169,
+        spatialReference: {
+          wkid: 102100,
+        },
+      }),
+    );
+  };
 
   const handleCoordinateExpandChange = (
-    event: TargetedEvent<
-      HTMLArcgisExpandElement,
-      {
-        name: "expanded";
-      }
-    >,
+    event: HTMLArcgisExpandElement["arcgisPropertyChange"],
+
   ) => {
     setCoordinateConversionOpen(event.target.expanded);
   };

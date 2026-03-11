@@ -1,6 +1,5 @@
 // hooks/useShell.ts
 import { useRef, useEffect, useState } from "react";
-import type { TargetedEvent } from "@arcgis/map-components";
 import LocatorSearchSource from "@arcgis/core/widgets/Search/LocatorSearchSource.js";
 import PictureMarkerSymbol from "@arcgis/core/symbols/PictureMarkerSymbol";
 import LayerSearchSource from "@arcgis/core/widgets/Search/LayerSearchSource";
@@ -8,25 +7,22 @@ import FeatureLayer from "@arcgis/core/layers/FeatureLayer";
 import * as intersectionOperator from "@arcgis/core/geometry/operators/intersectionOperator.js";
 import GraphicsLayer from "@arcgis/core/layers/GraphicsLayer";
 import Graphic from "@arcgis/core/Graphic";
-import type {
-  SearchViewModelEvents,
-  SearchViewModelSelectResultEvent,
-} from "@arcgis/core/widgets/Search/SearchViewModel";
+
 
 export interface UseLocationSearchProps {
   showIntersection: boolean;
   intersectingStreets: Graphic[];
   handleSearchReady: (
-    event: TargetedEvent<HTMLArcgisSearchElement, void>,
+    event: HTMLArcgisSearchElement["arcgisReady"],
   ) => void;
   handleSelectResult: (
-    event: CustomEvent<SearchViewModelSelectResultEvent>,
+    event: HTMLArcgisSearchElement["arcgisSelectResult"],
   ) => void;
   handleSearchClear: (
-    event: CustomEvent<SearchViewModelEvents["search-clear"]>,
+    event: HTMLArcgisSearchElement["arcgisSearchClear"],
   ) => void;
   handleIntersectingStreetChange: (
-    event: TargetedEvent<HTMLCalciteComboboxElement, void>,
+    event: HTMLCalciteComboboxElement["calciteComboboxChange"],
   ) => void;
 }
 
@@ -90,7 +86,7 @@ export const useLocationSearch = (
   };
 
   const handleSearchReady = (
-    event: TargetedEvent<HTMLArcgisSearchElement, void>,
+    event: HTMLArcgisSearchElement["arcgisReady"],
   ) => {
     event.target.sources = event.target.allSources.filter((source) => {
       source.name = source.name.split(":")[0];
@@ -103,7 +99,7 @@ export const useLocationSearch = (
   };
 
   const handleSelectResult = async (
-    event: CustomEvent<SearchViewModelSelectResultEvent>,
+    event: HTMLArcgisSearchElement["arcgisSelectResult"],
   ) => {
     const source = event.detail.source.name;
     setShowIntersection(source === "Intersection");
@@ -124,7 +120,7 @@ export const useLocationSearch = (
   };
 
   const handleIntersectingStreetChange = (
-    event: TargetedEvent<HTMLCalciteComboboxElement, void>,
+    event: HTMLCalciteComboboxElement["calciteComboboxChange"],
   ) => {
     if (
       !selectedStreet.current?.geometry ||
@@ -146,7 +142,7 @@ export const useLocationSearch = (
   };
 
   const handleSearchClear = (
-    event: CustomEvent<SearchViewModelEvents["search-clear"]>,
+    event: HTMLArcgisSearchElement["arcgisSearchClear"],
   ) => {
     console.log(event.detail);
     setShowIntersection(false);

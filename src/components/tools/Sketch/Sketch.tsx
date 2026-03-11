@@ -127,7 +127,7 @@ const Sketch: React.FC<SketchProps> = ({ mapElement, closed, onToolClose }) => {
             </calcite-action-bar>
           </div>
           {(mapMode === "point" || selectedGraphicsType === "point") && (
-            <calcite-block heading="Point Style" label="Point Style" open>
+            <calcite-block heading="Point Style" label="Point Style" expanded>
               <PointSymbolPicker
                 symbol={pointSymbol}
                 onSymbolChange={handlePointSymbolChange}
@@ -144,7 +144,7 @@ const Sketch: React.FC<SketchProps> = ({ mapElement, closed, onToolClose }) => {
             </calcite-block>
           )}
           {(mapMode === "polyline" || selectedGraphicsType === "polyline") && (
-            <calcite-block heading="Point Style" label="Point Style" open>
+            <calcite-block heading="Point Style" label="Point Style" expanded>
               <LineSymbolPicker
                 symbol={polylineSymbol}
                 onSymbolChange={handlePolylineSymbolChange}
@@ -153,7 +153,7 @@ const Sketch: React.FC<SketchProps> = ({ mapElement, closed, onToolClose }) => {
           )}
           {(["polygon", "rectangle", "circle"].includes(mapMode as string) ||
             selectedGraphicsType === "polygon") && (
-            <calcite-block heading="Polygon Style" label="Polygon Style" open>
+            <calcite-block heading="Polygon Style" label="Polygon Style" expanded>
               <FillSymbolPicker
                 symbol={polygonSymbol}
                 onSymbolChange={handlePolygonSymbolChange}
@@ -165,7 +165,7 @@ const Sketch: React.FC<SketchProps> = ({ mapElement, closed, onToolClose }) => {
             </calcite-block>
           )}
           {(mapMode === "text" || selectedGraphicsType === "text") && (
-            <calcite-block heading="Text Style" label="Text Style" open>
+            <calcite-block heading="Text Style" label="Text Style" expanded>
               <TextSymbolPicker
                 symbol={textSymbol}
                 onSymbolChange={handleTextSymbolChange}

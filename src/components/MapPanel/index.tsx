@@ -11,13 +11,10 @@ import "@arcgis/map-components/components/arcgis-scale-bar";
 import { lazyWithPreload } from "../../utils/lazyLoad";
 import OverviewMap from "../tools/OverviewMap";
 import CoodinateConversion from "../tools/CoodinateConversion";
-import type { TargetedEvent } from "@arcgis/map-components";
 import type { MapMode } from "../../context/MapContext";
 import type { ToolType } from "../Shell/useShell";
 
 import styles from "./MapPanel.module.css";
-import TipManager from "../TipsManager";
-import type { HoldEvent } from "@arcgis/core/views/input/types";
 
 interface MapPanelProps {
   mapElement: React.RefObject<HTMLArcgisMapElement>;
@@ -25,18 +22,13 @@ interface MapPanelProps {
   openedTools: ToolType[];
   mapMode: MapMode;
   coordinateConversionOpen: boolean;
-  onMapReady: (event: TargetedEvent<HTMLArcgisMapElement, void>) => void;
-  onViewHold: (event: CustomEvent<HoldEvent>) => void;
+  onMapReady: (event: HTMLArcgisMapElement["arcgisViewReadyChange"]) => void;
+  onViewHold: (event: HTMLArcgisMapElement["arcgisViewHold"]) => void;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onGoHome: any;
   onCustomActionClick: (action: "identify" | "streetview" | null) => void;
   onCoordinateExpand: (
-    event: TargetedEvent<
-      HTMLArcgisExpandElement,
-      {
-        name: "expanded";
-      }
-    >,
+    event: HTMLArcgisExpandElement["arcgisPropertyChange"],
   ) => void;
   onToolClose: () => void;
 }
@@ -92,39 +84,39 @@ const MapPanel: React.FC<MapPanelProps> = ({
         onarcgisViewReadyChange={onMapReady}
         onarcgisViewHold={onViewHold}
       >
-
         <arcgis-zoom slot="top-left"></arcgis-zoom>
         <arcgis-home slot="top-left" goToOverride={onGoHome}></arcgis-home>
         <arcgis-compass slot="top-left"></arcgis-compass>
         <arcgis-track slot="top-left"></arcgis-track>
-        <div slot="top-left">
+        {/* <div slot="top-left">
           <TipManager name="map" scale="s"></TipManager>
-        </div>
+        </div> */}
         <div slot="top-left" className={styles.customActions}>
-          <calcite-action
-            id="identify-action"
-            scale="s"
-            label="identify"
-            text={"identify"}
-            icon="information"
-            active={mapMode === "identify"}
-            onClick={() => onCustomActionClick("identify")}
-          ></calcite-action>
+          <calcite-action-bar layout="vertical" expandDisabled>
+            <calcite-action
+              id="identify-action"
+              label="identify"
+              text={"identify"}
+              icon="information"
+              active={mapMode === "identify"}
+              onClick={() => onCustomActionClick("identify")}
+            ></calcite-action>
+
+            <calcite-action
+              id="streetview-action"
+              label="streetview"
+              text={"streetview"}
+              icon="i360-view"
+              active={mapMode === "streetview"}
+              onClick={() => onCustomActionClick("streetview")}
+            ></calcite-action>
+          </calcite-action-bar>
           <calcite-tooltip
             reference-element="identify-action"
             placement="right"
           >
             Identify
           </calcite-tooltip>
-          <calcite-action
-            id="streetview-action"
-            scale="s"
-            label="streetview"
-            text={"streetview"}
-            icon="i360-view"
-            active={mapMode === "streetview"}
-            onClick={() => onCustomActionClick("streetview")}
-          ></calcite-action>
           <calcite-tooltip
             reference-element="streetview-action"
             placement="right"

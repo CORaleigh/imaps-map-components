@@ -51,7 +51,7 @@ const CoodinateConversion: React.FC<CoodinateConversionProps> = ({
       >
         <calcite-action
           id="coordinate-search-action"
-          slot="control"
+          slot="actions-end"
           text="search"
           icon="search"
           onClick={handleShowSearch}
@@ -61,7 +61,7 @@ const CoodinateConversion: React.FC<CoodinateConversionProps> = ({
 
         <calcite-action
           id="coordinate-settings-action"
-          slot="control"
+          slot="actions-end"
           text="settings"
           icon="gear"
           active={showSettings}
@@ -70,7 +70,7 @@ const CoodinateConversion: React.FC<CoodinateConversionProps> = ({
         ></calcite-action>
         <calcite-action
           id="coordinate-mode-action"
-          slot="control"
+          slot="actions-end"
           text="click"
           icon="pin"
           onClick={handleChangeMode}
@@ -79,7 +79,7 @@ const CoodinateConversion: React.FC<CoodinateConversionProps> = ({
         ></calcite-action>
         <calcite-action
           id="coordinate-copy-action"
-          slot="control"
+          slot="actions-end"
           text="copy to clipboard"
           icon="copy-to-clipboard"
           onClick={handleCopyToClipboard}
