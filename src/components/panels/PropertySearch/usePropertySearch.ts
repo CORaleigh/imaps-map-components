@@ -124,13 +124,9 @@ export const usePropertySearch = (
 
   const handleTableReady = useCallback(
     async (event: HTMLArcgisFeatureTableElement["arcgisReady"]) => {
-      if ((event.target as any).viewModel.messages) {
-        (event.target as any).viewModel.messages.header = `0 properties selected`;
-        (event.target as any).viewModel.messages.noLayer = "";
-      }
-
+      event.target.tableTitle = `0 properties selected`;
+      event.target.noDataMessage = "";
       const layer = await createTableLayer(mapElement.current);
-
       if (!layer) return;
       event.target.layer = layer;
       tableLayerRef.current = layer;
@@ -202,8 +198,7 @@ export const usePropertySearch = (
     event: HTMLArcgisFeatureTableElement["arcgisReady"],
   ) => {
     console.log("address table ready");
-
-    (event.target as any).viewModel.messages.header = `0 addresses`;
+    event.target.tableTitle = `0 addresses`;
 
     const table = event.target;
     const tableTemplate: TableTemplate = new TableTemplate({
@@ -265,7 +260,7 @@ export const usePropertySearch = (
     if (event.detail.name === "size") {
       event.target.style.maxHeight = "500px";
       event.target.style.height = `${(event.target.size + 2) * 40 + 100}px`;
-      (event.target as any).viewModel.messages.header = `${event.target.size} ${
+      event.target.tableTitle = `${event.target.size} ${
         event.target.size === 1 ? "address" : "addresses"
       }`;
     }
@@ -537,7 +532,7 @@ export const usePropertySearch = (
       setSelectedTab("list");
     }
 
-    (tableElement.current as any).viewModel.messages.header = `${
+    tableElement.current.tableTitle = `${
       condos.length
     } ${condos.length === 1 ? "property" : "properties"} selected`;
 
