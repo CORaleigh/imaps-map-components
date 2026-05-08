@@ -87,6 +87,7 @@ export const createItemPanel = (item: ListItem) => {
     item.panel = {
       content: content,
       open: false,
+      visible: item.visible
     };
   }
 };
@@ -114,7 +115,10 @@ export const watchLayerList = (item: ListItem, id: string) => {
   reactiveUtils.watch(
     () => item.layer?.visible === true,
     (visible: boolean) => {
+
+      item.panel.visible = visible;
       if (item.layer && item.layer.parent && item.parent) {
+
         if (item.layer.parent instanceof GroupLayer) {
           const parentVisible = visible
             ? true
