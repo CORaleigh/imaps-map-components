@@ -124,7 +124,7 @@ export const watchLayerList = (item: ListItem, id: string) => {
             ? false
             : true;
           (item.layer.parent as GroupLayer).visible = parentVisible;
-          item.parent.open = parentVisible;
+          //item.parent.open = parentVisible;
         }
 
         // const storage = JSON.parse(
@@ -185,9 +185,9 @@ export const watchLayerList = (item: ListItem, id: string) => {
         //   JSON.stringify(storage)
         // );
       }
-      if (item.layer?.type === "group") {
-        item.open = visible;
-      }
+      // if (item.layer?.type === "group") {
+      //   item.open = visible;
+      // }
     }
   );
   if (!item.layer || !item.layer.opacity) return;
