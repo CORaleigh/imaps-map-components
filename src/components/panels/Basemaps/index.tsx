@@ -29,7 +29,11 @@ const Basemaps: React.FC<BasemapsProps> = ({
     blendSlider,
     handleGalleryReady,
     handleTabChange,
-    handleBlendChange
+    handleBlendChange,
+    handleSliderInput,
+    handleGalleryChange,
+    blendEnabled,
+    showBlendOption
   } = useBasemaps(mapElement);
   return (
     <>
@@ -41,13 +45,13 @@ const Basemaps: React.FC<BasemapsProps> = ({
         className={styles.basemapsPanel}
       >
         <TipManager name="basemaps"></TipManager>
-        {selectedTab === "images" && (
+        {selectedTab === "images" && showBlendOption && (
           <div slot="content-top">
             <calcite-label layout="inline">
-              <calcite-switch oncalciteSwitchChange={handleBlendChange}></calcite-switch>
+              <calcite-switch oncalciteSwitchChange={handleBlendChange} checked={blendEnabled}></calcite-switch>
               Blend
             </calcite-label>
-             <calcite-slider ref={blendSlider} hidden></calcite-slider>
+             <calcite-slider ref={blendSlider} hidden oncalciteSliderInput={handleSliderInput} value={50}></calcite-slider>
           </div>
         )}
         <calcite-tabs
@@ -89,6 +93,7 @@ const Basemaps: React.FC<BasemapsProps> = ({
               referenceElement={mapElement.current}
               source={mapsSource}
               onarcgisReady={handleGalleryReady}
+              onarcgisPropertyChange={handleGalleryChange}              
             ></arcgis-basemap-gallery>
           </calcite-tab>
           <calcite-tab selected={selectedTab === "images"}>
@@ -98,6 +103,7 @@ const Basemaps: React.FC<BasemapsProps> = ({
               referenceElement={mapElement.current}
               source={imageSource}
               onarcgisReady={handleGalleryReady}
+              onarcgisPropertyChange={handleGalleryChange}
             ></arcgis-basemap-gallery>
           </calcite-tab>
           <calcite-tab>
@@ -107,6 +113,7 @@ const Basemaps: React.FC<BasemapsProps> = ({
               className={styles.basemapGallery}
               referenceElement={mapElement.current}
               onarcgisReady={handleGalleryReady}
+              onarcgisPropertyChange={handleGalleryChange}
             ></arcgis-basemap-gallery>
           </calcite-tab>
         </calcite-tabs>

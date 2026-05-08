@@ -55,8 +55,13 @@ export function useCondoHistory({
     }
 
     const pin = selectedCondo.getAttribute("PIN_NUM");
+
     if (pin) {
-      window.history.pushState({ pin }, "", `?pin=${pin}`);
+      const url = new URL(window.location.href);
+
+      url.searchParams.set("pin", pin);
+
+      window.history.pushState({ pin }, "", url);
     }
   }, [selectedCondo]);
 

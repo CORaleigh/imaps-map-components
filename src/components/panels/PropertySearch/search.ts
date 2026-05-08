@@ -40,7 +40,7 @@ export const getSearchSources = async (
 
   const condoTable = getTableByTitle(mapElement, "Condos") as FeatureLayer;
   const addressTable = getTableByTitle(mapElement, "Addresses") as FeatureLayer;
-
+  await reactiveUtils.whenOnce(() => condoTable?.loaded && addressTable?.loaded);
   const sources = new Collection<LayerSearchSource>([
     createLayerSource(
       "example: 222 W HARGETT ST",
@@ -55,15 +55,16 @@ export const getSearchSources = async (
         startsWith: true,
       },
     ),
+    
     createLayerSource(
       "example: SMITH, JOHN",
       "Owner",
       condoTable,
       arcgisSearch,
       {
-        outFields: ["OWNER"],
+        outFields: condoTable?.fields.find((f) => f.name === "OWNER1" || f.name === "OWNER2") ? ["OWNER", "OWNER1", "OWNER2"] : ["OWNER"],
         orderByFields: ["OWNER"],
-        searchFields: ["OWNER"],
+        searchFields: condoTable?.fields.find((f) => f.name === "OWNER1" || f.name === "OWNER2") ? ["OWNER1", "OWNER2"] : ["OWNER"],
         resultFields: ["OWNER", "OBJECTID"],
         startsWith: true,
       },

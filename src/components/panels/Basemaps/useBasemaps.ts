@@ -30,6 +30,14 @@ export interface UseBasemapsProps {
   handleBlendChange: (
     event: HTMLCalciteSwitchElement["calciteSwitchChange"],
   ) => void;
+  handleSliderInput: (
+    event: HTMLCalciteSliderElement["calciteSliderInput"],
+  ) => void;
+  handleGalleryChange: (
+    event: HTMLArcgisBasemapGalleryElement["arcgisPropertyChange"],
+  ) => void;
+  blendEnabled: boolean;
+  showBlendOption: boolean;
 }
 
 export const useBasemaps = (
@@ -47,6 +55,8 @@ export const useBasemaps = (
   );
   const { setAlert } = useMap();
 
+  const [blendEnabled, setBlendEnabled] = useState(false);
+  const [showBlendOption, setShowBlendOption] = useState(false);
   const mapsSource = new PortalBasemapsSource({
     portal: {
       url: "https://ral.maps.arcgis.com",
@@ -114,6 +124,15 @@ export const useBasemaps = (
     event: HTMLCalciteTabNavElement["calciteTabChange"],
   ) => {
     if (!imagesGallery.current) return;
+      const active = imagesGallery.current?.activeBasemap;
+
+      setShowBlendOption(
+        !!active &&
+        imagesGallery.current?.source?.basemaps?.some(
+          (bm: Basemap) =>
+            bm.title === active
+        )
+      );
     setSelectedTab(
       event.target.selectedTitle.getAttribute("label") as
         | "basemap"
@@ -132,6 +151,7 @@ export const useBasemaps = (
     (event: HTMLCalciteSwitchElement["calciteSwitchChange"]) => {
       if (!blendSlider.current) return;
       const checked = event.target.checked;
+      setBlendEnabled(checked);
       blendSlider.current.hidden = !checked;
 
       const view = mapElement.current?.view;
@@ -141,7 +161,8 @@ export const useBasemaps = (
       if (checked) {
         if (!blendLayer.current) {
           blendLayer.current = new VectorTileLayer({
-            portalItem: { id: "" },
+            portalItem: { id: "02d50d24991747538e218e0a5806e9b3" },
+            opacity: blendSlider.current.value as number / 100 as number,
           });
         }
 
@@ -153,11 +174,30 @@ export const useBasemaps = (
       // TURN BLEND OFF
       else {
         if (blendLayer.current) {
-          mapElement.current.view.map?.remove(blendLayer.current);
+          
+          mapElement.current.view.map?.basemap?.baseLayers.remove(blendLayer.current);
         }
       }
+
     },
     [mapElement],
+  );
+
+  const handleGalleryChange = useCallback(
+    (event: HTMLArcgisBasemapGalleryElement["arcgisPropertyChange"]) => {
+      console.log("Gallery property changed:", event);
+      if (blendLayer.current) {
+          mapElement.current.view.map?.basemap?.baseLayers.remove(blendLayer.current);
+          setBlendEnabled(false);
+      }
+      setShowBlendOption(!!imagesGallery.current?.activeBasemap);
+    }, [mapElement])
+  const handleSliderInput = useCallback(
+    (event: HTMLCalciteSliderElement["calciteSliderInput"]) => {
+      if (blendLayer.current) {
+        blendLayer.current.opacity = event.currentTarget.value as number/ 100 as number;
+      } 
+    },    [],
   );
 
   useEffect(() => {
@@ -222,5 +262,9 @@ export const useBasemaps = (
     handleGalleryReady,
     handleTabChange,
     handleBlendChange,
+    handleSliderInput,
+    handleGalleryChange,
+    blendEnabled,
+    showBlendOption
   };
 };
