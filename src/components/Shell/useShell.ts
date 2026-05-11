@@ -115,6 +115,7 @@ export const useShell = (): UseShellProps => {
   );
 
   const handlePanelClose = useCallback(() => {
+    console.log("closing panel");
     setActivePanel(null);
   }, []);
   const handleToolActionClick = useCallback(
@@ -130,6 +131,7 @@ export const useShell = (): UseShellProps => {
   );
 
   const handleToolClose = useCallback(() => {
+    console.log("closing tool");
     setActiveTool(null);
   }, []);
 

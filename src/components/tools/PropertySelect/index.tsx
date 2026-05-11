@@ -32,7 +32,9 @@ const PropertySelect: React.FC<PropertySelectProps> = ({
     handleClear,
     handleToolClose,
     handleBufferProperty,
-  } = usePropertySelect(mapElement, closed, onToolClose);
+  } = usePropertySelect(mapElement, 
+    // closed, 
+    onToolClose);
   return (
     <>
       <calcite-panel

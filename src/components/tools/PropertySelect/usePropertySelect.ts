@@ -48,7 +48,7 @@ export interface UsePropertySelectProps {
 
 export const usePropertySelect = (
   mapElement: React.RefObject<HTMLArcgisMapElement>,
-  closed: boolean,
+  // closed: boolean,
   onToolClose: () => void
 ): UsePropertySelectProps => {
   const {
@@ -225,7 +225,7 @@ export const usePropertySelect = (
     cancelSelect();
     setMapMode(null);
     onToolClose();
-  }, [onToolClose, setMapMode]);
+  }, [setMapMode]);
 
   const handleBufferProperty = useCallback(async () => {
     if (bufferDistance > 0 && selectedCondo?.geometry) {
@@ -275,9 +275,9 @@ export const usePropertySelect = (
   }, [bufferDistance]);
 
   // Close tool when `closed` prop changes
-  useEffect(() => {
-    if (closed) handleToolClose();
-  }, [closed, handleToolClose]);
+  // useEffect(() => {
+  //   if (closed) handleToolClose();
+  // }, [closed, handleToolClose]);
 
   return {
     mapMode,

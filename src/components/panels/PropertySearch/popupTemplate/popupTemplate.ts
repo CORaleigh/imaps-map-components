@@ -151,6 +151,19 @@ export const getPhotos = async (
       })
     );
   }
+  if (feature.getAttribute("CITY_DECODE")?.includes("CHATHAM COUNTY")) {
+    const photo = await getChathamPhoto(feature);
+  
+    mediaInfos.push(
+      new ImageMediaInfo({
+        title: "",
+        caption: "",
+        value: {
+          sourceURL: photo as string,
+        },
+      })
+    );
+  }  
   return mediaInfos;
 };
 
@@ -169,6 +182,30 @@ export const getDurhamPhoto = async (feature: Graphic) => {
   } catch {
     console.log("no photo available");
   }
+};
+
+const checkPhoto = (url: string): Promise<string | null> => {
+    return new Promise((resolve) => {
+        const img = new Image();
+        img.onload = () => resolve(url);
+        img.onerror = () => resolve(null);
+        img.src = url;
+    });
+}
+
+export const getChathamPhoto = async (feature: Graphic) => {
+  const photo = await executeArcade(
+    `if ($feature.CITY_DECODE == "CARY - CHATHAM COUNTY") { 
+        return Concatenate("https://gisservices.chathamcountync.gov/gisfiles/Tax%20Photos/",Replace($feature.REID, "C",""),"_unknown_1.jpg")}`,
+    feature
+  );
+  const validPhoto = await checkPhoto(photo as string);
+  if (validPhoto) {
+      return photo;
+  } else {
+      console.log("no photo available");
+  }  
+
 };
 
 const executeArcade = async (expression: string, feature: Graphic) => {
@@ -317,9 +354,11 @@ export const createLinkButtons = () => {
         const taxUrl = await executeArcade(
           `if ($feature.CITY_DECODE == "RALEIGH - DURHAM COUNTY") { 
                     return Concatenate("https://taxcama.dconc.gov/camapwa/PropertySummary.aspx?REID=",$feature.REID);
-                  } else {
-                    return Concatenate("https://services.wake.gov/realestate/Account.asp?id=", $feature.REID);
-                  }`,
+          } else if ($feature.CITY_DECODE == "CARY - CHATHAM COUNTY") {
+            return Concatenate("https://chathamnc.devnetwedge.com/parcel/view/",Replace($feature.REID, 'C', ''));
+          } else {
+            return Concatenate("https://services.wake.gov/realestate/Account.asp?id=", $feature.REID);
+          }`,
           graphic // Use the defined graphic
         );
         tax.onclick = () => {
@@ -361,7 +400,13 @@ export const createDurhamButton = () => {
               return Concatenate("https://maps.durhamnc.gov/?pid=", $feature.REID);}`,
         event.graphic
       );
-
+      const chatham = await executeArcade(
+        `if (Find("CHATHAM COUNTY", $feature.CITY_DECODE) > -1) { 
+              return Concatenate("https://chathamnc.devnetwedge.com/parcel/view/",Replace($feature.REID, 'C', ''));
+        }`,
+                            
+        event.graphic
+      );
       if (durham) {
         const durhamBtn = createButton("home", "Durham County");
         durhamBtn.onclick = () => {
@@ -369,7 +414,13 @@ export const createDurhamButton = () => {
         };
         div.append(durhamBtn);
       }
-
+      if (chatham) {
+        const chathamBtn = createButton("home", "Chatham County");
+        chathamBtn.onclick = () => {
+          window.open(chatham as string, "chatham");
+        };
+        div.append(chathamBtn);
+      }
       return div; // Return the div as HTMLElement
     },
   });
