@@ -117,7 +117,7 @@ const createLayerSource = (
   arcgisSearch: HTMLArcgisSearchElement,
   options: LayerSourceOptions,
 ): LayerSearchSource => {
-  const { outFields, orderByFields, searchFields, resultFields, startsWith } =
+  const { outFields, orderByFields, searchFields, resultFields } =
     options;
 
   const getResults = async (
@@ -142,38 +142,95 @@ const createLayerSource = (
     );
   };
 
-  const getSuggestions = async (params: GetSuggestionsParameters) => {
+  // const getSuggestions = async (params: GetSuggestionsParameters) => {
+  //   if (!params?.suggestTerm) return [];
+
+  //   const term = params.suggestTerm
+  //     .toUpperCase()
+  //     .replace(/'/g, "''")
+  //     .replace(/[\u2018\u2019]/g, "''");
+
+  //   const whereArray = searchFields.map((field) => {
+  //     if (startsWith) {
+  //       return `${field} LIKE '${term}%'`;
+  //     } else {
+  //       return `${field} LIKE '%${term}%'`;
+  //     }
+  //   });
+  //   console.log("whereArray", whereArray);
+  //   const results = await layer.queryFeatures({
+  //     returnDistinctValues: true,
+  //     outFields,
+  //     returnGeometry: false,
+  //     orderByFields,
+  //     num: arcgisSearch?.activeSource ? 50 : 6,
+  //     where: whereArray.join(" OR "),
+  //   });
+
+  //   return results.features.map((feature: Graphic) => ({
+  //     key: feature.getAttribute(outFields[0]),
+  //     text: feature.getAttribute(outFields[0]),
+  //     sourceIndex: params.sourceIndex,
+  //   }));
+  // };
+const getSuggestions = async (params: GetSuggestionsParameters) => {
     if (!params?.suggestTerm) return [];
 
     const term = params.suggestTerm
-      .toUpperCase()
-      .replace(/'/g, "''")
-      .replace(/[\u2018\u2019]/g, "''");
+        .toUpperCase()
+        .replace(/'/g, "''")
+        .replace(/[\u2018\u2019]/g, "''");
 
-    const whereArray = searchFields.map((field) => {
-      if (startsWith) {
-        return `${field} LIKE '${term}%'`;
-      } else {
-        return `${field} LIKE '%${term}%'`;
-      }
-    });
+    const num = arcgisSearch?.activeSource ? 50 : 6;
 
+    // If multiple search fields, run parallel queries instead of OR
+    if (searchFields.length > 1) {
+        const queries = await Promise.all(
+            searchFields.map((field) =>
+                layer.queryFeatures({
+                    returnDistinctValues: true,
+                    outFields,
+                    returnGeometry: false,
+                    orderByFields,
+                    num,
+                    where: `${field} LIKE '${term}%'`,
+                })
+            )
+        );
+
+        const seen = new Set<string>();
+        return queries
+            .flatMap((result) => result.features)
+            .filter((feature) => {
+                const key = feature.getAttribute(outFields[0]);
+                if (seen.has(key)) return false;
+                seen.add(key);
+                return true;
+            })
+            .slice(0, num)
+            .map((feature) => ({
+                key: feature.getAttribute(outFields[0]),
+                text: feature.getAttribute(outFields[0]),
+                sourceIndex: params.sourceIndex,
+            }));
+    }
+
+    // Single field — original path
     const results = await layer.queryFeatures({
-      returnDistinctValues: true,
-      outFields,
-      returnGeometry: false,
-      orderByFields,
-      num: arcgisSearch?.activeSource ? 50 : 6,
-      where: whereArray.join(" OR "),
+        returnDistinctValues: true,
+        outFields,
+        returnGeometry: false,
+        orderByFields,
+        num,
+        where: `${searchFields[0]} LIKE '${term}%'`,
     });
 
     return results.features.map((feature: Graphic) => ({
-      key: feature.getAttribute(outFields[0]),
-      text: feature.getAttribute(outFields[0]),
-      sourceIndex: params.sourceIndex,
+        key: feature.getAttribute(outFields[0]),
+        text: feature.getAttribute(outFields[0]),
+        sourceIndex: params.sourceIndex,
     }));
-  };
-
+};
   return new LayerSearchSource({
     layer: layer,
     placeholder: placeholder,
