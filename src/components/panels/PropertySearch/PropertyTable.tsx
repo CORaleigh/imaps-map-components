@@ -33,6 +33,7 @@ const PropertyTable: React.FC<PropertyTableProps> = ({
         onarcgisReady={onReady}
         hideMenuItemsRefreshData
         hideSelectionColumn
+        hideProgress
         onarcgisCellClick={onCellClick}
         noDataMessage={"No properties selected"}
         menuConfig={{

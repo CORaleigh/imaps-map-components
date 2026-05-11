@@ -39,6 +39,7 @@ const AddressTable: React.FC<AddressTableProps> = ({
         onarcgisReady={onReady}
         onarcgisPropertyChange={onPropertyChange}
         hideSelectionColumn
+        hideProgress
         onarcgisCellClick={onCellClick}
         noDataMessage={"No addresses found"}
         hideMenuItemsRefreshData

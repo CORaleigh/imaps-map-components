@@ -66,6 +66,7 @@ const Shell: React.FC = () => {
     handleViewHold,
     handleGoToHome,
     handleCoordinateExpandChange,
+    handleExpandChange,
     mapElement,
     mapReady,
   } = useShell();
@@ -301,6 +302,7 @@ const Shell: React.FC = () => {
           onMapReady={handleViewReady}
           onViewHold={handleViewHold}
           onCoordinateExpand={handleCoordinateExpandChange}
+          onExpandChange={handleExpandChange}
           onCustomActionClick={handleCustomActionClick}
           onGoHome={handleGoToHome}
           onToolClose={handleToolClose}

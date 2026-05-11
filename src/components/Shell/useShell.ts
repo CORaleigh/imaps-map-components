@@ -52,6 +52,9 @@ export interface UseShellProps {
   handleCoordinateExpandChange: (
     event: HTMLArcgisExpandElement["arcgisPropertyChange"],
   ) => void;
+  handleExpandChange: (
+    event: HTMLArcgisExpandElement["arcgisPropertyChange"],
+  ) => void;
   mapReady: boolean;
 }
 
@@ -185,9 +188,25 @@ export const useShell = (): UseShellProps => {
 
   const handleCoordinateExpandChange = (
     event: HTMLArcgisExpandElement["arcgisPropertyChange"],
-
   ) => {
     setCoordinateConversionOpen(event.target.expanded);
+    requestAnimationFrame(() => {
+      if (!event.target.ariaLabel) return;
+      event.target.shadowRoot
+        ?.querySelector("calcite-popover")
+        ?.setAttribute("aria-label", event.target.ariaLabel);
+    });
+  };
+
+  const handleExpandChange = (
+    event: HTMLArcgisExpandElement["arcgisPropertyChange"],
+  ) => {
+    requestAnimationFrame(() => {
+      if (!event.target.ariaLabel) return;
+      event.target.shadowRoot
+        ?.querySelector("calcite-popover")
+        ?.setAttribute("aria-label", event.target.ariaLabel);
+    });
   };
 
   useEffect(() => {
@@ -221,6 +240,7 @@ export const useShell = (): UseShellProps => {
     handleViewHold,
     handleGoToHome,
     handleCoordinateExpandChange,
+    handleExpandChange,
     mapReady,
   };
 };

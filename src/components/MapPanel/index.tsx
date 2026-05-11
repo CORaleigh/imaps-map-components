@@ -30,6 +30,7 @@ interface MapPanelProps {
   onCoordinateExpand: (
     event: HTMLArcgisExpandElement["arcgisPropertyChange"],
   ) => void;
+  onExpandChange: (event: HTMLArcgisExpandElement["arcgisPropertyChange"]) => void;
   onToolClose: () => void;
 }
 
@@ -70,6 +71,7 @@ const MapPanel: React.FC<MapPanelProps> = ({
   onGoHome,
   onCustomActionClick,
   onCoordinateExpand,
+  onExpandChange,
   onToolClose,
 }) => {
   useEffect(() => {
@@ -130,6 +132,7 @@ const MapPanel: React.FC<MapPanelProps> = ({
           expandIcon="crosshair"
           onarcgisPropertyChange={onCoordinateExpand}
           mode="floating"
+          aria-label="Coodinate Conversion"
         >
           {mapElement.current?.map && (
             <CoodinateConversion
@@ -146,6 +149,8 @@ const MapPanel: React.FC<MapPanelProps> = ({
           collapseIcon="arrow-down-right"
           id="overview-action"
           mode="floating"
+          onarcgisPropertyChange={onExpandChange}
+          aria-label="Overview Map"
         >
           <OverviewMap mapElement={mapElement}></OverviewMap>
         </arcgis-expand>
