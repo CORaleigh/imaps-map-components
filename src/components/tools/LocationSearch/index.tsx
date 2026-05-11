@@ -1,5 +1,6 @@
 import React from "react";
 import "@esri/calcite-components/components/calcite-panel";
+import "@esri/calcite-components/components/calcite-block";
 import "@arcgis/map-components/components/arcgis-search";
 import "@esri/calcite-components/components/calcite-combobox";
 import "@esri/calcite-components/components/calcite-combobox-item";
@@ -38,33 +39,34 @@ const LocationSearch: React.FC<LocationSearchProps> = ({
       collapsible
     >
       <TipManager name="location-search"></TipManager>
-
-      <arcgis-search
-        className={styles.searchContainer}
-        referenceElement={mapElement.current}
-        onarcgisReady={handleSearchReady}
-        onarcgisSelectResult={handleSelectResult}
-        onarcgisSearchClear={handleSearchClear}
-      ></arcgis-search>
-      <br />
-      {showIntersection && (
-        <calcite-combobox
-          scale="m"
-          overlayPositioning="fixed"
-          label={"intersecting street"}
-          selectionMode="single"
-          placeholder="Select intersecting street"
-          oncalciteComboboxChange={handleIntersectingStreetChange}
-        >
-          {intersectingStreets.map((street) => (
-            <calcite-combobox-item
-              key={street.getAttribute("CARTONAME")}
-              value={street}
-              heading={street.getAttribute("CARTONAME")}
-            ></calcite-combobox-item>
-          ))}
-        </calcite-combobox>
-      )}
+      <calcite-block expanded>
+        <arcgis-search
+          className={styles.searchContainer}
+          referenceElement={mapElement.current}
+          onarcgisReady={handleSearchReady}
+          onarcgisSelectResult={handleSelectResult}
+          onarcgisSearchClear={handleSearchClear}
+        ></arcgis-search>
+        <br />
+        {showIntersection && (
+          <calcite-combobox
+            scale="m"
+            overlayPositioning="fixed"
+            label={"intersecting street"}
+            selectionMode="single"
+            placeholder="Select intersecting street"
+            oncalciteComboboxChange={handleIntersectingStreetChange}
+          >
+            {intersectingStreets.map((street) => (
+              <calcite-combobox-item
+                key={street.getAttribute("CARTONAME")}
+                value={street}
+                heading={street.getAttribute("CARTONAME")}
+              ></calcite-combobox-item>
+            ))}
+          </calcite-combobox>
+        )}
+      </calcite-block>
     </calcite-panel>
   );
 };
