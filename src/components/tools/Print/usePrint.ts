@@ -209,7 +209,8 @@ export const usePrint = (
         printOptions.layout,
         printOptions.scale,
         printOptions.showAttributes,
-        printOptions.showLegend
+        printOptions.showLegend,
+        printOptions.scaleType
       );
     } else {
       hidePrintFrame(mapElement.current);
@@ -278,6 +279,7 @@ export const usePrint = (
       hidePrintFrame(mapElement.current);
       return;
     }
+    console.log(printOptions);
 
     const { layout, scale, showAttributes, showLegend } = printOptions;
     if (!layout) return;
@@ -290,7 +292,8 @@ export const usePrint = (
       layout,
       printOptions.scaleType === "custom" ? scale : roundScale(mapElement.current.scale),
       showAttributes,
-      showLegend
+      showLegend,
+      printOptions.scaleType
     );
   }, [
     printOptions.showPrintArea,

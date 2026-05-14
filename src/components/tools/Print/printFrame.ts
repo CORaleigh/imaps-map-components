@@ -1,22 +1,37 @@
+import type { ResourceHandle } from "@arcgis/core/core/Handles";
 import type { Layout } from "./printLayouts";
 import { printTemplates, type Template } from "./templates";
 
+import { watch } from "@arcgis/core/core/reactiveUtils";
+//Note, DPI is 200
 
+let handle: ResourceHandle;
 export const showPrintFrame = (
   mapElement: HTMLArcgisMapElement,
   selectedLayout: Layout,
   printScale: number,
   showAttributes: boolean,
-  showLegend: boolean
+  showLegend: boolean,
+  scaleType: "current" | "custom",
 ) => {
   const printTemplate = getPrintTemplate(
     selectedLayout,
     showAttributes,
-    showLegend
+    showLegend,
   );
 
-  if (printTemplate) {
-    addPrintGraphic(mapElement, printTemplate, printScale);
+  if (!printTemplate) return;
+
+  addPrintGraphic(mapElement, printTemplate, printScale);
+
+  handle?.remove();
+  if (scaleType === "custom") {
+    handle = watch(
+      () => mapElement.view.resolution,
+      () => {
+        addPrintGraphic(mapElement, printTemplate, printScale);
+      },
+    );
   }
 };
 
@@ -24,7 +39,7 @@ export function updatePrintFrame(
   mapElement: HTMLArcgisMapElement,
   width: number,
   height: number,
-  scale: number
+  scale: number,
 ) {
   const adjustmentFactor = 1.23; // Factor to adjust for scaling
 
@@ -53,10 +68,15 @@ export function updatePrintFrame(
   const top = centerY - frameHeightPixels / 2;
   //   const right = centerX + frameWidthPixels / 2;
   //   const bottom = centerY + frameHeightPixels / 2;
-
+  console.log("width:", width);
+  console.log("height:", height);
+  console.log("scale:", scale);
+  console.log("resolution:", mapElement.view.resolution);
+  console.log("frameWidthPixels:", frameWidthPixels);
+  console.log("frameHeightPixels:", frameHeightPixels);
   // Create or update the SVG element
   let svg = mapElement.shadowRoot?.getElementById(
-    "printFrameSvg"
+    "printFrameSvg",
   ) as SVGElement | null;
   if (!svg) {
     svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
@@ -85,7 +105,7 @@ export function updatePrintFrame(
   // Outer rectangle (entire map area) filled with white (visible area)
   const outerRect = document.createElementNS(
     "http://www.w3.org/2000/svg",
-    "rect"
+    "rect",
   );
   outerRect.setAttribute("x", "0");
   outerRect.setAttribute("y", "0");
@@ -96,7 +116,7 @@ export function updatePrintFrame(
   // Inner rectangle (print frame area) filled with black (cut-out area)
   const innerRect = document.createElementNS(
     "http://www.w3.org/2000/svg",
-    "rect"
+    "rect",
   );
   innerRect.setAttribute("x", left.toString());
   innerRect.setAttribute("y", top.toString());
@@ -115,7 +135,7 @@ export function updatePrintFrame(
   // Create the gray background, using the mask to hollow out the print area
   const grayRect = document.createElementNS(
     "http://www.w3.org/2000/svg",
-    "rect"
+    "rect",
   );
   grayRect.setAttribute("x", "0");
   grayRect.setAttribute("y", "0");
@@ -128,7 +148,7 @@ export function updatePrintFrame(
   // Add dashed blue border for the frame
   const borderRect = document.createElementNS(
     "http://www.w3.org/2000/svg",
-    "rect"
+    "rect",
   );
   borderRect.setAttribute("x", left.toString());
   borderRect.setAttribute("y", top.toString());
@@ -146,7 +166,7 @@ export function updatePrintFrame(
 const addPrintGraphic = async (
   mapElement: HTMLArcgisMapElement,
   printTemplate: Template,
-  printScale: number
+  printScale: number,
 ) => {
   //await projection.load();
   //   const extent = projection.project(mapElement.extent, {
@@ -163,7 +183,7 @@ const addPrintGraphic = async (
 const getTemplateName = (
   selectedLayout: Layout | undefined,
   showAttributes: boolean,
-  showLegend: boolean
+  showLegend: boolean,
 ) => {
   let selectedTemplate = selectedLayout?.template.replace(".", "");
 
@@ -179,12 +199,12 @@ const getTemplateName = (
 export const getPrintTemplate = (
   selectedLayout: Layout,
   showAttributes: boolean,
-  showLegend: boolean
+  showLegend: boolean,
 ) => {
   const templateName = getTemplateName(
     selectedLayout,
     showAttributes,
-    showLegend
+    showLegend,
   );
 
   const printTemplate = printTemplates.results[0].value.find((result) => {
