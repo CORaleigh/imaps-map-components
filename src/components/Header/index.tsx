@@ -66,7 +66,7 @@ const Header: React.FC<HeaderProps> = ({
               selectionMode="none"
             >
               <calcite-dropdown-item onClick={onOpenHelp}>
-                Help
+                User Guide
               </calcite-dropdown-item>
               {group.links.map((link, j) => (
                 <calcite-dropdown-item
