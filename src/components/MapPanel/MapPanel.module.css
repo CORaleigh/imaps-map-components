@@ -3,13 +3,26 @@
   max-width: 350px;
 }
 
-  :global(div[slot="bottom-left"]) {
-    z-index: 0;
-  }
+:global(div[slot="bottom-left"]) {
+  z-index: 0;
+}
 
 .customActions {
   position: absolute;
   left: 45px;
+}
+
+.customActions calcite-action[active] {
+  --calcite-action-background-color-press: var(--calcite-color-brand);
+  --calcite-action-text-color-press: white;
+}
+
+.customActions calcite-action[active]:hover {
+  --calcite-action-text-color-press: white;
+}
+
+.customActions calcite-action:hover {
+  --calcite-action-text-color-press: var(--calcite-action-text-color);
 }
 
 /* .customActions calcite-action {
@@ -37,6 +50,3 @@
     width: calc(100% - 48px);
   }
 }
-
-
-
