@@ -20,13 +20,12 @@ const Header: React.FC<HeaderProps> = ({
   theme,
   appSize,
   onOpenDisclaimer,
-  onOpenHelp
+  onOpenHelp,
 }) => {
   const { webMapId } = useMap();
 
-
   const { links, handleDropdownOpen, handleClearStorage } = useHeader(
-    webMapId.current
+    webMapId.current,
   );
   return (
     <>
@@ -65,9 +64,12 @@ const Header: React.FC<HeaderProps> = ({
               key={`header-group-${i}`}
               selectionMode="none"
             >
-              <calcite-dropdown-item onClick={onOpenHelp}>
-                User Guide
-              </calcite-dropdown-item>
+              {group.title === "Help" && (
+                <calcite-dropdown-item onClick={onOpenHelp}>
+                  User Guide
+                </calcite-dropdown-item>
+              )}
+
               {group.links.map((link, j) => (
                 <calcite-dropdown-item
                   key={`header-link-${i}-${j}`}
