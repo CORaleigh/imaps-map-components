@@ -89,7 +89,7 @@ export const getSearchSources = async (
       addressTable,
       arcgisSearch,
       {
-        outFields: ["STREET", "ADDR_LIST"],
+        outFields: ["STREET"],
         orderByFields: ["STREET"],
         searchFields: ["STREET"],
         resultFields: ["STREET", "REA_REID", "OBJECTID"],
