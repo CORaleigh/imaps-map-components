@@ -216,4 +216,5 @@ export const getPrintTemplate = (
 export const hidePrintFrame = (mapElement: HTMLArcgisMapElement) => {
   const svg = mapElement.shadowRoot?.getElementById("printFrameSvg");
   svg?.remove();
+  handle?.remove();
 };
