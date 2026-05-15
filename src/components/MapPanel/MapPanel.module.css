@@ -10,20 +10,39 @@
 .customActions {
   position: absolute;
   left: 45px;
+  --calcite-action-bar-background-color: transparent;
 }
 
+
+.customActions calcite-action {
+  --calcite-action-background-color: var(--calcite-color-surface-2);
+  --calcite-action-background-color-hover:  var(--calcite-color-surface-2)
+  
+
+}
 .customActions calcite-action[active] {
   --calcite-action-background-color-press: var(--calcite-color-brand);
   --calcite-action-text-color-press: white;
+  --calcite-action-background-color: var(--calcite-color-surface-2);
+
 }
 
 .customActions calcite-action[active]:hover {
   --calcite-action-text-color-press: white;
+    --calcite-action-background-color-press: var(--calcite-color-brand);
+
+  
 }
 
 .customActions calcite-action:hover {
-  --calcite-action-text-color-press: var(--calcite-action-text-color);
+  --calcite-action-text-color-press: var(--calcite-action-text-color,);
+  --calcite-action-background-color: var(--calcite-color-surface-2);
+  --calcite-action-background-color-press: var(--calcite-color-surface-2);
+
+  
 }
+
+
 
 /* .customActions calcite-action {
   margin-bottom: var(--calcite-spacing-sm-plus);
