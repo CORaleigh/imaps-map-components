@@ -10,6 +10,7 @@
 .customActions {
   position: absolute;
   left: 45px;
+  top: -7px;
   --calcite-action-bar-background-color: transparent;
 }
 
