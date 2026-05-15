@@ -13,12 +13,14 @@ interface HeaderProps {
   theme: "dark" | "light";
   appSize: "small" | "medium" | "large";
   onOpenDisclaimer: () => void;
+  onOpenHelp: () => void;
 }
 
 const Header: React.FC<HeaderProps> = ({
   theme,
   appSize,
-  onOpenDisclaimer
+  onOpenDisclaimer,
+  onOpenHelp
 }) => {
   const { webMapId } = useMap();
 
@@ -63,6 +65,9 @@ const Header: React.FC<HeaderProps> = ({
               key={`header-group-${i}`}
               selectionMode="none"
             >
+              <calcite-dropdown-item onClick={onOpenHelp}>
+                Help
+              </calcite-dropdown-item>
               {group.links.map((link, j) => (
                 <calcite-dropdown-item
                   key={`header-link-${i}-${j}`}

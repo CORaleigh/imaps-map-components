@@ -17,6 +17,7 @@ import Header from "../Header";
 import MapPanel from "../MapPanel";
 import { useDisclaimer } from "../Disclaimer/useDisclaimer";
 import Disclaimer from "../Disclaimer";
+import Help from "../Header/Help";
 
 // -------------------- Panels --------------------
 interface PanelProps {
@@ -56,6 +57,7 @@ const Shell: React.FC = () => {
     mapMode,
     appSize,
     coordinateConversionOpen,
+    showHelp,
     handleThemeClick,
     handlePanelActionClick,
     handlePanelClose,
@@ -67,11 +69,13 @@ const Shell: React.FC = () => {
     handleGoToHome,
     handleCoordinateExpandChange,
     handleExpandChange,
+    handleHelpClosed,
+    handleHelpOpened,
     mapElement,
     mapReady,
   } = useShell();
-  const { open, checkbox, handleDialogClose, handleDialogOpen } =
-    useDisclaimer();
+  const { open, checkbox, handleDialogClose, handleDialogOpen } = useDisclaimer();
+
   // -------------------- Prefetch all lazy panels/tools --------------------
   useEffect(() => {
     const panels = [PropertySearch, LayerList, Legend, Basemaps, Bookmarks];
@@ -81,12 +85,11 @@ const Shell: React.FC = () => {
   return (
     <>
       <calcite-shell className={appSize} contentBehind={appSize === "small"}>
-        <Header theme={theme} appSize={appSize} onOpenDisclaimer={handleDialogOpen}></Header>
+        <Header theme={theme} appSize={appSize} onOpenDisclaimer={handleDialogOpen} onOpenHelp={handleHelpOpened}></Header>
         {!mapReady && <calcite-scrim loading></calcite-scrim>}
 
         <calcite-shell-panel
           slot="panel-end"
-          position="end"
           collapsed={!activePanel}
           width="l"
           resizable={appSize === "large"}
@@ -323,6 +326,10 @@ const Shell: React.FC = () => {
         checkbox={checkbox}
         onClose={handleDialogClose}
       ></Disclaimer>
+      <Help
+        open={showHelp}
+        onClose={handleHelpClosed}
+      ></Help>      
     </>
   );
 };

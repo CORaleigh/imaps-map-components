@@ -55,6 +55,9 @@ export interface UseShellProps {
   handleExpandChange: (
     event: HTMLArcgisExpandElement["arcgisPropertyChange"],
   ) => void;
+  handleHelpClosed: () => void;
+  handleHelpOpened: () => void;
+  showHelp: boolean;
   mapReady: boolean;
 }
 
@@ -83,7 +86,7 @@ export const useShell = (): UseShellProps => {
   const [openedTools, setOpenedTools] = useState<ToolType[]>([]);
   const [coordinateConversionOpen, setCoordinateConversionOpen] =
     useState<boolean>(false);
-
+  const [showHelp, setShowHelp] = useState<boolean>(false);
   const handleThemeClick = useCallback(() => {
     setTheme((prev: "light" | "dark") => {
       const newTheme = prev === "light" ? "dark" : "light";
@@ -209,6 +212,12 @@ export const useShell = (): UseShellProps => {
     });
   };
 
+  const handleHelpClosed = () => {
+    setShowHelp(false);
+  };
+  const handleHelpOpened = () => {
+    setShowHelp(true);
+  };
   useEffect(() => {
     if (appSize !== "large" && activePanel && activeTool) {
       setActiveTool(null);
@@ -230,6 +239,7 @@ export const useShell = (): UseShellProps => {
     mapMode,
     appSize,
     coordinateConversionOpen,
+    showHelp,
     handleThemeClick,
     handlePanelActionClick,
     handlePanelClose,
@@ -241,6 +251,8 @@ export const useShell = (): UseShellProps => {
     handleGoToHome,
     handleCoordinateExpandChange,
     handleExpandChange,
+    handleHelpClosed,
+    handleHelpOpened,
     mapReady,
   };
 };
