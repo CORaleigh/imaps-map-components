@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import "@esri/calcite-components/components/calcite-dialog";
 import "@esri/calcite-components/components/calcite-label";
 import "@esri/calcite-components/components/calcite-list";
@@ -18,30 +19,8 @@ interface HelpSection {
   id: string;
   title: string;
   sections?: HelpSection[];
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   icon?: any;
 }
-// interface FaqItem {
-//   id: string;
-//   question: string;
-//   answer?: string;
-//   list?: string[];
-//   link?: FaqLink;
-// }
-// interface FaqLink {
-//   label: string;
-//   url: string;
-// }
-// interface FaqSection {
-//   id: string;
-//   title: string;
-//   faqs: FaqItem[];
-// }
-
-// interface FaqData {
-//   sections: FaqSection[];
-// }
-
 interface HelpProps {
   open: boolean;
   onClose: () => void;
@@ -466,7 +445,8 @@ export default function Help({ open, onClose }: HelpProps) {
               view a popup with details about the feature.
             </p>
 
-            <h3  className={styles.header} id="streetview-tool">Streetview Tool </h3>
+              Identify Tool <calcite-icon icon={"360-view" as any}></calcite-icon>
+            <h3  className={styles.header} id="streetview-tool">Streetview Tool  </h3>
             <p>
               The street view tool allows you to press on the map to view that
               location in Google Streetview in a new browser tab.
