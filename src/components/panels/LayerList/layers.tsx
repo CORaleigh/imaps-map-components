@@ -115,8 +115,8 @@ export const watchLayerList = (item: ListItem, id: string) => {
   reactiveUtils.watch(
     () => item.layer?.visible === true,
     (visible: boolean) => {
-      if (item.panel){
-      item.panel.visible = visible;
+      if (item.panel) {
+        item.panel.visible = visible;
       }
       if (item.layer && item.layer.parent && item.parent) {
 

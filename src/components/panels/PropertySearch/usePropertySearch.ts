@@ -25,6 +25,7 @@ import type Graphic from "@arcgis/core/Graphic";
 
 import type Layer from "@arcgis/core/layers/Layer";
 import type { ObjectId } from "@arcgis/core/views/types";
+import type { ResourceHandle } from "@arcgis/core/core/Handles";
 
 export interface UsePropertySearchProps {
   mapElement: React.RefObject<HTMLArcgisMapElement>;
@@ -70,6 +71,8 @@ export interface UsePropertySearchProps {
   handleNextPropertySelected: (feature: Graphic) => void;
   handleTabClick: () => void;
 }
+
+let highlightHandle: ResourceHandle;
 export const usePropertySearch = (
   mapElement: React.RefObject<HTMLArcgisMapElement>,
 ): UsePropertySearchProps => {
@@ -124,6 +127,7 @@ export const usePropertySearch = (
   const handleTableReady = useCallback(
     async (event: HTMLArcgisFeatureTableElement["arcgisReady"]) => {
       event.target.tableTitle = `0 properties selected`;
+      event.target.highlightDisabled = true;
       event.target.noDataMessage = "";
       const layer = await createTableLayer(mapElement.current);
       if (!layer) return;
@@ -144,7 +148,17 @@ export const usePropertySearch = (
           max-width: 150px;
         }         
       `;
-
+      const layerView = await mapElement.current.whenLayerView(layer);
+event.target.highlightIds.on("change", () => {
+  highlightHandle?.remove();
+  
+  if (event.target.highlightIds.length > 0) {
+    highlightHandle = layerView.highlight(
+      event.target.highlightIds.toArray(),
+      { name: "property-hightlight" }   // your custom color
+    );
+  }
+});
       grid?.appendChild(style);
       await mapElement.current.whenLayerView(tableLayerRef.current);
       setSearchReady(true);

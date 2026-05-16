@@ -6,23 +6,20 @@ import Color from "@arcgis/core/Color";
 import Field from "@arcgis/core/layers/support/Field";
 import { getTableByTitle } from "../../../utils/layerHelper";
 import type FieldInfo from "@arcgis/core/popup/FieldInfo";
-import type FeatureLayerView from "@arcgis/core/views/layers/FeatureLayerView";
-import type { LayerLayerviewCreateEvent } from "@arcgis/core/layers/Layer";
-
-
 
 export const createTableLayer = async (mapElement: HTMLArcgisMapElement) => {
   if (!mapElement || !mapElement.view.map) return;
   console.log(mapElement.view.ready);
   const table: FeatureLayer = getTableByTitle(
     mapElement,
-    "Condos"
+    "Condos",
   ) as FeatureLayer;
   if (!table) {
     console.error("Condos table not in web map");
     return;
   }
   await table.load();
+  
   const copyTable = new FeatureLayer({
     source: [],
     fields: table.fields,
@@ -81,23 +78,10 @@ export const createTableLayer = async (mapElement: HTMLArcgisMapElement) => {
       name: "selected",
       defaultValue: "no",
       length: 3,
-    })
+    }),
   );
   mapElement.view.map.add(copyTable);
 
-  copyTable.on(
-    "layerview-create",
-    (event: LayerLayerviewCreateEvent) => {
-      if (event.layerView.layer.type === "feature") {
-        const layerView: FeatureLayerView =
-          event.layerView as FeatureLayerView;
-        layerView.highlightOptions = {
-          color: new Color("red"),
-          fillOpacity: 0.5,
-        };
-      }
-    }
-  );
   await copyTable.load();
   mapElement?.map?.add(copyTable);
   return copyTable;
@@ -105,13 +89,13 @@ export const createTableLayer = async (mapElement: HTMLArcgisMapElement) => {
 
 export const getTableTemplate = (
   layer: FeatureLayer,
-  webMapId: string
+  webMapId: string,
 ): TableTemplate => {
   const tableTemplate: TableTemplate = new TableTemplate({
     columnTemplates: [],
   });
   const storedFields = JSON.parse(
-    window.localStorage.getItem(`imaps_${webMapId}_visibleColumns`) as string
+    window.localStorage.getItem(`imaps_${webMapId}_visibleColumns`) as string,
   );
   const ignoreFields = ["PARCELPK", "GlobalID", "OBJECTID"];
   const showColumns = ["SITE_ADDRESS", "OWNER", "REID", "PIN_NUM", "PIN_EXT"];
@@ -151,7 +135,7 @@ export const getTableTemplate = (
               : showColumns.includes(field.fieldName)
             : false,
           editable: false,
-        })
+        }),
       );
     }
   });

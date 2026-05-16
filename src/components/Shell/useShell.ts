@@ -9,6 +9,8 @@ import { constraints } from "../../utils/constraints";
 import MapViewConstraints from "@arcgis/core/views/2d/MapViewConstraints.js";
 import type SceneView from "@arcgis/core/views/SceneView";
 import type MapView from "@arcgis/core/views/MapView";
+import Color from "@arcgis/core/Color";
+import HighlightOptions from "@arcgis/core/views/support/HighlightOptions";
 
 export type PanelType =
   | "propertySearch"
@@ -153,6 +155,7 @@ export const useShell = (): UseShellProps => {
       event.target.view.extent = JSON.parse(storedExtent);
     }
     await event.target.view.when();
+    event.target.highlights.push( new HighlightOptions({color: new Color("red"), name: "property-highlight"}));
 
     setMapReady(true);
     event.target.addEventListener("arcgisViewChange", handleViewChange);
