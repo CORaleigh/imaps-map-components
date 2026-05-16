@@ -55,7 +55,7 @@ const SearchInput: React.FC<SearchInputProps> = ({
         id="history-popover-button"
         icon="clock"
         text="History"
-        scale="s"
+        scale="m"
       ></calcite-action>
       <calcite-tooltip closeOnClick referenceElement="history-popover-button">
         Search History
@@ -64,7 +64,7 @@ const SearchInput: React.FC<SearchInputProps> = ({
         id="search-clear-button"
         icon="trash"
         text="Clear"
-        scale="s"
+        scale="m"
         onClick={onClear}
       ></calcite-action>
       <calcite-tooltip closeOnClick referenceElement="search-clear-button">
