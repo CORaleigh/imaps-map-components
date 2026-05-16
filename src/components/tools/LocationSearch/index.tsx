@@ -1,6 +1,5 @@
 import React from "react";
 import "@esri/calcite-components/components/calcite-panel";
-import "@esri/calcite-components/components/calcite-block";
 import "@arcgis/map-components/components/arcgis-search";
 import "@esri/calcite-components/components/calcite-combobox";
 import "@esri/calcite-components/components/calcite-combobox-item";
@@ -39,7 +38,7 @@ const LocationSearch: React.FC<LocationSearchProps> = ({
       collapsible
     >
       <TipManager name="location-search"></TipManager>
-      <calcite-block expanded>
+      <div className={styles.locationContainer}>
         <arcgis-search
           className={styles.searchContainer}
           referenceElement={mapElement.current}
@@ -66,7 +65,7 @@ const LocationSearch: React.FC<LocationSearchProps> = ({
             ))}
           </calcite-combobox>
         )}
-      </calcite-block>
+      </div>
     </calcite-panel>
   );
 };

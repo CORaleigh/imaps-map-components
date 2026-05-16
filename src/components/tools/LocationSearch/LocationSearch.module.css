@@ -4,3 +4,7 @@
 .searchContainer {
   width: 100%;
 }
+
+.locationContainer {
+  margin: 1em;
+}
