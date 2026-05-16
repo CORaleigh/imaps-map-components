@@ -93,7 +93,7 @@ export const useCoordinateConversion = (
   const initializedRef = useRef<boolean>(false);
   const graphicsLayer = useRef<GraphicsLayer>(undefined);
   const inputRef = useRef<HTMLCalciteInputTextElement>(null);
-  const [display, setDisplay] = useState("");
+  const [display, setDisplay] = useState("- -");
   const [showSearch, setShowSearch] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [expanded, setExpanded] = useState(false);
@@ -295,7 +295,6 @@ export const useCoordinateConversion = (
     },
     [],
   );
-
   // Format DMS string from "35 50 44.618N 078 39 15.710W" → "35°50'44.618"N 78°39'15.710"W"
   const formatDMSString = (input: string): string => {
     // ex input: "35 50 44.618N 078 39 15.710W"
@@ -328,6 +327,12 @@ export const useCoordinateConversion = (
     const mapEl = mapElement.current;
     if (!mapEl || !isOpen) return;
 
+    (async () => {
+      const mapPoint = webMercatorUtils.webMercatorToGeographic(
+        mapElement.current.center,
+      ) as Point;
+      setDisplay(await convertMapPoint(mapPoint));
+    })();
     if (!pointerMoveHandlerRef.current) {
       pointerMoveHandlerRef.current = async (
         event: HTMLArcgisMapElement["arcgisViewPointerMove"],
