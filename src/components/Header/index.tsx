@@ -52,6 +52,7 @@ const Header: React.FC<HeaderProps> = ({
             text="Menu"
             icon="hamburger"
             slot="trigger"
+            scale="l"
           ></calcite-action>
           <calcite-dropdown-group groupTitle="About" selectionMode="none">
             <calcite-dropdown-item onClick={onOpenDisclaimer}>
