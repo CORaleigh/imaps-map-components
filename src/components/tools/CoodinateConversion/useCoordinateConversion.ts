@@ -327,12 +327,6 @@ export const useCoordinateConversion = (
     const mapEl = mapElement.current;
     if (!mapEl || !isOpen) return;
 
-    (async () => {
-      const mapPoint = webMercatorUtils.webMercatorToGeographic(
-        mapElement.current.center,
-      ) as Point;
-      setDisplay(await convertMapPoint(mapPoint));
-    })();
     if (!pointerMoveHandlerRef.current) {
       pointerMoveHandlerRef.current = async (
         event: HTMLArcgisMapElement["arcgisViewPointerMove"],
