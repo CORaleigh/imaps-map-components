@@ -149,16 +149,16 @@ export const usePropertySearch = (
         }         
       `;
       const layerView = await mapElement.current.whenLayerView(layer);
-event.target.highlightIds.on("change", () => {
-  highlightHandle?.remove();
-  
-  if (event.target.highlightIds.length > 0) {
-    highlightHandle = layerView.highlight(
-      event.target.highlightIds.toArray(),
-      { name: "property-hightlight" }   // your custom color
-    );
-  }
-});
+      event.target.highlightIds.on("change", () => {
+        highlightHandle?.remove();
+
+        if (event.target.highlightIds.length > 0) {
+          highlightHandle = layerView.highlight(
+            event.target.highlightIds.toArray(),
+            { name: "property-hightlight" }, // your custom color
+          );
+        }
+      });
       grid?.appendChild(style);
       await mapElement.current.whenLayerView(tableLayerRef.current);
       setSearchReady(true);
@@ -310,7 +310,9 @@ event.target.highlightIds.on("change", () => {
       }
     }
   };
-  const handleSearchComplete = async (event: HTMLArcgisSearchElement["arcgisSearchComplete"]) => {
+  const handleSearchComplete = async (
+    event: HTMLArcgisSearchElement["arcgisSearchComplete"],
+  ) => {
     if (mapElement.current) {
       if (event.detail.numResults === 0) {
         if (event.detail.searchTerm.length > 2) {
@@ -463,6 +465,13 @@ event.target.highlightIds.on("change", () => {
     setSelectedCondo(null);
     setCondos([]);
     setSelectedTab("list");
+    const params = new URLSearchParams(window.location.search);
+    params.delete("pin");
+    window.history.replaceState(
+      {},
+      "",
+      `${window.location.pathname}?${params}`,
+    );
   };
 
   const handleHistoryClick = (
