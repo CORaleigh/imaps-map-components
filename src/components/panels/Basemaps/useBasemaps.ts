@@ -2,6 +2,7 @@ import PortalBasemapsSource from "@arcgis/core/widgets/BasemapGallery/support/Po
 import {
   useCallback,
   useEffect,
+  useMemo,
   useRef,
   useState,
   type RefObject,
@@ -57,30 +58,36 @@ export const useBasemaps = (
 
   const [blendEnabled, setBlendEnabled] = useState(false);
   const [showBlendOption, setShowBlendOption] = useState(false);
-  const mapsSource = new PortalBasemapsSource({
-    portal: {
-      url: "https://ral.maps.arcgis.com",
-    },
-    query: "id: f6329364e80c438a958ce74aadc3a89f",
-  });
-  const imageSource = new PortalBasemapsSource({
-    portal: {
-      url: "https://ral.maps.arcgis.com",
-    },
-    query: "id: 492386759d264d49948bf7f83957ddb9",
-    filterFunction: async (item: Basemap) => {
-      await item.load();
-      if (item.portalItem?.tags?.includes("countywide")) return true;
-      const inRaleigh = intersectsOperator.execute(
-        raleighBoundary,
-        mapElement.current.extent,
-      );
-      return inRaleigh;
-    },
-    updateBasemapsCallback: (items: Basemap[]) => {
-      return items.reverse();
-    },
-  });
+  const mapsSource = useMemo(
+    () =>
+      new PortalBasemapsSource({
+        portal: { url: "https://ral.maps.arcgis.com" },
+        query: "id: f6329364e80c438a958ce74aadc3a89f",
+      }),
+    [],
+  );
+  const imageSource = useMemo(
+    () =>
+      new PortalBasemapsSource({
+        portal: {
+          url: "https://ral.maps.arcgis.com",
+        },
+        query: "id: 492386759d264d49948bf7f83957ddb9",
+        filterFunction: async (item: Basemap) => {
+          await item.load();
+          if (item.portalItem?.tags?.includes("countywide")) return true;
+          const inRaleigh = intersectsOperator.execute(
+            raleighBoundary,
+            mapElement.current.extent,
+          );
+          return inRaleigh;
+        },
+        updateBasemapsCallback: (items: Basemap[]) => {
+          return items.reverse();
+        },
+      }),
+    [mapElement],
+  );
 
   const handleGalleryReady = async (
     event: HTMLArcgisBasemapGalleryElement["arcgisReady"],
@@ -124,15 +131,14 @@ export const useBasemaps = (
     event: HTMLCalciteTabNavElement["calciteTabChange"],
   ) => {
     if (!imagesGallery.current) return;
-      const active = imagesGallery.current?.activeBasemap;
+    const active = imagesGallery.current?.activeBasemap;
 
-      setShowBlendOption(
-        !!active &&
+    setShowBlendOption(
+      !!active &&
         imagesGallery.current?.source?.basemaps?.some(
-          (bm: Basemap) =>
-            bm.title === active
-        )
-      );
+          (bm: Basemap) => bm.title === active,
+        ),
+    );
     setSelectedTab(
       event.target.selectedTitle.getAttribute("label") as
         | "basemap"
@@ -162,7 +168,7 @@ export const useBasemaps = (
         if (!blendLayer.current) {
           blendLayer.current = new VectorTileLayer({
             portalItem: { id: "02d50d24991747538e218e0a5806e9b3" },
-            opacity: blendSlider.current.value as number / 100 as number,
+            opacity: ((blendSlider.current.value as number) / 100) as number,
           });
         }
 
@@ -174,11 +180,11 @@ export const useBasemaps = (
       // TURN BLEND OFF
       else {
         if (blendLayer.current) {
-          
-          mapElement.current.view.map?.basemap?.baseLayers.remove(blendLayer.current);
+          mapElement.current.view.map?.basemap?.baseLayers.remove(
+            blendLayer.current,
+          );
         }
       }
-
     },
     [mapElement],
   );
@@ -187,17 +193,23 @@ export const useBasemaps = (
     (event: HTMLArcgisBasemapGalleryElement["arcgisPropertyChange"]) => {
       console.log("Gallery property changed:", event);
       if (blendLayer.current) {
-          mapElement.current.view.map?.basemap?.baseLayers.remove(blendLayer.current);
-          setBlendEnabled(false);
+        mapElement.current.view.map?.basemap?.baseLayers.remove(
+          blendLayer.current,
+        );
+        setBlendEnabled(false);
       }
       setShowBlendOption(!!imagesGallery.current?.activeBasemap);
-    }, [mapElement])
+    },
+    [mapElement],
+  );
   const handleSliderInput = useCallback(
     (event: HTMLCalciteSliderElement["calciteSliderInput"]) => {
       if (blendLayer.current) {
-        blendLayer.current.opacity = event.currentTarget.value as number/ 100 as number;
-      } 
-    },    [],
+        blendLayer.current.opacity = ((event.currentTarget.value as number) /
+          100) as number;
+      }
+    },
+    [],
   );
 
   useEffect(() => {
@@ -265,6 +277,6 @@ export const useBasemaps = (
     handleSliderInput,
     handleGalleryChange,
     blendEnabled,
-    showBlendOption
+    showBlendOption,
   };
 };
