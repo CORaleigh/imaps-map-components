@@ -156,7 +156,7 @@ export const usePropertySearch = (
         if (event.target.highlightIds.length > 0) {
           highlightHandle.current = layerView.highlight(
             event.target.highlightIds.toArray(),
-            { name: "property-hightlight" }, // your custom color
+            { name: "property-highlight" }, // your custom color
           );
         }
       });
