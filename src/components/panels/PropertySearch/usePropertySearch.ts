@@ -72,7 +72,6 @@ export interface UsePropertySearchProps {
   handleTabClick: () => void;
 }
 
-let highlightHandle: ResourceHandle;
 export const usePropertySearch = (
   mapElement: React.RefObject<HTMLArcgisMapElement>,
 ): UsePropertySearchProps => {
@@ -81,6 +80,8 @@ export const usePropertySearch = (
   const addressTableElement = useRef<HTMLArcgisFeatureTableElement>(null!);
   const searchElement = useRef<HTMLArcgisSearchElement>(null!);
   const tableLayerRef = useRef<FeatureLayer>(undefined);
+  const highlightHandle = useRef<ResourceHandle | null>(null);
+
   const {
     condos,
     setCondos,
@@ -150,10 +151,10 @@ export const usePropertySearch = (
       `;
       const layerView = await mapElement.current.whenLayerView(layer);
       event.target.highlightIds.on("change", () => {
-        highlightHandle?.remove();
+        highlightHandle.current?.remove();
 
         if (event.target.highlightIds.length > 0) {
-          highlightHandle = layerView.highlight(
+          highlightHandle.current = layerView.highlight(
             event.target.highlightIds.toArray(),
             { name: "property-hightlight" }, // your custom color
           );
