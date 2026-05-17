@@ -160,7 +160,7 @@ export const usePropertySearch = (
           );
         }
       });
-      grid?.appendChild(style);
+      if(grid) grid.appendChild(style);
       await mapElement.current.whenLayerView(tableLayerRef.current);
       setSearchReady(true);
       reactiveUtils.watch(
@@ -173,8 +173,7 @@ export const usePropertySearch = (
         },
       );
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [mapElement, webMapId],
+    [mapElement, setSearchReady, webMapId],
   );
 
   const handleTableCellClick = async (
@@ -468,10 +467,11 @@ export const usePropertySearch = (
     setSelectedTab("list");
     const params = new URLSearchParams(window.location.search);
     params.delete("pin");
+    const query = params.toString();
     window.history.replaceState(
       {},
       "",
-      `${window.location.pathname}?${params}`,
+      query ? `${window.location.pathname}?${query}` : window.location.pathname,
     );
   };
 
