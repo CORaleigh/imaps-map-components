@@ -8,12 +8,12 @@ import "@esri/calcite-components/components/calcite-tooltip";
 import styles from "./CoordinateConversion.module.css";
 
 import { useCoordinateConversion } from "./useCoordinateConversion";
-interface CoodinateConversionProps {
+interface CoordinateConversionProps {
   mapElement: React.RefObject<HTMLArcgisMapElement>;
   isOpen: boolean;
 }
 
-const CoodinateConversion: React.FC<CoodinateConversionProps> = ({
+const CoordinateConversion: React.FC<CoordinateConversionProps> = ({
   mapElement,
   isOpen,
 }) => {
@@ -155,4 +155,4 @@ const CoodinateConversion: React.FC<CoodinateConversionProps> = ({
   );
 };
 
-export default CoodinateConversion;
+export default CoordinateConversion;

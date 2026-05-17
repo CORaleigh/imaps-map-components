@@ -11,7 +11,7 @@ import "@arcgis/map-components/components/arcgis-scale-bar";
 
 import { lazyWithPreload } from "../../utils/lazyLoad";
 import OverviewMap from "../tools/OverviewMap";
-import CoodinateConversion from "../tools/CoodinateConversion";
+import CoordinateConversion from "../tools/CoordinateConversion";
 import type { MapMode } from "../../context/MapContext";
 import type { ToolType } from "../Shell/useShell";
 
@@ -135,10 +135,10 @@ const MapPanel: React.FC<MapPanelProps> = ({
         aria-label="Coodinate Conversion"
       >
         {mapElement.current?.map && (
-          <CoodinateConversion
+          <CoordinateConversion
             mapElement={mapElement}
             isOpen={coordinateConversionOpen}
-          ></CoodinateConversion>
+          ></CoordinateConversion>
         )}
       </arcgis-expand>
 
