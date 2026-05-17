@@ -7,8 +7,7 @@ import type { MapMode } from "../../context/MapContext";
 import { constraints } from "../../utils/constraints";
 
 import MapViewConstraints from "@arcgis/core/views/2d/MapViewConstraints.js";
-import type SceneView from "@arcgis/core/views/SceneView";
-import type MapView from "@arcgis/core/views/MapView";
+
 import Color from "@arcgis/core/Color";
 import HighlightOptions from "@arcgis/core/views/support/HighlightOptions";
 
@@ -47,10 +46,7 @@ export interface UseShellProps {
     event: HTMLArcgisMapElement["arcgisViewReadyChange"],
   ) => void;
   handleViewHold: (event: HTMLArcgisMapElement["arcgisViewHold"]) => void;
-  handleGoToHome: (
-    view: MapView | SceneView,
-    goToParams: unknown,
-  ) => Promise<unknown>;
+  handleGoToHome: NonNullable<HTMLArcgisHomeElement["goToOverride"]>;
   handleCoordinateExpandChange: (
     event: HTMLArcgisExpandElement["arcgisPropertyChange"],
   ) => void;
@@ -174,16 +170,20 @@ export const useShell = (): UseShellProps => {
       setMapReady(true);
       event.target.addEventListener("arcgisViewChange", handleViewChange);
     },
-    [handleViewChange, setMapReady, webMapId],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [handleViewChange, webMapId],
   );
   const handleViewHold = useCallback(
     async (event: HTMLArcgisMapElement["arcgisViewHold"]) => {
       setGeometry(event.detail.mapPoint);
     },
-    [setGeometry],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
   );
 
-  const handleGoToHome = (view: MapView | SceneView) => {
+  const handleGoToHome: NonNullable<HTMLArcgisHomeElement["goToOverride"]> = (
+    view,
+  ) => {
     return view.goTo(
       new Extent({
         xmin: -8810106.471332055,

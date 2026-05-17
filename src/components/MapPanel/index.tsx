@@ -25,8 +25,7 @@ interface MapPanelProps {
   coordinateConversionOpen: boolean;
   onMapReady: (event: HTMLArcgisMapElement["arcgisViewReadyChange"]) => void;
   onViewHold: (event: HTMLArcgisMapElement["arcgisViewHold"]) => void;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  onGoHome: any;
+  onGoHome: HTMLArcgisHomeElement["goToOverride"];
   onCustomActionClick: (action: "identify" | "streetview" | null) => void;
   onCoordinateExpand: (
     event: HTMLArcgisExpandElement["arcgisPropertyChange"],
