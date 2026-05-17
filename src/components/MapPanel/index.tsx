@@ -1,6 +1,7 @@
 import React, { Suspense, useEffect } from "react";
 
 import "@arcgis/map-components/components/arcgis-map";
+import "@arcgis/map-components/components/arcgis-popup";
 import "@arcgis/map-components/components/arcgis-expand";
 import "@arcgis/map-components/components/arcgis-home";
 import "@arcgis/map-components/components/arcgis-zoom";
@@ -86,6 +87,7 @@ const MapPanel: React.FC<MapPanelProps> = ({
         onarcgisViewReadyChange={onMapReady}
         onarcgisViewHold={onViewHold}
       >
+        <arcgis-popup slot="popup"></arcgis-popup>
         <arcgis-zoom slot="top-left"></arcgis-zoom>
         <arcgis-home slot="top-left" goToOverride={onGoHome}></arcgis-home>
         <arcgis-compass slot="top-left"></arcgis-compass>
