@@ -1,4 +1,4 @@
-import React, { Suspense, useEffect } from "react";
+import React, { Suspense } from "react";
 
 import "@esri/calcite-components/components/calcite-shell";
 import "@esri/calcite-components/components/calcite-shell-panel";
@@ -11,7 +11,7 @@ import "@esri/calcite-components/components/calcite-action";
 import "@esri/calcite-components/components/calcite-scrim";
 
 import { useShell } from "./useShell";
-import { lazyWithPreload } from "../../utils/lazyLoad";
+import { lazy } from "react";
 import Header from "../Header";
 
 import MapPanel from "../MapPanel";
@@ -19,33 +19,14 @@ import { useDisclaimer } from "../Disclaimer/useDisclaimer";
 import Disclaimer from "../Disclaimer";
 import Help from "../Header/Help";
 
-// -------------------- Panels --------------------
-interface PanelProps {
-  mapElement: React.RefObject<HTMLArcgisMapElement>;
-  onPanelClose: () => void;
-  closed: boolean;
-}
 
-// Lazy-loaded panels with preload
-export const PropertySearch = lazyWithPreload<PanelProps>(
-  () => import("../panels/PropertySearch/PropertySearch")
-);
 
-export const LayerList = lazyWithPreload<PanelProps>(
-  () => import("../panels/LayerList")
-);
-
-export const Legend = lazyWithPreload<PanelProps>(
-  () => import("../panels/Legend")
-);
-
-export const Basemaps = lazyWithPreload<PanelProps>(
-  () => import("../panels/Basemaps")
-);
-
-export const Bookmarks = lazyWithPreload<PanelProps>(
-  () => import("../panels/Bookmarks")
-);
+// Lazy-loaded panels
+export const PropertySearch = lazy(() => import("../panels/PropertySearch/PropertySearch"));
+export const LayerList = lazy(() => import("../panels/LayerList"));
+export const Legend = lazy(() => import("../panels/Legend"));
+export const Basemaps = lazy(() => import("../panels/Basemaps"));
+export const Bookmarks = lazy(() => import("../panels/Bookmarks"));
 
 const Shell: React.FC = () => {
   const {
@@ -76,11 +57,6 @@ const Shell: React.FC = () => {
   } = useShell();
   const { open, checkbox, handleDialogClose, handleDialogOpen } = useDisclaimer();
 
-  // -------------------- Prefetch all lazy panels/tools --------------------
-  useEffect(() => {
-    const panels = [PropertySearch, LayerList, Legend, Basemaps, Bookmarks];
-    panels.forEach((p) => p.preload?.());
-  }, []);
 
   return (
     <>

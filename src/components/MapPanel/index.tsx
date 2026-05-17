@@ -1,4 +1,4 @@
-import React, { Suspense, useEffect } from "react";
+import React, { Suspense } from "react";
 
 import "@arcgis/map-components/components/arcgis-map";
 import "@arcgis/map-components/components/arcgis-popup";
@@ -9,7 +9,7 @@ import "@arcgis/map-components/components/arcgis-compass";
 import "@arcgis/map-components/components/arcgis-track";
 import "@arcgis/map-components/components/arcgis-scale-bar";
 
-import { lazyWithPreload } from "../../utils/lazyLoad";
+import { lazy } from "react";
 import OverviewMap from "../tools/OverviewMap";
 import CoordinateConversion from "../tools/CoordinateConversion";
 import type { MapMode } from "../../context/MapContext";
@@ -36,32 +36,14 @@ interface MapPanelProps {
   onToolClose: () => void;
 }
 
-// -------------------- Tools --------------------
-interface ToolProps {
-  mapElement: React.RefObject<HTMLArcgisMapElement>;
-  onToolClose: () => void;
-  closed: boolean;
-}
+
 
 // Lazy-loaded tools with preload
-export const PropertySelect = lazyWithPreload<ToolProps>(
-  () => import("../tools/PropertySelect"),
-);
-
-export const LocationSearch = lazyWithPreload<ToolProps>(
-  () => import("../tools/LocationSearch"),
-);
-
-export const Measure = lazyWithPreload<ToolProps>(
-  () => import("../tools/Measure"),
-);
-
-export const Sketch = lazyWithPreload<ToolProps>(
-  () => import("../tools/Sketch/Sketch"),
-);
-
-export const Print = lazyWithPreload<ToolProps>(() => import("../tools/Print"));
-
+const PropertySelect = lazy(() => import("../tools/PropertySelect"));
+const LocationSearch = lazy(() => import("../tools/LocationSearch"));
+const Measure = lazy(() => import("../tools/Measure"));
+const Sketch = lazy(() => import("../tools/Sketch/Sketch"));
+const Print = lazy(() => import("../tools/Print"));
 const MapPanel: React.FC<MapPanelProps> = ({
   mapElement,
   activeTool,
@@ -76,10 +58,10 @@ const MapPanel: React.FC<MapPanelProps> = ({
   onExpandChange,
   onToolClose,
 }) => {
-  useEffect(() => {
-    const tools = [PropertySelect, LocationSearch, Measure, Sketch, Print];
-    tools.forEach((t) => t.preload?.());
-  }, []);
+  // useEffect(() => {
+  //   const tools = [PropertySelect, LocationSearch, Measure, Sketch, Print];
+  //   tools.forEach((t) => t.preload?.());
+  // }, []);
 
   return (
     <arcgis-map
@@ -133,12 +115,10 @@ const MapPanel: React.FC<MapPanelProps> = ({
         mode="floating"
         aria-label="Coodinate Conversion"
       >
-        {mapElement.current?.map && (
-          <CoordinateConversion
-            mapElement={mapElement}
-            isOpen={coordinateConversionOpen}
-          ></CoordinateConversion>
-        )}
+        <CoordinateConversion
+          mapElement={mapElement}
+          isOpen={coordinateConversionOpen}
+        ></CoordinateConversion>
       </arcgis-expand>
 
       <arcgis-scale-bar slot="bottom-left"></arcgis-scale-bar>
