@@ -142,31 +142,6 @@ export const useShell = (): UseShellProps => {
     console.log("closing tool");
     setActiveTool(null);
   }, []);
-
-  const handleViewReady = async (
-    event: HTMLArcgisMapElement["arcgisViewReadyChange"],
-  ) => {
-    event.target.constraints = constraints as MapViewConstraints;
-
-    const storedExtent = localStorage.getItem(
-      `imaps_${webMapId.current}_extent`,
-    );
-    if (storedExtent) {
-      event.target.view.extent = JSON.parse(storedExtent);
-    }
-    await event.target.view.when();
-    event.target.highlights.push( new HighlightOptions({color: new Color("red"), name: "property-highlight"}));
-
-    setMapReady(true);
-    event.target.addEventListener("arcgisViewChange", handleViewChange);
-  };
-  const handleViewHold = useCallback(
-    async (event: HTMLArcgisMapElement["arcgisViewHold"]) => {
-      setGeometry(event.detail.mapPoint);
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [],
-  );
   const handleViewChange = useCallback(
     (event: HTMLArcgisMapElement["arcgisViewChange"]) => {
       //if (!mapReady) return;
@@ -178,6 +153,36 @@ export const useShell = (): UseShellProps => {
     },
     [webMapId],
   );
+  const handleViewReady = useCallback(
+    async (event: HTMLArcgisMapElement["arcgisViewReadyChange"]) => {
+      event.target.constraints = constraints as MapViewConstraints;
+
+      const storedExtent = localStorage.getItem(
+        `imaps_${webMapId.current}_extent`,
+      );
+      if (storedExtent) {
+        event.target.view.extent = JSON.parse(storedExtent);
+      }
+      await event.target.view.when();
+      event.target.highlights.push(
+        new HighlightOptions({
+          color: new Color("red"),
+          name: "property-highlight",
+        }),
+      );
+
+      setMapReady(true);
+      event.target.addEventListener("arcgisViewChange", handleViewChange);
+    },
+    [handleViewChange, setMapReady, webMapId],
+  );
+  const handleViewHold = useCallback(
+    async (event: HTMLArcgisMapElement["arcgisViewHold"]) => {
+      setGeometry(event.detail.mapPoint);
+    },
+    [setGeometry],
+  );
+
   const handleGoToHome = (view: MapView | SceneView) => {
     return view.goTo(
       new Extent({
@@ -222,11 +227,10 @@ export const useShell = (): UseShellProps => {
     setShowHelp(true);
   };
   useEffect(() => {
-    if (appSize !== "large" && activePanel && activeTool) {
+    if (appSize !== "large" && activePanel) {
       setActiveTool(null);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [appSize]);
+  }, [activePanel, appSize]);
 
   useEffect(() => {
     setActivePanel("propertySearch");
