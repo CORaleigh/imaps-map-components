@@ -193,16 +193,17 @@ export const useBasemaps = (
   );
 
   const handleGalleryChange = useCallback(
-  () => {
-    if (blendLayer.current) {
-      mapElement.current.view.map?.basemap?.baseLayers.remove(blendLayer.current);
-      setBlendEnabled(false);
-      if (blendSlider.current) blendSlider.current.hidden = true; // sync slider
-    }
-    setShowBlendOption(!!imagesGallery.current?.activeBasemap);
-  },
-  [mapElement]
-);
+    () => {
+      if (blendLayer.current) {
+        mapElement.current.view.map?.basemap?.baseLayers.remove(
+          blendLayer.current,
+        );
+        setBlendEnabled(false);
+      }
+      setShowBlendOption(!!imagesGallery.current?.activeBasemap);
+    },
+    [mapElement],
+  );
   const handleSliderInput = useCallback(
     (event: HTMLCalciteSliderElement["calciteSliderInput"]) => {
       if (blendLayer.current) {
