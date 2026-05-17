@@ -51,6 +51,7 @@ export const useBasemaps = (
   const blendSlider = useRef<HTMLCalciteSliderElement>(null);
   const wasInRaleigh = useRef<boolean>(false);
   const blendLayer = useRef<VectorTileLayer | null>(null);
+
   const [selectedTab, setSelectedTab] = useState<"basemap" | "images" | "esri">(
     "basemap",
   );
@@ -93,7 +94,9 @@ export const useBasemaps = (
     event: HTMLArcgisBasemapGalleryElement["arcgisReady"],
   ) => {
     const gallery = event.target;
-    await reactiveUtils.whenOnce(() => gallery.source.basemaps.length > 0);
+    await reactiveUtils.whenOnce(
+      () => gallery.source.basemaps.length > 0,
+    );
 
     const selected = gallery.source.basemaps.find(
       (basemap) =>
@@ -190,23 +193,21 @@ export const useBasemaps = (
   );
 
   const handleGalleryChange = useCallback(
-    (event: HTMLArcgisBasemapGalleryElement["arcgisPropertyChange"]) => {
-      console.log("Gallery property changed:", event);
-      if (blendLayer.current) {
-        mapElement.current.view.map?.basemap?.baseLayers.remove(
-          blendLayer.current,
-        );
-        setBlendEnabled(false);
-      }
-      setShowBlendOption(!!imagesGallery.current?.activeBasemap);
-    },
-    [mapElement],
-  );
+  () => {
+    if (blendLayer.current) {
+      mapElement.current.view.map?.basemap?.baseLayers.remove(blendLayer.current);
+      setBlendEnabled(false);
+      if (blendSlider.current) blendSlider.current.hidden = true; // sync slider
+    }
+    setShowBlendOption(!!imagesGallery.current?.activeBasemap);
+  },
+  [mapElement]
+);
   const handleSliderInput = useCallback(
     (event: HTMLCalciteSliderElement["calciteSliderInput"]) => {
       if (blendLayer.current) {
-        blendLayer.current.opacity = ((event.currentTarget.value as number) /
-          100) as number;
+        blendLayer.current.opacity =
+          (event.currentTarget.value as number) / 100;
       }
     },
     [],
@@ -217,7 +218,7 @@ export const useBasemaps = (
     // Initialize basemap logic only once
     initializedRef.current = true;
 
-    reactiveUtils.watch(
+    const handle = reactiveUtils.watch(
       () => mapElement.current.stationary,
       async (stationary) => {
         if (!imagesGallery.current) return;
@@ -259,7 +260,7 @@ export const useBasemaps = (
         }
       },
     );
-    // return () => handle.remove(); // cleanup
+    return () => handle.remove(); // cleanup
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mapElement]);
 
