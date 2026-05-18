@@ -572,7 +572,7 @@ export const usePropertySearch = (
       const address = await executeArcade(arcade, selectedCondo);
       setSiteAddress(address as string);
     })();
-  }, [mapElement, selectedCondo, setSiteAddress]);
+  }, [mapElement, selectedCondo]);
 
   return {
     mapElement,

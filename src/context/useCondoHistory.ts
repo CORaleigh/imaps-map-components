@@ -91,5 +91,5 @@ export function useCondoHistory({
 
     window.addEventListener("popstate", onPopState);
     return () => window.removeEventListener("popstate", onPopState);
-  }, [mapElementRef, searchCondos, setSelectedCondo, setCondos]);
+  }, [mapElementRef, searchCondos, setCondos]);
 }

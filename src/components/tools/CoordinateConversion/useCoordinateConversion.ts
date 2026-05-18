@@ -391,7 +391,8 @@ export const useCoordinateConversion = (
       );
       mapEl.removeEventListener("arcgisViewClick", clickHandlerRef.current!);
     };
-  }, [mapElement, isOpen, mode, convertMapPoint, setMapMode]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mapElement, isOpen, mode, convertMapPoint]);
 
   useEffect(() => {
     if (!mapElement.current.map || initializedRef.current) return;
@@ -409,7 +410,8 @@ export const useCoordinateConversion = (
       graphicsLayer.current?.removeAll();
       setMapMode("identify");
     }
-  }, [isOpen, setMapMode]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen]);
 
   return {
     display,
