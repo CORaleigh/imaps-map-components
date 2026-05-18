@@ -88,9 +88,8 @@ export const usePropertySelect = (
 
   const cancelSelect = useCallback(() => {
     sketchViewModel.current?.cancel();
-    if (highlight) {
-      highlight.current?.remove();
-    }
+    highlight.current?.remove();
+
     graphicsLayer.current?.removeAll();
   }, []);
 
@@ -220,7 +219,7 @@ export const usePropertySelect = (
     cancelSelect();
     setMapMode(null);
     onToolClose();
-  }, [setMapMode]);
+  }, [setMapMode, onToolClose]);
 
   const handleBufferProperty = useCallback(async () => {
     if (bufferDistance > 0 && selectedCondo?.geometry) {
