@@ -5,11 +5,12 @@ import styles from "./OverviewMap.module.css";
 
 interface OverviewMapProps {
   mapElement: React.RefObject<HTMLArcgisMapElement>;
+  isOpen: boolean;
 }
 
-const OverviewMap: React.FC<OverviewMapProps> = ({ mapElement }) => {
+const OverviewMap: React.FC<OverviewMapProps> = ({ mapElement, isOpen }) => {
   const { overviewMapElement, handleOverviewReady } =
-    useOverviewMap(mapElement);
+    useOverviewMap(mapElement, isOpen);
 
   return (
     <>

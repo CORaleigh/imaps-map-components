@@ -23,6 +23,7 @@ interface MapPanelProps {
   openedTools: ToolType[];
   mapMode: MapMode;
   coordinateConversionOpen: boolean;
+  overviewOpen: boolean;
   onMapReady: (event: HTMLArcgisMapElement["arcgisViewReadyChange"]) => void;
   onViewHold: (event: HTMLArcgisMapElement["arcgisViewHold"]) => void;
   onGoHome: HTMLArcgisHomeElement["goToOverride"];
@@ -30,13 +31,11 @@ interface MapPanelProps {
   onCoordinateExpand: (
     event: HTMLArcgisExpandElement["arcgisPropertyChange"],
   ) => void;
-  onExpandChange: (
+  onOverviewExpand: (
     event: HTMLArcgisExpandElement["arcgisPropertyChange"],
   ) => void;
   onToolClose: () => void;
 }
-
-
 
 // Lazy-loaded tools with preload
 const PropertySelect = lazy(() => import("../tools/PropertySelect"));
@@ -50,12 +49,13 @@ const MapPanel: React.FC<MapPanelProps> = ({
   openedTools,
   mapMode,
   coordinateConversionOpen,
+  overviewOpen,
   onMapReady,
   onViewHold,
   onGoHome,
   onCustomActionClick,
   onCoordinateExpand,
-  onExpandChange,
+  onOverviewExpand,
   onToolClose,
 }) => {
   // useEffect(() => {
@@ -128,10 +128,13 @@ const MapPanel: React.FC<MapPanelProps> = ({
         collapseIcon="arrow-down-right"
         id="overview-action"
         mode="floating"
-        onarcgisPropertyChange={onExpandChange}
+        onarcgisPropertyChange={onOverviewExpand}
         aria-label="Overview Map"
       >
-        <OverviewMap mapElement={mapElement}></OverviewMap>
+        <OverviewMap
+          mapElement={mapElement}
+          isOpen={overviewOpen}
+        ></OverviewMap>
       </arcgis-expand>
 
       <div slot="top-right">

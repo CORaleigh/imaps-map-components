@@ -19,10 +19,10 @@ import { useDisclaimer } from "../Disclaimer/useDisclaimer";
 import Disclaimer from "../Disclaimer";
 import Help from "../Header/Help";
 
-
-
 // Lazy-loaded panels
-export const PropertySearch = lazy(() => import("../panels/PropertySearch/PropertySearch"));
+export const PropertySearch = lazy(
+  () => import("../panels/PropertySearch/PropertySearch"),
+);
 export const LayerList = lazy(() => import("../panels/LayerList"));
 export const Legend = lazy(() => import("../panels/Legend"));
 export const Basemaps = lazy(() => import("../panels/Basemaps"));
@@ -38,6 +38,7 @@ const Shell: React.FC = () => {
     mapMode,
     appSize,
     coordinateConversionOpen,
+    overviewOpen,
     showHelp,
     handleThemeClick,
     handlePanelActionClick,
@@ -49,19 +50,24 @@ const Shell: React.FC = () => {
     handleViewHold,
     handleGoToHome,
     handleCoordinateExpandChange,
-    handleExpandChange,
+    handleOverviewExpandChange,
     handleHelpClosed,
     handleHelpOpened,
     mapElement,
     mapReady,
   } = useShell();
-  const { open, checkbox, handleDialogClose, handleDialogOpen } = useDisclaimer();
-
+  const { open, checkbox, handleDialogClose, handleDialogOpen } =
+    useDisclaimer();
 
   return (
     <>
       <calcite-shell className={appSize} contentBehind={appSize === "small"}>
-        <Header theme={theme} appSize={appSize} onOpenDisclaimer={handleDialogOpen} onOpenHelp={handleHelpOpened}></Header>
+        <Header
+          theme={theme}
+          appSize={appSize}
+          onOpenDisclaimer={handleDialogOpen}
+          onOpenHelp={handleHelpOpened}
+        ></Header>
         {!mapReady && <calcite-scrim loading></calcite-scrim>}
 
         <calcite-shell-panel
@@ -278,10 +284,11 @@ const Shell: React.FC = () => {
           mapMode={mapMode}
           openedTools={openedTools}
           coordinateConversionOpen={coordinateConversionOpen}
+          overviewOpen={overviewOpen}
           onMapReady={handleViewReady}
           onViewHold={handleViewHold}
           onCoordinateExpand={handleCoordinateExpandChange}
-          onExpandChange={handleExpandChange}
+          onOverviewExpand={handleOverviewExpandChange}
           onCustomActionClick={handleCustomActionClick}
           onGoHome={handleGoToHome}
           onToolClose={handleToolClose}
@@ -302,10 +309,7 @@ const Shell: React.FC = () => {
         checkbox={checkbox}
         onClose={handleDialogClose}
       ></Disclaimer>
-      <Help
-        open={showHelp}
-        onClose={handleHelpClosed}
-      ></Help>      
+      <Help open={showHelp} onClose={handleHelpClosed}></Help>
     </>
   );
 };

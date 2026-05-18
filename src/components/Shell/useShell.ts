@@ -36,6 +36,7 @@ export interface UseShellProps {
   mapMode: MapMode;
   appSize: AppSize;
   coordinateConversionOpen: boolean;
+  overviewOpen: boolean;
   handleThemeClick: () => void;
   handlePanelClose: () => void;
   handleToolClose: () => void;
@@ -50,7 +51,7 @@ export interface UseShellProps {
   handleCoordinateExpandChange: (
     event: HTMLArcgisExpandElement["arcgisPropertyChange"],
   ) => void;
-  handleExpandChange: (
+  handleOverviewExpandChange: (
     event: HTMLArcgisExpandElement["arcgisPropertyChange"],
   ) => void;
   handleHelpClosed: () => void;
@@ -84,6 +85,8 @@ export const useShell = (): UseShellProps => {
   const [openedTools, setOpenedTools] = useState<ToolType[]>([]);
   const [coordinateConversionOpen, setCoordinateConversionOpen] =
     useState<boolean>(false);
+  const [overviewOpen, setOverviewOpen] =
+    useState<boolean>(false);    
   const [showHelp, setShowHelp] = useState<boolean>(false);
   const handleThemeClick = useCallback(() => {
     setTheme((prev: "light" | "dark") => {
@@ -209,16 +212,19 @@ export const useShell = (): UseShellProps => {
     });
   };
 
-  const handleExpandChange = (
+  const handleOverviewExpandChange = (
     event: HTMLArcgisExpandElement["arcgisPropertyChange"],
   ) => {
+    setOverviewOpen(event.target.expanded);
     requestAnimationFrame(() => {
       if (!event.target.ariaLabel) return;
       event.target.shadowRoot
         ?.querySelector("calcite-popover")
         ?.setAttribute("aria-label", event.target.ariaLabel);
     });
-  };
+  };  
+
+
 
   const handleHelpClosed = () => {
     setShowHelp(false);
@@ -246,6 +252,7 @@ export const useShell = (): UseShellProps => {
     mapMode,
     appSize,
     coordinateConversionOpen,
+    overviewOpen,
     showHelp,
     handleThemeClick,
     handlePanelActionClick,
@@ -257,7 +264,7 @@ export const useShell = (): UseShellProps => {
     handleViewHold,
     handleGoToHome,
     handleCoordinateExpandChange,
-    handleExpandChange,
+    handleOverviewExpandChange,
     handleHelpClosed,
     handleHelpOpened,
     mapReady,

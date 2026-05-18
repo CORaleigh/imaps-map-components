@@ -8,15 +8,12 @@ import type Extent from "@arcgis/core/geometry/Extent";
 export interface UseOverviewMapProps {
   overviewMapElement: RefObject<HTMLArcgisMapElement | null>;
   handleOverviewReady: (
-    event: HTMLArcgisMapElement["arcgisViewReadyChange"]
+    event: HTMLArcgisMapElement["arcgisViewReadyChange"],
   ) => void;
+  isOpen: boolean;
 }
 
-const addGraphic = (
-  overviewMap: HTMLArcgisMapElement,
-  mapExtent: Extent
-) => {
-  
+const addGraphic = (overviewMap: HTMLArcgisMapElement, mapExtent: Extent) => {
   overviewMap.graphics.removeAll();
   overviewMap.graphics.add(
     new Graphic({
@@ -30,31 +27,43 @@ const addGraphic = (
           width: 2,
         },
       },
-    })
+    }),
   );
 };
 
 export const useOverviewMap = (
-  mapElement: React.RefObject<HTMLArcgisMapElement>
+  mapElement: React.RefObject<HTMLArcgisMapElement>,
+  isOpen: boolean,
 ): UseOverviewMapProps => {
   const overviewMapElement = useRef<HTMLArcgisMapElement | null>(null);
   const initializedRef = useRef(false);
-  const handleOverviewReady =  async (
-    event: HTMLArcgisMapElement["arcgisViewReadyChange"]
+  const handleOverviewReady = async (
+    event: HTMLArcgisMapElement["arcgisViewReadyChange"],
   ) => {
     event.target.basemap = mapElement.current.basemap;
     await event.target.goTo(mapElement.current.extent.clone().expand(4));
     addGraphic(event.target, mapElement.current.extent);
+  };
 
-    reactiveUtils.watch(
-      () => mapElement.current.view.extent,
-      async (mapExtent: Extent) => {
-        if (!overviewMapElement.current) return;
+  useEffect(() => {
+    if (!isOpen) return;
+
+    if (!mapElement.current) return;
+
+    const handle = reactiveUtils.watch(
+      () => mapElement.current?.view?.stationary,
+      async (stationary: boolean) => {
+        if (!overviewMapElement.current || !stationary) return;
+        const mapExtent = mapElement.current.extent;
         await overviewMapElement.current.goTo(mapExtent.clone().expand(4));
         addGraphic(overviewMapElement.current, mapExtent);
-      }
+      },
     );
-  };
+
+    return () => {
+      handle.remove();
+    };
+  }, [isOpen, mapElement]);
   useEffect(() => {
     if (
       !mapElement.current ||
@@ -68,5 +77,6 @@ export const useOverviewMap = (
   return {
     overviewMapElement,
     handleOverviewReady,
+    isOpen,
   };
 };
