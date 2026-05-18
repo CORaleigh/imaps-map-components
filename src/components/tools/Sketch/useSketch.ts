@@ -62,7 +62,7 @@ export const useSketch = (
 
   const mapNotesLayer = useRef<MapNotesLayer>(
     new MapNotesLayer({
-      id: "sketch-lauer",
+      id: "sketch-layer",
       listMode: "hide",
     })
   );
