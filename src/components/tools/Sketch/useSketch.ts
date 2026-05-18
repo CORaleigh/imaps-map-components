@@ -255,8 +255,7 @@ const handleSketchCreate = (event: CreateEvent) => {
     pointSketchVm.current.pointSymbol = symbol as SimpleMarkerSymbol;
     setPointSymbol(symbol as SimpleMarkerSymbol);
     selectedGraphics.current.forEach((graphic) => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      graphic.symbol = { ...symbol } as any;
+      graphic.symbol = symbol.clone();
     });
   };
 
@@ -271,8 +270,7 @@ const handleSketchCreate = (event: CreateEvent) => {
     lineSketchVm.current.polylineSymbol = symbol as SimpleLineSymbol;
     setLineSymbol(symbol as SimpleLineSymbol);
     selectedGraphics.current.forEach((graphic) => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      graphic.symbol = { ...symbol } as any;
+      graphic.symbol = symbol.clone();
     });
   };
 
@@ -283,12 +281,11 @@ const handleSketchCreate = (event: CreateEvent) => {
       | SimpleFillSymbol
       | TextSymbol
   ) => {
-    if (!lineSketchVm.current) return;
-    lineSketchVm.current.polygonSymbol = symbol as SimpleFillSymbol;
+    if (!polygonSketchVm.current) return;
+    polygonSketchVm.current.polygonSymbol = symbol as SimpleFillSymbol;
     setPolygonSymbol(symbol as SimpleFillSymbol);
     selectedGraphics.current.forEach((graphic) => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      graphic.symbol = { ...symbol } as any;
+      graphic.symbol = symbol.clone();
     });
   };
 
