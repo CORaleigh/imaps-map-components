@@ -39,17 +39,36 @@ export interface UsePropertySelectProps {
   selectedCondo: Graphic | null;
   handleActionClick: (tool: MapMode) => void;
   handleBufferDistanceInput: (
-    event: HTMLCalciteInputNumberElement["calciteInputNumberChange"]
+    event: HTMLCalciteInputNumberElement["calciteInputNumberChange"],
   ) => void;
   handleClear: () => void;
   handleToolClose: () => void;
   handleBufferProperty: () => void;
 }
 
+const getLayerByTitle = (mapElement: HTMLArcgisMapElement, name: string) => {
+  return mapElement.view.map?.allLayers.find(
+    (layer: Layer) => layer.title === name && layer.type === "feature",
+  );
+};
+
+const getFeatureLayerView = async (
+  mapElement: HTMLArcgisMapElement,
+): Promise<FeatureLayerView> => {
+  const layer = getLayerByTitle(mapElement, "Property") as FeatureLayer;
+  if (!layer) throw new Error("Property layer not found");
+
+  const layerView = (await mapElement.whenLayerView(layer)) as FeatureLayerView;
+
+  if (!layerView) throw new Error("FeatureLayerView for Property not found");
+
+  return layerView;
+};
+
 export const usePropertySelect = (
   mapElement: React.RefObject<HTMLArcgisMapElement>,
   // closed: boolean,
-  onToolClose: () => void
+  onToolClose: () => void,
 ): UsePropertySelectProps => {
   const {
     setGeometry,
@@ -67,37 +86,13 @@ export const usePropertySelect = (
 
   const highlight = useRef<ResourceHandle>(undefined);
 
-  const getLayerByTitle = (mapElement: HTMLArcgisMapElement, name: string) => {
-    return mapElement.view.map?.allLayers.find(
-      (layer: Layer) => layer.title === name && layer.type === "feature"
-    );
-  };
-
-  const getFeatureLayerView = async (
-    mapElement: HTMLArcgisMapElement
-  ): Promise<FeatureLayerView> => {
-    const layer = getLayerByTitle(
-      mapElement,
-      "Property"
-    ) as FeatureLayer;
-    if (!layer) throw new Error("Property layer not found");
-
-    const layerView = (await mapElement.whenLayerView(
-      layer
-    )) as FeatureLayerView;
-
-    if (!layerView) throw new Error("FeatureLayerView for Property not found");
-
-    return layerView;
-  };
-
-  const cancelSelect = () => {
+  const cancelSelect = useCallback(() => {
     sketchViewModel.current?.cancel();
     if (highlight) {
       highlight.current?.remove();
     }
     graphicsLayer.current?.removeAll();
-  };
+  }, []);
 
   // Handle sketch tool actions
   const handleActionClick = useCallback(
@@ -120,11 +115,11 @@ export const usePropertySelect = (
         mapElement.current.popupDisabled = tool === "streetview";
       }
     },
-    [mapElement, mapMode, setMapMode]
+    [mapElement, mapMode, setMapMode],
   );
 
   const highlightProperties = async (
-    geometry: Geometry
+    geometry: Geometry,
   ): Promise<ResourceHandle> => {
     const propertyLayerView = await getFeatureLayerView(mapElement.current);
     const result = await propertyLayerView.queryFeatures({
@@ -148,7 +143,7 @@ export const usePropertySelect = (
             style: "dash",
           },
         },
-      })
+      }),
     );
   };
   // Handle SketchViewModel create events
@@ -157,7 +152,7 @@ export const usePropertySelect = (
       if (!event.graphic?.geometry) return;
       if (!geodesicBufferOperator.isLoaded())
         await geodesicBufferOperator.load();
-  
+
       if (event.state === "start" || event.state === "cancel") {
         graphicsLayer.current?.removeAll();
         if (highlight) {
@@ -167,12 +162,12 @@ export const usePropertySelect = (
       }
       if (event.state === "complete") {
         sketchViewModel.current?.removeAllGraphics();
-  
+
         if (bufferDistanceRef.current > 0) {
           const buffer = geodesicBufferOperator.execute(
             event.graphic.geometry,
             bufferDistanceRef.current,
-            { unit: "feet" }
+            { unit: "feet" },
           ) as Geometry;
           setGeometry(buffer);
           addBufferGraphic(buffer);
@@ -191,7 +186,7 @@ export const usePropertySelect = (
           const buffer = geodesicBufferOperator.execute(
             event.graphic.geometry,
             bufferDistanceRef.current,
-            { unit: "feet" }
+            { unit: "feet" },
           ) as Geometry;
           highlightGeometry = buffer;
           addBufferGraphic(buffer);
@@ -201,12 +196,12 @@ export const usePropertySelect = (
         highlight.current = newHighlight;
       }
     },
-    [setGeometry]
+    [setGeometry],
   );
 
   // Handle buffer distance input
   const handleBufferDistanceInput = (
-    event: HTMLCalciteInputNumberElement["calciteInputNumberChange"]
+    event: HTMLCalciteInputNumberElement["calciteInputNumberChange"],
   ) => {
     const val = parseInt(event.target.value);
     setBufferDistance(val);
@@ -234,7 +229,7 @@ export const usePropertySelect = (
       const buffer = geodesicBufferOperator.execute(
         selectedCondo.geometry,
         bufferDistanceRef.current,
-        { unit: "feet" }
+        { unit: "feet" },
       ) as Geometry;
       setGeometry(buffer);
       addBufferGraphic(buffer);
