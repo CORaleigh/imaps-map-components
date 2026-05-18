@@ -142,37 +142,6 @@ const createLayerSource = (
     );
   };
 
-  // const getSuggestions = async (params: GetSuggestionsParameters) => {
-  //   if (!params?.suggestTerm) return [];
-
-  //   const term = params.suggestTerm
-  //     .toUpperCase()
-  //     .replace(/'/g, "''")
-  //     .replace(/[\u2018\u2019]/g, "''");
-
-  //   const whereArray = searchFields.map((field) => {
-  //     if (startsWith) {
-  //       return `${field} LIKE '${term}%'`;
-  //     } else {
-  //       return `${field} LIKE '%${term}%'`;
-  //     }
-  //   });
-  //   console.log("whereArray", whereArray);
-  //   const results = await layer.queryFeatures({
-  //     returnDistinctValues: true,
-  //     outFields,
-  //     returnGeometry: false,
-  //     orderByFields,
-  //     num: arcgisSearch?.activeSource ? 50 : 6,
-  //     where: whereArray.join(" OR "),
-  //   });
-
-  //   return results.features.map((feature: Graphic) => ({
-  //     key: feature.getAttribute(outFields[0]),
-  //     text: feature.getAttribute(outFields[0]),
-  //     sourceIndex: params.sourceIndex,
-  //   }));
-  // };
 const getSuggestions = async (params: GetSuggestionsParameters) => {
     if (!params?.suggestTerm) return [];
 
@@ -540,7 +509,7 @@ export const wildcardSearch = async (
   searchFields: string[],
   term: string,
 ): Promise<Graphic[]> => {
-  setTimeout(() => {
+  requestAnimationFrame(() => {
     const notice = searchElement.shadowRoot?.querySelector("calcite-notice");
 
     if (notice) {
