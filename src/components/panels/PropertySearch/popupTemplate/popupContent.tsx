@@ -4,6 +4,7 @@ import {
   createDurhamButton,
   createLinkButtons,
   createEnvironmentalButtons,
+  createDeedButtons,
 } from "./popupTemplate";
 import type Graphic from "@arcgis/core/Graphic";
 import type MediaInfo from "@arcgis/core/popup/content/mixins/MediaInfo";
@@ -138,6 +139,7 @@ export const getPopupContent = (
         },
       ],
     },
+    createDeedButtons(),
     feature.getAttribute("HEATEDAREA")
       ? {
           type: "text",
