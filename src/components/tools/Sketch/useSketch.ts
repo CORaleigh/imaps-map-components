@@ -350,7 +350,7 @@ const handleSketchCreate = (event: CreateEvent) => {
         );
         break;
     }
-  }, [selectedGraphicsType, selectedGraphics]);
+  }, [selectedGraphicsType]);
   useEffect(() => {
     if (!mapMode || mapMode === "streetview" || mapMode === "identify") {
       pointSketchVm.current?.cancel();
