@@ -10,6 +10,7 @@ interface HeaderLinkGroup {
 }
 export interface UseHeaderProps {
   links: React.RefObject<HeaderLinkGroup[]>;
+  logo: React.RefObject<string>;
   handleDropdownOpen: (
     event: HTMLCalciteDropdownElement["calciteDropdownOpen"]) => void;
   handleClearStorage: () => void;
@@ -17,6 +18,7 @@ export interface UseHeaderProps {
 
 export const useHeader = (webMapId: string): UseHeaderProps => {
   const links = useRef<HeaderLinkGroup[]>([]);
+  const logo = useRef<string>("");
   const handleDropdownOpen = (
     event: HTMLCalciteDropdownElement["calciteDropdownOpen"]
   ) => {
@@ -41,15 +43,19 @@ export const useHeader = (webMapId: string): UseHeaderProps => {
   };
   useEffect(() => {
     (async () => {
-      const res = await fetch("config.json");
+      const params = new URLSearchParams(window.location.search);
+      const app = params.get("app") ?? "config";      
+      const res = await fetch(`${app}.json`);
       const data = await res.json();
       if (data.links) {
         links.current = data.links;
       }
+      logo.current = app === "puma" ? "puma" : "logo";
     })();
   }, []);
   return {
     links,
+    logo,
     handleDropdownOpen,
     handleClearStorage,
   };

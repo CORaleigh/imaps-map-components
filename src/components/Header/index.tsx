@@ -24,7 +24,7 @@ const Header: React.FC<HeaderProps> = ({
 }) => {
   const { webMapId } = useMap();
 
-  const { links, handleDropdownOpen, handleClearStorage } = useHeader(
+  const { links, logo, handleDropdownOpen, handleClearStorage } = useHeader(
     webMapId.current,
   );
   return (
@@ -32,7 +32,7 @@ const Header: React.FC<HeaderProps> = ({
       <calcite-navigation slot="header">
         <calcite-navigation-logo
           slot="logo"
-          thumbnail={theme === "light" ? "logo.svg" : "logo_dark.svg"}
+          thumbnail={theme === "light" ? logo.current + ".svg" : logo.current + "_dark.svg"}
           description={
             appSize !== "small" ? "Wake County and City of Raleigh" : ""
           }

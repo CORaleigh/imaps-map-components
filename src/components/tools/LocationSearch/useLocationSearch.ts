@@ -43,9 +43,11 @@ export const useLocationSearch = (
     width: 20,
   });
   const addGeocodingSource = async (searchElement: HTMLArcgisSearchElement) => {
-    const config = await fetch("config.json");
+    const params = new URLSearchParams(window.location.search);
+    const app = params.get("app") ?? "config";      
+    const config = await fetch(`${app}.json`);
     const data = await config.json();
-    if (data.printUrl) {
+    if (data.geocodeUrl) {
       const geocodeUrl = data.geocodeUrl;
       searchElement.sources.add(
         new LocatorSearchSource({
@@ -62,7 +64,9 @@ export const useLocationSearch = (
   const addIntersectionSource = async (
     searchElement: HTMLArcgisSearchElement,
   ) => {
-    const config = await fetch("config.json");
+    const params = new URLSearchParams(window.location.search);
+    const app = params.get("app") ?? "config";        
+    const config = await fetch(`${app}.json`);
     const data = await config.json();
     if (data.intersectionItem) {
       intersectionLayer.current = new FeatureLayer({

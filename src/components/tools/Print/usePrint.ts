@@ -45,45 +45,44 @@ export interface UsePrintProps {
   selectedTab: "layout" | "exports";
   selectedCondo: Graphic | null;
   handleTitleChange: (
-    event: HTMLCalciteInputTextElement["calciteInputTextInput"]
+    event: HTMLCalciteInputTextElement["calciteInputTextInput"],
   ) => void;
   handleScaleTypeChange: (
-    event: HTMLCalciteRadioButtonGroupElement["calciteRadioButtonGroupChange"]
+    event: HTMLCalciteRadioButtonGroupElement["calciteRadioButtonGroupChange"],
   ) => void;
   handleRemovePrintResult: (
-    event: HTMLCalciteListItemElement["calciteListItemClose"]
+    event: HTMLCalciteListItemElement["calciteListItemClose"],
   ) => void;
   handleLayoutSelected: (
-    event: HTMLCalciteSelectElement["calciteSelectChange"]
+    event: HTMLCalciteSelectElement["calciteSelectChange"],
   ) => void;
   handleFormatSelected: (
-    event: HTMLCalciteSelectElement["calciteSelectChange"]
+    event: HTMLCalciteSelectElement["calciteSelectChange"],
   ) => void;
   handleTabChange: (
-    event: HTMLCalciteTabNavElement["calciteTabChange"]
+    event: HTMLCalciteTabNavElement["calciteTabChange"],
   ) => void;
   handleExportClick: () => void;
   handleShowAttributesChange: (
-    event: HTMLCalciteSwitchElement["calciteSwitchChange"]
+    event: HTMLCalciteSwitchElement["calciteSwitchChange"],
   ) => void;
   handleShowLegendChange: (
-    event: HTMLCalciteSwitchElement["calciteSwitchChange"]
+    event: HTMLCalciteSwitchElement["calciteSwitchChange"],
   ) => void;
   handleShowPrintAreaChange: (
-    event: HTMLCalciteSwitchElement["calciteSwitchChange"]
+    event: HTMLCalciteSwitchElement["calciteSwitchChange"],
   ) => void;
   handleCustomScaleChange: (
-    event: HTMLCalciteSelectElement["calciteSelectChange"]
+    event: HTMLCalciteSelectElement["calciteSelectChange"],
   ) => void;
   handleUserDefinedInput: (
-    event: HTMLCalciteInputNumberElement["calciteInputNumberChange"]
+    event: HTMLCalciteInputNumberElement["calciteInputNumberChange"],
   ) => void;
-
 }
 
 export const usePrint = (
   mapElement: React.RefObject<HTMLArcgisMapElement>,
-  closed: boolean
+  closed: boolean,
 ): UsePrintProps => {
   const { selectedCondo } = useMap();
   const printUrl = useRef("");
@@ -115,11 +114,11 @@ export const usePrint = (
   const [scales, setScales] = useState<MapScale[]>([]);
   const [exports, setExports] = useState<Export[]>([]);
   const [selectedTab, setSelectedTab] = useState<"layout" | "exports">(
-    "layout"
+    "layout",
   );
 
   const handleTitleChange = (
-    event: HTMLCalciteInputTextElement["calciteInputTextInput"]
+    event: HTMLCalciteInputTextElement["calciteInputTextInput"],
   ) => {
     setPrintOptions((prev) => ({
       ...prev,
@@ -128,19 +127,22 @@ export const usePrint = (
   };
 
   const handleScaleTypeChange = (
-    event: HTMLCalciteRadioButtonGroupElement["calciteRadioButtonGroupChange"]
+    event: HTMLCalciteRadioButtonGroupElement["calciteRadioButtonGroupChange"],
   ) => {
-    const scale = event.target.selectedItem.value === "current" ? mapElement.current.scale : scales.at(0)?.scale;
-    console.log(scale)
+    const scale =
+      event.target.selectedItem.value === "current"
+        ? mapElement.current.scale
+        : scales.at(0)?.scale;
+    console.log(scale);
     setPrintOptions((prev) => ({
       ...prev,
       scaleType: event.target.selectedItem.value,
-      scale: scale as number
+      scale: scale as number,
     }));
   };
 
   const handleLayoutSelected = (
-    event: HTMLCalciteSelectElement["calciteSelectChange"]
+    event: HTMLCalciteSelectElement["calciteSelectChange"],
   ) => {
     setPrintOptions((prev) => ({
       ...prev,
@@ -148,7 +150,7 @@ export const usePrint = (
     }));
   };
   const handleFormatSelected = (
-    event: HTMLCalciteSelectElement["calciteSelectChange"]
+    event: HTMLCalciteSelectElement["calciteSelectChange"],
   ) => {
     setPrintOptions((prev) => ({
       ...prev,
@@ -157,7 +159,7 @@ export const usePrint = (
   };
 
   const handleShowAttributesChange = (
-    event: HTMLCalciteSwitchElement["calciteSwitchChange"]
+    event: HTMLCalciteSwitchElement["calciteSwitchChange"],
   ) => {
     setPrintOptions((prev) => ({
       ...prev,
@@ -166,7 +168,7 @@ export const usePrint = (
   };
 
   const handleShowLegendChange = (
-    event: HTMLCalciteSwitchElement["calciteSwitchChange"]
+    event: HTMLCalciteSwitchElement["calciteSwitchChange"],
   ) => {
     setPrintOptions((prev) => ({
       ...prev,
@@ -175,7 +177,7 @@ export const usePrint = (
   };
 
   const handleCustomScaleChange = (
-    event: HTMLCalciteSelectElement["calciteSelectChange"]
+    event: HTMLCalciteSelectElement["calciteSelectChange"],
   ) => {
     const selected = event.target.selectedOption.value; // this is a string
     setPrintOptions((prev) => ({
@@ -186,7 +188,7 @@ export const usePrint = (
   };
 
   const handleUserDefinedInput = (
-    event: HTMLCalciteInputNumberElement["calciteInputNumberChange"]
+    event: HTMLCalciteInputNumberElement["calciteInputNumberChange"],
   ) => {
     setPrintOptions((prev) => ({
       ...prev,
@@ -195,7 +197,7 @@ export const usePrint = (
   };
 
   const handleShowPrintAreaChange = (
-    event: HTMLCalciteSwitchElement["calciteSwitchChange"]
+    event: HTMLCalciteSwitchElement["calciteSwitchChange"],
   ) => {
     setPrintOptions((prev) => ({
       ...prev,
@@ -210,7 +212,7 @@ export const usePrint = (
         printOptions.scale,
         printOptions.showAttributes,
         printOptions.showLegend,
-        printOptions.scaleType
+        printOptions.scaleType,
       );
     } else {
       hidePrintFrame(mapElement.current);
@@ -218,12 +220,12 @@ export const usePrint = (
   };
 
   const handleTabChange = (
-    event: HTMLCalciteTabNavElement["calciteTabChange"]
+    event: HTMLCalciteTabNavElement["calciteTabChange"],
   ) => {
     setSelectedTab(
       event.target.selectedTitle.textContent.toLowerCase() as
         | "layout"
-        | "exports"
+        | "exports",
     );
   };
 
@@ -231,7 +233,9 @@ export const usePrint = (
     if (!printUrl.current) return;
     prepareExport(
       mapElement.current,
-      printOptions.scaleType === "custom" ? printOptions.scale : roundScale(mapElement.current.scale),
+      printOptions.scaleType === "custom"
+        ? printOptions.scale
+        : roundScale(mapElement.current.scale),
       printOptions.layout,
       printOptions.format,
       printOptions.title,
@@ -239,24 +243,24 @@ export const usePrint = (
       printOptions.showAttributes,
       selectedCondo,
       printUrl.current,
-      setExports
+      setExports,
     );
     setSelectedTab("exports");
   };
 
   const handleRemovePrintResult = (
-    event: HTMLCalciteListItemElement["calciteListItemClose"]
+    event: HTMLCalciteListItemElement["calciteListItemClose"],
   ) => {
     setExports((prev) =>
-      prev.filter((result) => result.id.toString() !== event.target.value)
+      prev.filter((result) => result.id.toString() !== event.target.value),
     );
   };
 
-
-
   useEffect(() => {
     (async () => {
-      const config = await fetch("config.json");
+      const params = new URLSearchParams(window.location.search);
+      const app = params.get("app") ?? "config";
+      const config = await fetch(`${app}.json`);
       const data = await config.json();
       if (data.printUrl) {
         printUrl.current = data.printUrl;
@@ -290,10 +294,12 @@ export const usePrint = (
     showPrintFrame(
       mapElement.current,
       layout,
-      printOptions.scaleType === "custom" ? scale : roundScale(mapElement.current.scale),
+      printOptions.scaleType === "custom"
+        ? scale
+        : roundScale(mapElement.current.scale),
       showAttributes,
       showLegend,
-      printOptions.scaleType
+      printOptions.scaleType,
     );
   }, [
     printOptions.showPrintArea,
@@ -337,6 +343,6 @@ export const usePrint = (
     handleShowLegendChange,
     handleShowPrintAreaChange,
     handleCustomScaleChange,
-    handleUserDefinedInput
+    handleUserDefinedInput,
   };
 };

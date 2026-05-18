@@ -218,12 +218,13 @@ export const MapProvider: React.FC<{ children: React.ReactNode }> = ({
 
     async function initMap() {
       const params = new URLSearchParams(window.location.search);
-      const app = params.get("app");
-      const id = params.get("id");
-      const mapId =
-        app === "puma"
-          ? "1feff5b9d152475b828c8483b12a86bb"
-          : id || "95092428774c4b1fb6a3b6f5fed9fbc4";
+      const app = params.get("app") ?? "config";
+      const res = await fetch(`${app}.json`);
+      const config = await res.json();
+
+
+      const mapId = params.get("id") ?? config.mapId ?? "95092428774c4b1fb6a3b6f5fed9fbc4";
+
       console.log("creating web map");
       const { webmap, webmapTemplate } =
         await layerService.createWebMapWithRequiredAndPersisted(mapId);
