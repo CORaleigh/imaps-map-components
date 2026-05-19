@@ -109,7 +109,8 @@ class LayerService {
     // Add top-level layers: required or persisted-visible only
     const addLayerRecursive = (
       layer: Layer,
-      parent: WebMap | GroupLayer
+      parent: WebMap | GroupLayer,
+      parentVisible: boolean
     ): boolean => {
       if (layer.type === "group") {
         const groupLayer = layer as GroupLayer;
@@ -125,21 +126,21 @@ class LayerService {
         // Add children in template order if required or persisted-visible
         for (const child of groupLayer.layers.toArray()) {
           const title = child.title || "";
-          const shouldDisplay =
-            isRequired(title) || isVisibleLastSession(title) || inUrl(title);
+         // const shouldDisplay =
+          //  isRequired(title) || isVisibleLastSession(title) || inUrl(title) || (layer.visible && parentVisible);
           const shouldAdd =
             isRequired(title) ||
             isVisibleLastSession(title) ||
             isSearchable(child.id) ||
-            inUrl(title);
+            inUrl(title) || (layer.visible && parentVisible);
 
           if (child.type === "group") {
-            if (addLayerRecursive(child, newGroup)) {
+            if (addLayerRecursive(child, newGroup, (child.parent as GroupLayer).visible)) {
               anyChildAdded = true;
             }
           } else if (shouldAdd) {
             newGroup.layers.add(child);
-            child.visible = shouldDisplay;
+            ///child.visible = shouldDisplay;
             anyChildAdded = true;
           }
         }
@@ -169,7 +170,7 @@ class LayerService {
 
     // Use for loop instead of forEach for potential early exit
     for (const layer of this.webmapTemplate.layers.toArray()) {
-      addLayerRecursive(layer, webmap);
+      addLayerRecursive(layer, webmap, (layer.parent as GroupLayer).visible);
     }
 
     // Add tables - use Set for faster lookup
