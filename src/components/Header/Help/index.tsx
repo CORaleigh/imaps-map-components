@@ -356,8 +356,6 @@ export default function Help({ open, onClose, goToId }: HelpProps) {
                       ))}
                     </calcite-list>
                   )}
-
-                  {section.title}
                 </calcite-list-item>
               ))}
             </calcite-list>
@@ -389,6 +387,7 @@ export default function Help({ open, onClose, goToId }: HelpProps) {
             <h1 className={styles.header} id="using-map">
               Using Map
             </h1>
+            <hr/>
             <h2 className={styles.header} id="navigating-map">
               Navigating Map
             </h2>
@@ -500,6 +499,7 @@ export default function Help({ open, onClose, goToId }: HelpProps) {
             <h1 className={styles.header} id="panels">
               Panels
             </h1>
+            <hr/>
             <p>
               Panels appear on the right side of the map. To change panels,
               press on the button in the top half of the action bar on the
@@ -857,6 +857,7 @@ export default function Help({ open, onClose, goToId }: HelpProps) {
             <h1 className={styles.header} id="tools">
               Tools
             </h1>
+            <hr/>
             <p>
               Tools appear in the top right corner of the map. To change tools,
               press on the button in the bottom half of the action bar on the
