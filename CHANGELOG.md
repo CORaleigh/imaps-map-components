@@ -29,3 +29,6 @@
 
 ## Sketch widget
 - redeveloped to handle bugs
+
+## Changes to layer persistence
+- previous version stored entire web map JSON, this version stores properties for the visible layers which is used to control which layers are visible on load.
