@@ -4,8 +4,8 @@ import "@esri/calcite-components/components/calcite-label";
 import "@esri/calcite-components/components/calcite-list";
 import "@esri/calcite-components/components/calcite-list-item";
 import "@esri/calcite-components/components/calcite-link";
-import "@esri/calcite-components/components/calcite-tree";
-import "@esri/calcite-components/components/calcite-tree-item";
+import "@esri/calcite-components/components/calcite-list";
+import "@esri/calcite-components/components/calcite-list-item";
 import "@esri/calcite-components/components/calcite-shell";
 import "@esri/calcite-components/components/calcite-shell-panel";
 import "@esri/calcite-components/components/calcite-fab";
@@ -68,11 +68,27 @@ export default function Help({ open, onClose }: HelpProps) {
               title: "Compass Tool",
               icon: "compass-needle",
             },
-            { id: "location-tool", title: "Location Tool", icon: "compass-north-circle" },
-            { id: "identify-tool", title: "Identify Tool", icon: "information" },
-            { id: "streetview-tool", title: "Streetview Tool", icon: "360-view"  },
+            {
+              id: "location-tool",
+              title: "Location Tool",
+              icon: "compass-north-circle",
+            },
+            {
+              id: "identify-tool",
+              title: "Identify Tool",
+              icon: "information",
+            },
+            {
+              id: "streetview-tool",
+              title: "Streetview Tool",
+              icon: "360-view",
+            },
             { id: "overview-map", title: "Overview Map" },
-            { id: "coordinates-tool", title: "Coordinates Tool",  icon: "crosshair"   },
+            {
+              id: "coordinates-tool",
+              title: "Coordinates Tool",
+              icon: "crosshair",
+            },
           ],
         },
       ],
@@ -89,9 +105,6 @@ export default function Help({ open, onClose }: HelpProps) {
             {
               id: "property-searching",
               title: "Searching for a Property",
-              sections: [
-                { id: "filtering-desc", title: "Filtering by Description" },
-              ],
             },
             {
               id: "property-details",
@@ -187,7 +200,7 @@ export default function Help({ open, onClose }: HelpProps) {
         {
           id: "location-search",
           title: "Location Search",
-           icon: "pin",
+          icon: "pin",
           sections: [
             { id: "place-search", title: "Place Search" },
             { id: "intersection-search", title: "Intersection Search" },
@@ -244,23 +257,14 @@ export default function Help({ open, onClose }: HelpProps) {
   //       .then((res) => res.json())
   //       .then((data: FaqData) => setFaqSections(data.sections));
   //   }, []);
-  // Handles both string id and event for onClick
-  const scrollToSection = (idOrEvent: string | React.MouseEvent<HTMLElement>) => {
-    let id = "";
-    if (typeof idOrEvent === "string") {
-      id = idOrEvent;
-    } else if (idOrEvent && idOrEvent.currentTarget) {
-      id = idOrEvent.currentTarget.getAttribute("data-id") || "";
-    }
-    if (id) {
-      const element = document.getElementById(id);
-      if (element) {
-        element.scrollIntoView({ behavior: "smooth", block: "start" });
-      }
+  const scrollToSection = (id: string) => {
+    const element = document.getElementById(id);
+    console.log(element);
+
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth", block: "start" });
     }
   };
-
-  
 
   return (
     <calcite-dialog
@@ -273,74 +277,94 @@ export default function Help({ open, onClose }: HelpProps) {
       <calcite-shell contentBehind={isSmall}>
         <calcite-shell-panel slot="panel-start" width="m" collapsed={!showToc}>
           <calcite-panel>
-            <calcite-tree
-              oncalciteTreeSelect={(
-                event: HTMLCalciteTreeElement["calciteTreeSelect"],
-              ) => {
-                const item = event.target
-                  .selectedItems[0] as HTMLCalciteTreeItemElement;
-                if (item) {
-                  scrollToSection(item.getAttribute("data-id") || "");
-                  item.selected = false;
-                }
-              }}
+            <calcite-list
+              label={"Table of Contents"}
+              selectionMode="none"
+              displayMode="nested"
             >
               {sections.map((section) => (
-                <calcite-tree-item
+                <calcite-list-item
+                  label={section.title}
                   key={section.id}
                   data-id={section.id}
                   expanded
-                  onClick={scrollToSection}
                   iconStart={section.icon}
+                  onClick={(event) => {
+                    event.currentTarget.expanded = true;
+                    scrollToSection(section.id);
+                  }}
                 >
                   {section.sections && (
-                    <calcite-tree slot="children">
+                    <calcite-list
+                      label={section.title}
+                      selectionMode="none"
+                      displayMode="nested"
+                    >
                       {section.sections.map((subSection) => (
-                        <calcite-tree-item
+                        <calcite-list-item
+                          label={subSection.title}
                           key={subSection.id}
                           data-id={subSection.id}
                           expanded
                           iconStart={subSection.icon}
+                          onClick={(event) => {
+                            event.currentTarget.expanded = true;
+                            scrollToSection(subSection.id);
+                          }}
                         >
-                          {subSection.title}
                           {subSection.sections && (
-                            <calcite-tree slot="children">
+                            <calcite-list
+                              label={subSection.title}
+                              selectionMode="none"
+                              displayMode="nested"
+                            >
                               {subSection.sections.map((subSection1) => (
-                                <calcite-tree-item
+                                <calcite-list-item
+                                  label={subSection1.title}
                                   key={subSection1.id}
                                   data-id={subSection1.id}
                                   expanded
                                   iconStart={subSection1.icon}
+                                  onClick={(event) => {
+                                    event.currentTarget.expanded = true;
+                                    scrollToSection(subSection1.id);
+                                  }}
                                 >
-                                  {subSection1.title}
                                   {subSection1.sections && (
-                                    <calcite-tree slot="children">
+                                    <calcite-list
+                                      label={subSection1.title}
+                                      selectionMode="none"
+                                      displayMode="nested"
+                                    >
                                       {subSection1.sections.map(
                                         (subSection2) => (
-                                          <calcite-tree-item
+                                          <calcite-list-item
+                                            label={subSection2.title}
                                             key={subSection2.id}
                                             data-id={subSection2.id}
                                             expanded
-                                          >
-                                            {subSection2.title}
-                                          </calcite-tree-item>
+                                            onClick={(event) => {
+                                              event.currentTarget.expanded = true;
+                                              scrollToSection(subSection2.id);
+                                            }}
+                                          ></calcite-list-item>
                                         ),
                                       )}
-                                    </calcite-tree>
+                                    </calcite-list>
                                   )}
-                                </calcite-tree-item>
+                                </calcite-list-item>
                               ))}
-                            </calcite-tree>
+                            </calcite-list>
                           )}
-                        </calcite-tree-item>
+                        </calcite-list-item>
                       ))}
-                    </calcite-tree>
+                    </calcite-list>
                   )}
 
                   {section.title}
-                </calcite-tree-item>
+                </calcite-list-item>
               ))}
-            </calcite-tree>
+            </calcite-list>
             <calcite-fab
               slot="fab"
               scale="l"
@@ -366,9 +390,12 @@ export default function Help({ open, onClose }: HelpProps) {
               }
             }}
           >
-            <h1 className={styles.header} id="using-map">Using Map</h1>
-
-            <h2 className={styles.header} id="navigating-map">Navigating Map</h2>
+            <h1 className={styles.header} id="using-map">
+              Using Map
+            </h1>
+            <h2 className={styles.header} id="navigating-map">
+              Navigating Map
+            </h2>
             <ul>
               <li>
                 To <strong>zoom</strong> the map with a mouse, scroll the wheel
@@ -399,17 +426,20 @@ export default function Help({ open, onClose }: HelpProps) {
                 with two fingers and twist to rotate.
               </li>
             </ul>
-            <h2 className={styles.header} id="longpress-map">Long Press to Select Property</h2>
+            <h2 className={styles.header} id="longpress-map">
+              Long Press to Select Property
+            </h2>
             <p>
               Long pressing on a property on the map will select that property.
             </p>
-            <h2 className={styles.header} id="map-tools">Map Tools</h2>
+            <h2 className={styles.header} id="map-tools">
+              Map Tools
+            </h2>
             <p>
               Map tools appear in the top left, bottom left and bottom right
               corners of the map.
             </p>
-
-            <h3  className={styles.header} id="zoom-tools">
+            <h3 className={styles.header} id="zoom-tools">
               Zoom Tools <calcite-icon icon="plus"></calcite-icon>
               <calcite-icon icon="minus"></calcite-icon>
             </h3>
@@ -417,24 +447,21 @@ export default function Help({ open, onClose }: HelpProps) {
               In the top left corner of the map are the zoom tools, press + to
               zoom in a level and - to zoom out a level.
             </p>
-
-            <h3  className={styles.header} id="home-tool">
+            <h3 className={styles.header} id="home-tool">
               Home Tool <calcite-icon icon="home"></calcite-icon>
             </h3>
             <p>
               The home button will set the map to the full extent of Wake
               County.
             </p>
-
-            <h3  className={styles.header} id="compass-tool">
+            <h3 className={styles.header} id="compass-tool">
               Compass Tool <calcite-icon icon="compass-needle"></calcite-icon>
             </h3>
             <p>
               The compass tool indicates if the map has been rotated. Press to
               return to true north.
             </p>
-
-            <h3  className={styles.header} id="location-tool">
+            <h3 className={styles.header} id="location-tool">
               Location Tool
               <calcite-icon icon="compass-north-circle"></calcite-icon>
             </h3>
@@ -443,23 +470,22 @@ export default function Help({ open, onClose }: HelpProps) {
               location. Note that you will need to give iMAPS permission to use
               your device's location.
             </p>
-
-            <h3  className={styles.header} id="identify-tool">
+            <h3 className={styles.header} id="identify-tool">
               Identify Tool <calcite-icon icon="information"></calcite-icon>
             </h3>
             <p>
               The identify tool allows you to press on a feature on the map to
               view a popup with details about the feature.
             </p>
-
-              Identify Tool <calcite-icon icon={"360-view" as any}></calcite-icon>
-            <h3  className={styles.header} id="streetview-tool">Streetview Tool  </h3>
+            Identify Tool <calcite-icon icon={"360-view" as any}></calcite-icon>
+            <h3 className={styles.header} id="streetview-tool">
+              Streetview Tool{" "}
+            </h3>
             <p>
               The street view tool allows you to press on the map to view that
               location in Google Streetview in a new browser tab.
             </p>
-
-            <h3  className={styles.header} id="overview-map">
+            <h3 className={styles.header} id="overview-map">
               Overview Map <calcite-icon icon="arrow-up-left"></calcite-icon>
             </h3>
             <p>
@@ -467,8 +493,7 @@ export default function Help({ open, onClose }: HelpProps) {
               overview map. When you pan on the main map, the map extent will
               appear in the overview map.
             </p>
-
-            <h3  className={styles.header} id="coordinates-tool">
+            <h3 className={styles.header} id="coordinates-tool">
               Coordinates Tool <calcite-icon icon="crosshair"></calcite-icon>
             </h3>
             <p>
@@ -476,14 +501,14 @@ export default function Help({ open, onClose }: HelpProps) {
               your mouse cursor. Refer to the section under Tools for additional
               features.
             </p>
-
-            <h1 className={styles.header} id="panels">Panels</h1>
+            <h1 className={styles.header} id="panels">
+              Panels
+            </h1>
             <p>
               Panels appear on the right side of the map. To change panels,
               press on the button in the top half of the action bar on the
               right.
             </p>
-
             <h2 className={styles.header} id="property-search">
               Property Search <calcite-icon icon="search"></calcite-icon>
             </h2>
@@ -498,13 +523,19 @@ export default function Help({ open, onClose }: HelpProps) {
               <li>Real Estate ID (REID)</li>
               <li>Street Name</li>
             </ul>
-            <h3  className={styles.header} id="property-searching">Searching for a Property</h3>
+            <h3 className={styles.header} id="property-searching">
+              Searching for a Property
+            </h3>
             <p>
               To search, start typing in the input box. As you type, suggestions
               will appear in a list below, once you see the suggestion you want,
               press on it.
             </p>
-            <img className={styles.helpImage} src="./help/property_search.gif" alt="Video showing how to search by address"/>
+            <img
+              className={styles.helpImage}
+              src="./help/property_search.gif"
+              alt="Video showing how to search by address"
+            />
             <p>
               If you press the enter key while typing, all properties containing
               what you have typed will be searched for.
@@ -524,7 +555,9 @@ export default function Help({ open, onClose }: HelpProps) {
               The clear button <calcite-icon icon="trash"></calcite-icon> will
               clear the input box and unselect the property.
             </p>
-            <h3  className={styles.header} id="property-details">Property Details</h3>
+            <h3 className={styles.header} id="property-details">
+              Property Details
+            </h3>
             <p>
               After you have selected a property. Details about that property
               are displayed including:
@@ -539,55 +572,73 @@ export default function Help({ open, onClose }: HelpProps) {
             <ul>Building Details</ul>
             <ul>Services</ul>
             <ul>Addresses</ul>
-
-            <h4 className={styles.header} id="property-links">Property Links</h4>
-            <h5 className={styles.header} id="google-link">Google Maps</h5>
+            <h4 className={styles.header} id="property-links">
+              Property Links
+            </h4>
+            <h5 className={styles.header} id="google-link">
+              Google Maps
+            </h5>
             <p>
               Press the Google Maps button to open Google Maps at the location
               of the selected property.
             </p>
-            <h5 className={styles.header} id="tax-link">Tax Page</h5>
+            <h5 className={styles.header} id="tax-link">
+              Tax Page
+            </h5>
             <p>
               Press the tax page button to view additional details about the
               property.
             </p>
-            <h5 className={styles.header} id="septic-link">Septic Permits</h5>
+            <h5 className={styles.header} id="septic-link">
+              Septic Permits
+            </h5>
             <p>
               If there is a septic permit associated with the property, a button
               will appear. Press to view the permit in a new browser tab.
             </p>
-
-            <h5 className={styles.header} id="well-link">Well Results</h5>
+            <h5 className={styles.header} id="well-link">
+              Well Results
+            </h5>
             <p>
-              If there are well testing results associated with the property,
-              a button will appear. Press to view the well testing details in a
+              If there are well testing results associated with the property, a
+              button will appear. Press to view the well testing details in a
               new browser tab.
             </p>
-            <h5 className={styles.header} id="county-link">Other Counties</h5>
+            <h5 className={styles.header} id="county-link">
+              Other Counties
+            </h5>
             <p>
               If the property is outside of Wake County, a button will appear
               with the county name as the label. Pressing the button will open
               that county's property research application.
             </p>
-            <h4 className={styles.header} id="deed-links">Deed and Plat Links</h4>
+            <h4 className={styles.header} id="deed-links">
+              Deed and Plat Links
+            </h4>
             <p>
               Under the deeds section, if a deed or book of maps is available
               for the property, a Deeds or Book of Maps button will display.
               Pressing the buttons will open the document in a new browser tab.
             </p>
-            <h4 className={styles.header} id="photos">Photos</h4>
+            <h4 className={styles.header} id="photos">
+              Photos
+            </h4>
             <p>
               If there are building photos available for the property, photos
               are displayed under the buildings section. If there are multiple
               photos available, press the arrow buttons below the photo.
             </p>
-            <h4 className={styles.header} id="services">Services</h4>
+            <h4 className={styles.header} id="services">
+              Services
+            </h4>
             <p>
               Under the services section an accordion is displayed with a list
               of different categories. Pressing a category displays details
               about that category for the selected property.
             </p>
-            <h4 className={styles.header} id="addresses">Addresses</h4>
+            <h4 className={styles.header} id="addresses">
+              Addresses
+            </h4>
             <p>
               A list of addresses located on the selected property are listed in
               a table. Pressing on an address in the table will zoom to that
@@ -598,20 +649,26 @@ export default function Help({ open, onClose }: HelpProps) {
               <calcite-icon icon="ellipsis"></calcite-icon> button and selecting
               Export to CSV.
             </p>
-            <h3  className={styles.header} id="property-list">Property List</h3>
+            <h3 className={styles.header} id="property-list">
+              Property List
+            </h3>
             <p>
               If there are multiple properties that match your search, they will
               be listed in the List tab. Pressing on a row in the table will
               select that property and switch to the Info tab.
             </p>
-            <h4 className={styles.header} id="export-csv">Export to CSV</h4>
+            <h4 className={styles.header} id="export-csv">
+              Export to CSV
+            </h4>
             <p>
               To export the list of selected properties to a CSV file, press the{" "}
               <calcite-icon icon="ellipsis"></calcite-icon> button and select
               Export to CSV. All attributes available (not just those displayed)
               will be included in the CSV file.
             </p>
-            <h4 className={styles.header} id="list-columns">Columns</h4>
+            <h4 className={styles.header} id="list-columns">
+              Columns
+            </h4>
             <p>
               By default only Address, Owner, REID, and PIN are displayed in the
               table. To view additional columns, press the columns button{" "}
@@ -627,8 +684,9 @@ export default function Help({ open, onClose }: HelpProps) {
             <h2 className={styles.header} id="layer-list">
               Layer List <calcite-icon icon="layers"></calcite-icon>
             </h2>
-
-            <h3  className={styles.header} id="group-layers">Group Layers</h3>
+            <h3 className={styles.header} id="group-layers">
+              Group Layers
+            </h3>
             <p>
               Layers are displayed in groups based on theme. To view the layers
               in a group. Press the right icon
@@ -638,7 +696,9 @@ export default function Help({ open, onClose }: HelpProps) {
               <calcite-icon icon="chevron-left"></calcite-icon> button to
               collapse the group.
             </p>
-            <h3  className={styles.header} id="search-layers">Layers</h3>
+            <h3 className={styles.header} id="search-layers">
+              Layers
+            </h3>
             <p>
               To make a layer visible, press the check box to the left of the
               layer name. Press again to hide the layer from the map.
@@ -648,14 +708,18 @@ export default function Help({ open, onClose }: HelpProps) {
               displayed at the current map scale. The layer will appear once you
               zoom into its minimum zoom scale.
             </p>
-            <h3  className={styles.header} id="search-layers">Searching Layers</h3>
+            <h3 className={styles.header} id="search-layers">
+              Searching Layers
+            </h3>
             <p>
               There are a large number of layers available in the map. To easily
               find a layer, start typing the layer name in the search box above
               the map. Layers with names matching what you have entered will be
               filtered from the list.
             </p>
-            <h3  className={styles.header} id="layer-options">Layer Options</h3>
+            <h3 className={styles.header} id="layer-options">
+              Layer Options
+            </h3>
             <p>
               When a layer is visible, the options button{" "}
               <calcite-icon icon="legend"></calcite-icon> appears to the right
@@ -664,20 +728,25 @@ export default function Help({ open, onClose }: HelpProps) {
               transparency of the layer. Slide to the left to make more
               transparent, slide to the right to make more opaque.
             </p>
-
-            <h4 className={styles.header} id="layer-transparency">Layer Transparency</h4>
+            <h4 className={styles.header} id="layer-transparency">
+              Layer Transparency
+            </h4>
             <p>
               Slide to the left to make more transparent, slide to the right to
               make more opaque.
             </p>
-            <h3  className={styles.header} id="property-labels">Property Labels</h3>
+            <h3 className={styles.header} id="property-labels">
+              Property Labels
+            </h3>
             <p>
               An additional button <calcite-icon icon="ellipsis"></calcite-icon>{" "}
               appears for the property layer. Press this button to see a list of
               labels that can be displayed on the map. Press on each type of
               label you would like to display. Press again to hide the label.
             </p>
-            <h3  className={styles.header} id="layer-reset">Resetting Layer Visibility</h3>
+            <h3 className={styles.header} id="layer-reset">
+              Resetting Layer Visibility
+            </h3>
             <p>
               To reset that layer list to its original state. Press the reset
               button <calcite-icon icon="reset"></calcite-icon> in the panel
@@ -696,7 +765,7 @@ export default function Help({ open, onClose }: HelpProps) {
               the tabs at the bottom of the panel to toggle between a the
               different base map types.
             </p>
-            <h3  className={styles.header} id="maps-basemaps">
+            <h3 className={styles.header} id="maps-basemaps">
               Maps <calcite-icon icon="basemap"></calcite-icon>
             </h3>
             <p>
@@ -704,33 +773,35 @@ export default function Help({ open, onClose }: HelpProps) {
               Wake County. These maps display data managed by the city and
               county.
             </p>
-            <h3  className={styles.header} id="image-basemaps">
+            <h3 className={styles.header} id="image-basemaps">
               Images <calcite-icon icon="image-layer"></calcite-icon>
             </h3>
             <p>
               These are aerial photography base maps available for the current
               year and previous years.
             </p>
-            <h4 className={styles.header} id="basemaps-blend">Blend</h4>
+            <h4 className={styles.header} id="basemaps-blend">
+              Blend
+            </h4>
             <p>
               Once an image base map is made available, the option to blend the
-              aerial photography with the default base map appears. Toggling the blend
-              switch displays a slider.
+              aerial photography with the default base map appears. Toggling the
+              blend switch displays a slider.
             </p>
             <p>
               Slide the slider to the left to make the default base map more
               transparent and to the right to make it less transparent.
             </p>
             <p>To disable the blending, uncheck the blend switch.</p>
-
             <calcite-notice open>
               <div slot="message">
                 <strong>Note: </strong> when the selected base map changes, the
                 blend option is disabled.
               </div>
             </calcite-notice>
-
-            <h4 className={styles.header} id="basemaps-availability">Image Basemap Availability</h4>
+            <h4 className={styles.header} id="basemaps-availability">
+              Image Basemap Availability
+            </h4>
             <p>
               Not all imagery is made available county wide, some are only
               available for the City of Raleigh jurisdiction. When the map
@@ -744,7 +815,7 @@ export default function Help({ open, onClose }: HelpProps) {
               the basemap will automatically change to the latest year available
               countywide. A warning will appear when the basemap changes.
             </p>
-            <h3  className={styles.header} id="esri-basemaps">
+            <h3 className={styles.header} id="esri-basemaps">
               Esri <calcite-icon icon="arcgis-online"></calcite-icon>
             </h3>
             <p>
@@ -787,7 +858,9 @@ export default function Help({ open, onClose }: HelpProps) {
                 any bookmarks you have added or modified.
               </div>
             </calcite-notice>
-            <h1 className={styles.header} id="tools">Tools</h1>
+            <h1 className={styles.header} id="tools">
+              Tools
+            </h1>
             <p>
               Tools appear in the top right corner of the map. To change tools,
               press on the button in the bottom half of the action bar on the
@@ -807,7 +880,9 @@ export default function Help({ open, onClose }: HelpProps) {
               Properties can also be selected on the map by drawing a shape on
               the map.
             </p>
-            <h3  className={styles.header} id="select-draw">Drawing a Shape</h3>
+            <h3 className={styles.header} id="select-draw">
+              Drawing a Shape
+            </h3>
             <p>Select from the following shape types:</p>
             <ul>
               <li>
@@ -859,21 +934,27 @@ export default function Help({ open, onClose }: HelpProps) {
                 </li>
               </ul>
             </ul>
-            <img className={styles.helpImage} src="./help/property_select.gif" alt="Video showing how to select by drawing a polygon."/>
-
-            <h3  className={styles.header} id="select-buffer">Specifying a Buffer</h3>
+            <img
+              className={styles.helpImage}
+              src="./help/property_select.gif"
+              alt="Video showing how to select by drawing a polygon."
+            />
+            <h3 className={styles.header} id="select-buffer">
+              Specifying a Buffer
+            </h3>
             <p>
               To apply a buffer distance to the shape, enter a distance in feet
               in the input box, then draw the shape on the map.
             </p>
-            <h3  className={styles.header} id="select-buffer">Buffer Selected Property</h3>
+            <h3 className={styles.header} id="select-buffer">
+              Buffer Selected Property
+            </h3>
             <p>
               If a single property is selected a Buffer Property button will
               display. Specify a buffer distance and press the button.
               Properties within that distance of the property boundary will be
               selected.
             </p>
-
             <h2 className={styles.header} id="location-search">
               Location Search <calcite-icon icon="pin"></calcite-icon>
             </h2>
@@ -902,15 +983,15 @@ export default function Help({ open, onClose }: HelpProps) {
                 been moved to the tool section.
               </div>
             </calcite-notice>
-
-            <h3  className={styles.header} id="intersection-search">Intersection Search</h3>
+            <h3 className={styles.header} id="intersection-search">
+              Intersection Search
+            </h3>
             <p>
               To search for an intersection, select a street name from the
               Intersection category. Once selected, all streets that intersect
               the selected street name will appear in a dropdown list. Selecting
               from the dropdown list will zoom the map to that intersection.
             </p>
-
             <h2 className={styles.header} id="measure">
               Measure <calcite-icon icon="measure-line"></calcite-icon>
             </h2>
@@ -959,24 +1040,30 @@ export default function Help({ open, onClose }: HelpProps) {
             <h2 className={styles.header} id="sketch">
               Sketch <calcite-icon icon="pencil"></calcite-icon>
             </h2>
-
-            <h3  className={styles.header} id="sketch-draw">Sketching on Map</h3>
-
-            <h3  className={styles.header} id="sketch-delete">Deleting a Sketch</h3>
-
-            <h3  className={styles.header} id="sketch-clear">Clearing all sketches</h3>
-
+            <h3 className={styles.header} id="sketch-draw">
+              Sketching on Map
+            </h3>
+            <h3 className={styles.header} id="sketch-delete">
+              Deleting a Sketch
+            </h3>
+            <h3 className={styles.header} id="sketch-clear">
+              Clearing all sketches
+            </h3>
             <h2 className={styles.header} id="print">
               Print <calcite-icon icon="print"></calcite-icon>
             </h2>
             <p>The map can be exported as a PDF or another image format.</p>
-            <h3  className={styles.header} id="print-layout">Layout Tab</h3>
+            <h3 className={styles.header} id="print-layout">
+              Layout Tab
+            </h3>
             <p>
               The layout tab is where you can define layout of the outputted
               file. Enter a title to include a title on the exported map, choose
               from different layouts and specify the file type.
             </p>
-            <h4 className={styles.header} id="print-scale">Print Scale</h4>
+            <h4 className={styles.header} id="print-scale">
+              Print Scale
+            </h4>
             <p>
               By default, the current scale of the map is used. A custom scale
               can be selected by selecting the Custom Scale radio button. A list
@@ -984,14 +1071,17 @@ export default function Help({ open, onClose }: HelpProps) {
               defined option to enter a scale in an input box in 1 inch equals
               feet format.
             </p>
-            <h4 className={styles.header} id="print-attributes">Show Attributes</h4>
+            <h4 className={styles.header} id="print-attributes">
+              Show Attributes
+            </h4>
             <p>
               If a single property is selected, an option to show attributes is
               displayed. Enabling this will display the attributes for the
               selected property next to the map.
             </p>
-
-            <h4 className={styles.header} id="print-legend">Show Legend</h4>
+            <h4 className={styles.header} id="print-legend">
+              Show Legend
+            </h4>
             <p>
               A legend can be included on the exported map by enabling the Show
               Legend option.
@@ -1003,7 +1093,9 @@ export default function Help({ open, onClose }: HelpProps) {
                 constraints.
               </div>
             </calcite-notice>
-            <h4 className={styles.header} id="print-area">Show Print Area</h4>
+            <h4 className={styles.header} id="print-area">
+              Show Print Area
+            </h4>
             <p>
               Displays the viewport of the export on the map. The viewport
               adjusted based on the scale and layout selected.
@@ -1014,7 +1106,9 @@ export default function Help({ open, onClose }: HelpProps) {
                 specified, as the viewport may exceed the current map extent.
               </div>
             </calcite-notice>
-            <h3  className={styles.header} id="print-exports">Exports Tab</h3>
+            <h3 className={styles.header} id="print-exports">
+              Exports Tab
+            </h3>
             <p>
               After you press the Export Map button, you will be taken to the
               Exports tab. Here you can see the status of the print job and also
