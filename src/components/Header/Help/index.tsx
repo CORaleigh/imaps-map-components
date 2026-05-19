@@ -254,13 +254,7 @@ export default function Help({ open, onClose }: HelpProps) {
       ],
     },
   ];
-  // const [faqSections, setFaqSections] = useState<FaqSection[]>([]);
 
-  //   useEffect(() => {
-  //     fetch("./faq.json")
-  //       .then((res) => res.json())
-  //       .then((data: FaqData) => setFaqSections(data.sections));
-  //   }, []);
   const scrollToSection = (id: string) => {
     const element = document.getElementById(id);
     console.log(element);
@@ -297,7 +291,7 @@ export default function Help({ open, onClose }: HelpProps) {
                     event: HTMLCalciteListItemElement["calciteListItemSelect"],
                   ) => {
                     const id = event.target.getAttribute("data-id");
-                    
+
                     if (!id) return;
                     scrollToSection(id);
                   }}
@@ -942,6 +936,11 @@ export default function Help({ open, onClose }: HelpProps) {
               To apply a buffer distance to the shape, enter a distance in feet
               in the input box, then draw the shape on the map.
             </p>
+            <img
+              className={styles.helpImage}
+              src="./help/property_select_buffer.gif"
+              alt="Video showing how to select by buffering the drawn shape."
+            ></img>
             <h3 className={styles.header} id="select-buffer">
               Buffer Selected Property
             </h3>
@@ -951,6 +950,11 @@ export default function Help({ open, onClose }: HelpProps) {
               Properties within that distance of the property boundary will be
               selected.
             </p>
+            <img
+              className={styles.helpImage}
+              src="./help/property_buffer.gif"
+              alt="Video showing how to select by buffering the selected property"
+            ></img>
             <h2 className={styles.header} id="location-search">
               Location Search <calcite-icon icon="pin"></calcite-icon>
             </h2>
@@ -988,6 +992,11 @@ export default function Help({ open, onClose }: HelpProps) {
               the selected street name will appear in a dropdown list. Selecting
               from the dropdown list will zoom the map to that intersection.
             </p>
+            <img
+              className={styles.helpImage}
+              src="./help/intersection_search.gif"
+              alt="Video showing how to search by intersection."
+            ></img>
             <h2 className={styles.header} id="measure">
               Measure <calcite-icon icon="measure-line"></calcite-icon>
             </h2>
@@ -1025,6 +1034,12 @@ export default function Help({ open, onClose }: HelpProps) {
                   imperial.
                 </li>
               </ul>
+              <img
+                className={styles.helpImage}
+                src="./help/measure_area.gif"
+                alt="Video showing how to measure an area."
+              ></img>
+
               <li>
                 Clear <calcite-icon icon="trash"></calcite-icon>
               </li>
