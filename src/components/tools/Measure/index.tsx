@@ -11,12 +11,14 @@ interface MeasureProps {
   mapElement: React.RefObject<HTMLArcgisMapElement>;
   closed: boolean;
   onToolClose: () => void;
+  onHelpClick: (id: string) => void;
 }
 
 const Measure: React.FC<MeasureProps> = ({
   mapElement,
   closed,
   onToolClose,
+  onHelpClick,
 }) => {
   const { areaMeasure, distanceMeasure, activeTool, handleActionClick } =
     useMeasure(mapElement);
@@ -30,31 +32,37 @@ const Measure: React.FC<MeasureProps> = ({
       collapsible
       className={styles.measurePanel}
     >
+      <calcite-action
+        slot="header-actions-end"
+        icon="question-mark"
+        text="Help"
+        onClick={() => onHelpClick("measure")}
+      ></calcite-action>
       <TipManager name="measure"></TipManager>
 
-        <calcite-action-bar layout="horizontal" expandDisabled>
-          <calcite-action
-            text="Distance"
-            icon="measure-line"
-            textEnabled
-            active={activeTool === "distance"}
-            onClick={() => handleActionClick("distance")}
-          ></calcite-action>
-          <calcite-action
-            text="Area"
-            icon="measure-area"
-            textEnabled
-            active={activeTool === "area"}
-            onClick={() => handleActionClick("area")}
-          ></calcite-action>
-          <calcite-action
-            text="Clear"
-            icon="trash"
-            textEnabled
-            onClick={() => handleActionClick(null)}
-          ></calcite-action>
-        </calcite-action-bar>
-      <div className={styles.measureContainer}>        
+      <calcite-action-bar layout="horizontal" expandDisabled>
+        <calcite-action
+          text="Distance"
+          icon="measure-line"
+          textEnabled
+          active={activeTool === "distance"}
+          onClick={() => handleActionClick("distance")}
+        ></calcite-action>
+        <calcite-action
+          text="Area"
+          icon="measure-area"
+          textEnabled
+          active={activeTool === "area"}
+          onClick={() => handleActionClick("area")}
+        ></calcite-action>
+        <calcite-action
+          text="Clear"
+          icon="trash"
+          textEnabled
+          onClick={() => handleActionClick(null)}
+        ></calcite-action>
+      </calcite-action-bar>
+      <div className={styles.measureContainer}>
         <arcgis-distance-measurement-2d
           ref={distanceMeasure}
           referenceElement={mapElement.current}

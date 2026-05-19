@@ -10,6 +10,8 @@ import TipManager from "../../TipsManager";
 interface BasemapsProps {
   mapElement: React.RefObject<HTMLArcgisMapElement>;
   onPanelClose: () => void;
+  onHelpClick: (id: string) => void;
+
   closed: boolean;
   style?: React.CSSProperties;
 }
@@ -18,6 +20,7 @@ const Basemaps: React.FC<BasemapsProps> = ({
   mapElement,
   closed,
   onPanelClose,
+  onHelpClick,
 }) => {
   const {
     mapsSource,
@@ -33,7 +36,7 @@ const Basemaps: React.FC<BasemapsProps> = ({
     handleSliderInput,
     handleGalleryChange,
     blendEnabled,
-    showBlendOption
+    showBlendOption,
   } = useBasemaps(mapElement);
   return (
     <>
@@ -44,14 +47,28 @@ const Basemaps: React.FC<BasemapsProps> = ({
         closed={closed}
         className={styles.basemapsPanel}
       >
+        <calcite-action
+          slot="header-actions-end"
+          icon="question-mark"
+          text="Help"
+          onClick={() => onHelpClick("basemaps")}
+        ></calcite-action>
         <TipManager name="basemaps"></TipManager>
         {selectedTab === "images" && showBlendOption && (
           <div slot="content-top">
             <calcite-label layout="inline">
-              <calcite-switch oncalciteSwitchChange={handleBlendChange} checked={blendEnabled}></calcite-switch>
+              <calcite-switch
+                oncalciteSwitchChange={handleBlendChange}
+                checked={blendEnabled}
+              ></calcite-switch>
               Blend
             </calcite-label>
-             <calcite-slider ref={blendSlider} hidden oncalciteSliderInput={handleSliderInput} value={50}></calcite-slider>
+            <calcite-slider
+              ref={blendSlider}
+              hidden
+              oncalciteSliderInput={handleSliderInput}
+              value={50}
+            ></calcite-slider>
           </div>
         )}
         <calcite-tabs
@@ -93,7 +110,7 @@ const Basemaps: React.FC<BasemapsProps> = ({
               referenceElement={mapElement.current}
               source={mapsSource}
               onarcgisReady={handleGalleryReady}
-              onarcgisPropertyChange={handleGalleryChange}              
+              onarcgisPropertyChange={handleGalleryChange}
             ></arcgis-basemap-gallery>
           </calcite-tab>
           <calcite-tab selected={selectedTab === "images"}>
@@ -127,5 +144,5 @@ export default React.memo(
   (prev, next) =>
     prev.mapElement === next.mapElement &&
     prev.closed === next.closed &&
-    prev.onPanelClose === next.onPanelClose
+    prev.onPanelClose === next.onPanelClose,
 );

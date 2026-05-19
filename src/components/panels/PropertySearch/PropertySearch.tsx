@@ -25,12 +25,14 @@ interface PropertySearchProps {
   mapElement: React.RefObject<HTMLArcgisMapElement>;
   closed: boolean;
   onPanelClose: () => void;
+  onHelpClick: (id: string) => void;
 }
 
 const PropertySearch: React.FC<PropertySearchProps> = ({
   mapElement,
   closed,
   onPanelClose,
+  onHelpClick,
 }) => {
   const {
     tableElement,
@@ -67,6 +69,12 @@ const PropertySearch: React.FC<PropertySearchProps> = ({
         closed={closed}
         id={styles.propertySearch}
       >
+        <calcite-action
+          slot="header-actions-end"
+          icon="question-mark"
+          text="Help"
+          onClick={() => onHelpClick("property-search")}
+        ></calcite-action>
         <TipManager name="property-search"></TipManager>
         <div slot="content-top" className={styles.searchTop}>
           <SearchInput
@@ -146,5 +154,5 @@ export default React.memo(
   (prev, next) =>
     prev.mapElement === next.mapElement &&
     prev.closed === next.closed &&
-    prev.onPanelClose === next.onPanelClose
+    prev.onPanelClose === next.onPanelClose,
 );

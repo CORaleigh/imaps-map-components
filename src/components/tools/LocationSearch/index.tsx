@@ -11,6 +11,7 @@ interface LocationSearchProps {
   mapElement: React.RefObject<HTMLArcgisMapElement>;
   closed: boolean;
   onToolClose: () => void;
+  onHelpClick: (id: string) => void;
   style?: React.CSSProperties;
 }
 
@@ -18,6 +19,7 @@ const LocationSearch: React.FC<LocationSearchProps> = ({
   mapElement,
   closed,
   onToolClose,
+  onHelpClick
 }) => {
   const {
     showIntersection,
@@ -37,6 +39,12 @@ const LocationSearch: React.FC<LocationSearchProps> = ({
       closed={closed}
       collapsible
     >
+      <calcite-action
+        slot="header-actions-end"
+        icon="question-mark"
+        text="Help"
+        onClick={() => onHelpClick("location-search")}
+      ></calcite-action>
       <TipManager name="location-search"></TipManager>
       <div className={styles.locationContainer}>
         <arcgis-search

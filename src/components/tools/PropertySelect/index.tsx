@@ -16,12 +16,14 @@ interface PropertySelectProps {
   mapElement: React.RefObject<HTMLArcgisMapElement>;
   closed: boolean;
   onToolClose: () => void;
+  onHelpClick: (id: string) => void;
 }
 
 const PropertySelect: React.FC<PropertySelectProps> = ({
   mapElement,
   closed,
   onToolClose,
+  onHelpClick,
 }) => {
   const {
     mapMode,
@@ -32,9 +34,11 @@ const PropertySelect: React.FC<PropertySelectProps> = ({
     handleClear,
     handleToolClose,
     handleBufferProperty,
-  } = usePropertySelect(mapElement, 
-    // closed, 
-    onToolClose);
+  } = usePropertySelect(
+    mapElement,
+    // closed,
+    onToolClose,
+  );
   return (
     <>
       <calcite-panel
@@ -44,6 +48,12 @@ const PropertySelect: React.FC<PropertySelectProps> = ({
         closed={closed}
         collapsible
       >
+        <calcite-action
+          slot="header-actions-end"
+          icon="question-mark"
+          text="Help"
+          onClick={() => onHelpClick("property-select")}
+        ></calcite-action>
         <TipManager name="property-select"></TipManager>
 
         <calcite-action-bar layout="horizontal" expandDisabled>

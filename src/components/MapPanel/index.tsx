@@ -35,6 +35,7 @@ interface MapPanelProps {
     event: HTMLArcgisExpandElement["arcgisPropertyChange"],
   ) => void;
   onToolClose: () => void;
+  onHelpClick: (id: string) => void;
 }
 
 // Lazy-loaded tools with preload
@@ -57,6 +58,7 @@ const MapPanel: React.FC<MapPanelProps> = ({
   onCoordinateExpand,
   onOverviewExpand,
   onToolClose,
+  onHelpClick,
 }) => {
   // useEffect(() => {
   //   const tools = [PropertySelect, LocationSearch, Measure, Sketch, Print];
@@ -144,6 +146,7 @@ const MapPanel: React.FC<MapPanelProps> = ({
               mapElement={mapElement}
               onToolClose={onToolClose}
               closed={activeTool !== "select"}
+              onHelpClick={(id: string) => onHelpClick(id)}
             ></PropertySelect>
           </Suspense>
         )}
@@ -153,6 +156,7 @@ const MapPanel: React.FC<MapPanelProps> = ({
               mapElement={mapElement}
               onToolClose={onToolClose}
               closed={activeTool !== "location"}
+              onHelpClick={(id: string) => onHelpClick(id)}
             />
           </Suspense>
         )}
@@ -162,6 +166,7 @@ const MapPanel: React.FC<MapPanelProps> = ({
               onToolClose={onToolClose}
               mapElement={mapElement}
               closed={activeTool !== "measure"}
+              onHelpClick={(id: string) => onHelpClick(id)}
             ></Measure>
           </Suspense>
         )}
@@ -171,6 +176,7 @@ const MapPanel: React.FC<MapPanelProps> = ({
               onToolClose={onToolClose}
               closed={activeTool !== "sketch"}
               mapElement={mapElement}
+              onHelpClick={(id: string) => onHelpClick(id)}
             ></Sketch>
           </Suspense>
         )}
@@ -180,6 +186,7 @@ const MapPanel: React.FC<MapPanelProps> = ({
               mapElement={mapElement}
               onToolClose={onToolClose}
               closed={activeTool !== "print"}
+              onHelpClick={(id: string) => onHelpClick(id)}
             ></Print>
           </Suspense>
         )}

@@ -11,6 +11,7 @@ import styles from "./LayerList.module.css";
 interface LayerListProps {
   mapElement: React.RefObject<HTMLArcgisMapElement>;
   onPanelClose: () => void;
+  onHelpClick: (id: string) => void;
   closed: boolean;
   style?: React.CSSProperties;
 }
@@ -19,6 +20,7 @@ const LayerList: React.FC<LayerListProps> = ({
   mapElement,
   closed,
   onPanelClose,
+  onHelpClick,
 }) => {
   const {
     layerListElement,
@@ -36,6 +38,12 @@ const LayerList: React.FC<LayerListProps> = ({
         oncalcitePanelClose={() => onPanelClose()}
         closed={closed}
       >
+        <calcite-action
+          slot="header-actions-end"
+          icon="question-mark"
+          text="Help"
+          onClick={() => onHelpClick("layer-list")}
+        ></calcite-action>
         <TipManager name="layer-list"></TipManager>
 
         <calcite-action
@@ -77,5 +85,5 @@ export default React.memo(
   (prev, next) =>
     prev.mapElement === next.mapElement &&
     prev.closed === next.closed &&
-    prev.onPanelClose === next.onPanelClose
+    prev.onPanelClose === next.onPanelClose,
 );

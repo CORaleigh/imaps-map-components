@@ -28,9 +28,10 @@ interface SketchProps {
   mapElement: React.RefObject<HTMLArcgisMapElement>;
   closed: boolean;
   onToolClose: () => void;
+  onHelpClick: (id: string) => void;
 }
 
-const Sketch: React.FC<SketchProps> = ({ mapElement, closed, onToolClose }) => {
+const Sketch: React.FC<SketchProps> = ({ mapElement, closed, onToolClose, onHelpClick }) => {
   const {
     mapMode,
     pointSymbol,
@@ -63,12 +64,18 @@ const Sketch: React.FC<SketchProps> = ({ mapElement, closed, onToolClose }) => {
           collapsible
           style={{ marginRight: "1em" }}
         >
-        <TipManager name="sketch"></TipManager>
+          <calcite-action
+            slot="header-actions-end"
+            icon="question-mark"
+            text="Help"
+            onClick={() => onHelpClick("sketch")}
+          ></calcite-action>
+          <TipManager name="sketch"></TipManager>
 
           <div className={styles.panelContent}>
             <calcite-action-bar layout="horizontal" expandDisabled>
               <calcite-action
-              id="sketch-point-action"
+                id="sketch-point-action"
                 text="Point"
                 icon="pin"
                 onClick={() => handleActionClick("point")}
@@ -89,7 +96,7 @@ const Sketch: React.FC<SketchProps> = ({ mapElement, closed, onToolClose }) => {
                 active={mapMode === "polygon"}
               ></calcite-action>
               <calcite-action
-                id="sketch-rectangle-action"  
+                id="sketch-rectangle-action"
                 text="Rectangle"
                 icon="rectangle"
                 onClick={() => handleActionClick("rectangle")}
@@ -103,7 +110,7 @@ const Sketch: React.FC<SketchProps> = ({ mapElement, closed, onToolClose }) => {
                 active={mapMode === "circle"}
               ></calcite-action>
               <calcite-action
-                id="sketch-text-action" 
+                id="sketch-text-action"
                 text="Text"
                 icon="text"
                 onClick={() => handleActionClick("text")}
@@ -153,7 +160,11 @@ const Sketch: React.FC<SketchProps> = ({ mapElement, closed, onToolClose }) => {
           )}
           {(["polygon", "rectangle", "circle"].includes(mapMode as string) ||
             selectedGraphicsType === "polygon") && (
-            <calcite-block heading="Polygon Style" label="Polygon Style" expanded>
+            <calcite-block
+              heading="Polygon Style"
+              label="Polygon Style"
+              expanded
+            >
               <FillSymbolPicker
                 symbol={polygonSymbol}
                 onSymbolChange={handlePolygonSymbolChange}
@@ -211,7 +222,7 @@ const Sketch: React.FC<SketchProps> = ({ mapElement, closed, onToolClose }) => {
       </calcite-tooltip>
       <calcite-tooltip closeOnClick reference-element="sketch-select-action">
         Select sketch
-      </calcite-tooltip>      
+      </calcite-tooltip>
       <calcite-tooltip closeOnClick reference-element="sketch-clear-action">
         Clear sketch
       </calcite-tooltip>

@@ -11,12 +11,14 @@ interface BookmarksProps {
   mapElement: React.RefObject<HTMLArcgisMapElement>;
   closed: boolean;
   onPanelClose: () => void;
+  onHelpClick: (id: string) => void;
 }
 
 const Bookmarks: React.FC<BookmarksProps> = ({
   mapElement,
   closed,
   onPanelClose,
+  onHelpClick,
 }) => {
   const initializedRef = useRef(false);
   const { webMapId } = useMap();
@@ -33,6 +35,12 @@ const Bookmarks: React.FC<BookmarksProps> = ({
       closed={closed}
       className={styles.bookmarksPanel}
     >
+      <calcite-action
+        slot="header-actions-end"
+        icon="question-mark"
+        text="Help"
+        onClick={() => onHelpClick("bookmarks")}
+      ></calcite-action>
       <TipManager name="bookmarks"></TipManager>
 
       <arcgis-bookmarks
@@ -49,14 +57,13 @@ const Bookmarks: React.FC<BookmarksProps> = ({
             flow.style.height = "calc(100vh - 32px - 50px - 41px)";
           }
           reactiveUtils.watch(
-            () =>
-              bookmarks.bookmarks.toArray().map((b:Bookmark) => b.name), // or id
+            () => bookmarks.bookmarks.toArray().map((b: Bookmark) => b.name), // or id
             () => {
               localStorage.setItem(
                 `imaps_${webMapId.current}_bookmarks`,
-                JSON.stringify(bookmarks.bookmarks.toArray() ?? [])
+                JSON.stringify(bookmarks.bookmarks.toArray() ?? []),
               );
-            }
+            },
           );
         }}
       ></arcgis-bookmarks>

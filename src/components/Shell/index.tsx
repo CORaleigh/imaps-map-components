@@ -53,6 +53,8 @@ const Shell: React.FC = () => {
     handleOverviewExpandChange,
     handleHelpClosed,
     handleHelpOpened,
+    handleHelpClick,
+    helpId,
     mapElement,
     mapReady,
   } = useShell();
@@ -83,6 +85,7 @@ const Shell: React.FC = () => {
                   mapElement={mapElement}
                   onPanelClose={handlePanelClose}
                   closed={activePanel !== "propertySearch"}
+                  onHelpClick={(id: string) => handleHelpClick(id)}
                 />
               </Suspense>
             </div>
@@ -94,6 +97,7 @@ const Shell: React.FC = () => {
                   mapElement={mapElement}
                   onPanelClose={handlePanelClose}
                   closed={activePanel !== "bookmarks"}
+                  onHelpClick={(id: string) => handleHelpClick(id)}
                 ></Bookmarks>
               </Suspense>
             </div>
@@ -105,6 +109,7 @@ const Shell: React.FC = () => {
                   mapElement={mapElement}
                   onPanelClose={handlePanelClose}
                   closed={activePanel !== "layerList"}
+                  onHelpClick={(id: string) => handleHelpClick(id)}
                 />
               </Suspense>
             </div>
@@ -128,6 +133,7 @@ const Shell: React.FC = () => {
                   mapElement={mapElement}
                   onPanelClose={handlePanelClose}
                   closed={activePanel !== "basemap"}
+                  onHelpClick={(id: string) => handleHelpClick(id)}
                 />
               </Suspense>
             </div>
@@ -292,6 +298,7 @@ const Shell: React.FC = () => {
           onCustomActionClick={handleCustomActionClick}
           onGoHome={handleGoToHome}
           onToolClose={handleToolClose}
+          onHelpClick={(id: string) => handleHelpClick(id)}
         ></MapPanel>
         <calcite-tooltip closeOnClick reference-element="overview-action">
           Overview
@@ -309,7 +316,7 @@ const Shell: React.FC = () => {
         checkbox={checkbox}
         onClose={handleDialogClose}
       ></Disclaimer>
-      <Help open={showHelp} onClose={handleHelpClosed}></Help>
+      <Help open={showHelp} onClose={handleHelpClosed} goToId={helpId}></Help>
     </>
   );
 };

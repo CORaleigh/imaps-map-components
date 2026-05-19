@@ -56,8 +56,11 @@ export interface UseShellProps {
   ) => void;
   handleHelpClosed: () => void;
   handleHelpOpened: () => void;
+  handleHelpClick: (id: string) => void;
+
   showHelp: boolean;
   mapReady: boolean;
+  helpId: string | undefined;
 }
 
 export const useShell = (): UseShellProps => {
@@ -84,9 +87,10 @@ export const useShell = (): UseShellProps => {
   const [openedTools, setOpenedTools] = useState<ToolType[]>([]);
   const [coordinateConversionOpen, setCoordinateConversionOpen] =
     useState<boolean>(false);
-  const [overviewOpen, setOverviewOpen] =
-    useState<boolean>(false);    
+  const [overviewOpen, setOverviewOpen] = useState<boolean>(false);
   const [showHelp, setShowHelp] = useState<boolean>(false);
+
+  const [helpId, setHelpId] = useState<string>();
   const handleThemeClick = useCallback(() => {
     setTheme((prev: "light" | "dark") => {
       const newTheme = prev === "light" ? "dark" : "light";
@@ -219,16 +223,21 @@ export const useShell = (): UseShellProps => {
         ?.querySelector("calcite-popover")
         ?.setAttribute("aria-label", event.target.ariaLabel);
     });
-  };  
-
-
+  };
 
   const handleHelpClosed = () => {
     setShowHelp(false);
+     setHelpId(undefined);
   };
   const handleHelpOpened = () => {
     setShowHelp(true);
   };
+
+  const handleHelpClick = (id: string) => {
+    setShowHelp(true);
+    setHelpId(id);
+  };
+
   useEffect(() => {
     if (appSize !== "large" && activePanel) {
       setActiveTool(null);
@@ -251,6 +260,7 @@ export const useShell = (): UseShellProps => {
     coordinateConversionOpen,
     overviewOpen,
     showHelp,
+    helpId,
     handleThemeClick,
     handlePanelActionClick,
     handlePanelClose,
@@ -264,6 +274,7 @@ export const useShell = (): UseShellProps => {
     handleOverviewExpandChange,
     handleHelpClosed,
     handleHelpOpened,
+    handleHelpClick,
     mapReady,
   };
 };

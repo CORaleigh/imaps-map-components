@@ -22,9 +22,10 @@ interface PrintProps {
   mapElement: React.RefObject<HTMLArcgisMapElement>;
   closed: boolean;
   onToolClose: () => void;
+  onHelpClick: (id: string) => void;
 }
 
-const Print: React.FC<PrintProps> = ({ mapElement, closed, onToolClose }) => {
+const Print: React.FC<PrintProps> = ({ mapElement, closed, onToolClose, onHelpClick }) => {
   const {
     printOptions,
     exports,
@@ -55,7 +56,12 @@ const Print: React.FC<PrintProps> = ({ mapElement, closed, onToolClose }) => {
       closed={closed}
       collapsible
     >
-      
+      <calcite-action
+        slot="header-actions-end"
+        icon="question-mark"
+        text="Help"
+        onClick={() => onHelpClick("print")}
+      ></calcite-action>
       <TipManager name="print"></TipManager>
       <calcite-tabs bordered position="top">
         <calcite-tab-nav

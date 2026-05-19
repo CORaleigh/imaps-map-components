@@ -24,9 +24,10 @@ interface HelpSection {
 interface HelpProps {
   open: boolean;
   onClose: () => void;
+  goToId: string | undefined;
 }
 
-export default function Help({ open, onClose }: HelpProps) {
+export default function Help({ open, onClose, goToId }: HelpProps) {
   function useMediaQuery(query: string) {
     const [matches, setMatches] = useState(
       () => window.matchMedia(query).matches,
@@ -42,6 +43,12 @@ export default function Help({ open, onClose }: HelpProps) {
 
     return matches;
   }
+  useEffect(() => {
+    if (!goToId) return;
+    requestAnimationFrame(() => {
+      scrollToSection(goToId);
+    });
+  }, [goToId]);
 
   const isSmall = useMediaQuery("(max-width: 768px)");
   const [showToc, setShowToc] = useState<boolean>(!isSmall);
@@ -257,7 +264,6 @@ export default function Help({ open, onClose }: HelpProps) {
 
   const scrollToSection = (id: string) => {
     const element = document.getElementById(id);
-    console.log(element);
 
     if (element) {
       element.scrollIntoView({ behavior: "smooth", block: "start" });
