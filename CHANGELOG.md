@@ -4,8 +4,8 @@
   released 6/1/2026
 
 ## 
-  @arcgis-map-components: 5.0
-  @esri/calcite-components: 5.0.19
+  @arcgis-map-components: 5.0.19
+  @esri/calcite-components: 5.0.2
 
 
 ## Migrated from ArcGIS JS SDK Widgets to Components
