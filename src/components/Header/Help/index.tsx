@@ -244,12 +244,23 @@ export default function Help({ open, onClose }: HelpProps) {
   //       .then((res) => res.json())
   //       .then((data: FaqData) => setFaqSections(data.sections));
   //   }, []);
-  const scrollToSection = (id: string) => {
-    const element = document.getElementById(id);
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth", block: "start" });
+  // Handles both string id and event for onClick
+  const scrollToSection = (idOrEvent: string | React.MouseEvent<HTMLElement>) => {
+    let id = "";
+    if (typeof idOrEvent === "string") {
+      id = idOrEvent;
+    } else if (idOrEvent && idOrEvent.currentTarget) {
+      id = idOrEvent.currentTarget.getAttribute("data-id") || "";
+    }
+    if (id) {
+      const element = document.getElementById(id);
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
     }
   };
+
+  
 
   return (
     <calcite-dialog
@@ -279,11 +290,7 @@ export default function Help({ open, onClose }: HelpProps) {
                   key={section.id}
                   data-id={section.id}
                   expanded
-                  onClick={(event) => {
-                    (event.target as HTMLCalciteTreeItemElement).expanded =
-                      true;
-                    scrollToSection(section.id);
-                  }}
+                  onClick={scrollToSection}
                   iconStart={section.icon}
                 >
                   {section.sections && (
@@ -497,6 +504,7 @@ export default function Help({ open, onClose }: HelpProps) {
               will appear in a list below, once you see the suggestion you want,
               press on it.
             </p>
+            <img className={styles.helpImage} src="./help/property_search.gif" alt="Video showing how to search by address"/>
             <p>
               If you press the enter key while typing, all properties containing
               what you have typed will be searched for.
@@ -851,6 +859,8 @@ export default function Help({ open, onClose }: HelpProps) {
                 </li>
               </ul>
             </ul>
+            <img className={styles.helpImage} src="./help/property_select.gif" alt="Video showing how to select by drawing a polygon."/>
+
             <h3  className={styles.header} id="select-buffer">Specifying a Buffer</h3>
             <p>
               To apply a buffer distance to the shape, enter a distance in feet

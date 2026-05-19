@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 
 interface HeaderLink {
   title: string;
@@ -19,11 +19,13 @@ export interface UseHeaderProps {
 
 export const useHeader = (webMapId: string): UseHeaderProps => {
   const links = useRef<HeaderLinkGroup[]>([]);
+
   const params = new URLSearchParams(window.location.search);
   const app = params.get("app") ?? "config";
 
   // inside component:
   const logo = useRef(app === "puma" ? "puma" : "logo");
+
   const handleDropdownOpen = (
     event: HTMLCalciteDropdownElement["calciteDropdownOpen"],
   ) => {
@@ -46,7 +48,17 @@ export const useHeader = (webMapId: string): UseHeaderProps => {
     localStorage.removeItem(`imaps_theme_mode`);
     window.location.reload();
   };
-
+  useEffect(() => {
+    (async () => {
+      const params = new URLSearchParams(window.location.search);
+      const app = params.get("app") ?? "config";
+      const res = await fetch(`${app}.json`);
+      const data = await res.json();
+      if (data.links) {
+        links.current = data.links;
+      }
+    })();
+  }, []);
   return {
     links,
     logo,
