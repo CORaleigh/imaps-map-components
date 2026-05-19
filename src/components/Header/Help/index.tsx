@@ -384,7 +384,7 @@ export default function Help({ open, onClose }: HelpProps) {
               </li>
               <li>
                 To <strong>rotate</strong> the map with a mouse, press and hold
-                the right mounse button and move the mouse to the left or the
+                the right mouse button and move the mouse to the left or the
                 right.
               </li>
               <li>
@@ -551,7 +551,7 @@ export default function Help({ open, onClose }: HelpProps) {
 
             <h5 className={styles.header} id="well-link">Well Results</h5>
             <p>
-              If there is are well testing results associated with the property,
+              If there are well testing results associated with the property,
               a button will appear. Press to view the well testing details in a
               new browser tab.
             </p>
@@ -559,13 +559,12 @@ export default function Help({ open, onClose }: HelpProps) {
             <p>
               If the property is outside of Wake County, a button will appear
               with the county name as the label. Pressing the button will open
-              that county's property research application. Press to view the
-              well testing details in a new browser tab.
+              that county's property research application.
             </p>
             <h4 className={styles.header} id="deed-links">Deed and Plat Links</h4>
             <p>
               Under the deeds section, if a deed or book of maps is available
-              for the property a Deeds or Book of Maps button will display.
+              for the property, a Deeds or Book of Maps button will display.
               Pressing the buttons will open the document in a new browser tab.
             </p>
             <h4 className={styles.header} id="photos">Photos</h4>
@@ -624,10 +623,10 @@ export default function Help({ open, onClose }: HelpProps) {
             <h3  className={styles.header} id="group-layers">Group Layers</h3>
             <p>
               Layers are displayed in groups based on theme. To view the layers
-              in a group. Press the right chevron
+              in a group. Press the right icon
               <calcite-icon icon="chevron-right"></calcite-icon>
               to the left of the layer name to expand the group. Press the left
-              chevron
+              icon
               <calcite-icon icon="chevron-left"></calcite-icon> button to
               collapse the group.
             </p>
@@ -637,9 +636,9 @@ export default function Help({ open, onClose }: HelpProps) {
               layer name. Press again to hide the layer from the map.
             </p>
             <p>
-              If the layer name appears to be grayed out, that layer can not be
+              If the layer name appears to be grayed out, that layer cannot be
               displayed at the current map scale. The layer will appear once you
-              zoom into is minimum zoom scale.
+              zoom into its minimum zoom scale.
             </p>
             <h3  className={styles.header} id="search-layers">Searching Layers</h3>
             <p>
@@ -706,9 +705,9 @@ export default function Help({ open, onClose }: HelpProps) {
             </p>
             <h4 className={styles.header} id="basemaps-blend">Blend</h4>
             <p>
-              Once an image base map is made avaiable, the option to blend the
-              aerial photography with the default base map. Toggling the blend
-              switch displays are slider.
+              Once an image base map is made available, the option to blend the
+              aerial photography with the default base map appears. Toggling the blend
+              switch displays a slider.
             </p>
             <p>
               Slide the slider to the left to make the default base map more
@@ -769,14 +768,14 @@ export default function Help({ open, onClose }: HelpProps) {
             <p>
               The bookmarks can also be reordered by pressing and holding the
               drag button <calcite-icon icon="drag"></calcite-icon>, dragging
-              the bookmark to a new position and releasing.
+              the bookmark to a new position, and releasing.
             </p>
             <p>
-              These bookmarks will be displayed the next time your visit iMAPS.
+              These bookmarks will be displayed the next time you visit iMAPS.
             </p>
             <calcite-notice open>
               <div slot="message">
-                <strong>Note: </strong> clearing your browser cache will remove
+                <strong>Note: </strong> Clearing your browser cache will remove
                 any bookmarks you have added or modified.
               </div>
             </calcite-notice>
@@ -788,7 +787,7 @@ export default function Help({ open, onClose }: HelpProps) {
             </p>
             <p>
               If the tool gets in the way of the map, it can be collapsed by
-              pressing the chevron button{" "}
+              pressing the up icon{" "}
               <calcite-icon icon="chevron-up"></calcite-icon> and then expanded
               by clicking it again{" "}
               <calcite-icon icon="chevron-down"></calcite-icon>.
@@ -917,8 +916,8 @@ export default function Help({ open, onClose }: HelpProps) {
                 <li>
                   As the cursor moves on the map, the distance will change.
                 </li>
-                <li>Tap on the map against to add a vertex to the line.</li>
-                <li>Double tap to complete the measement.</li>
+                <li>Tap on the map again to add a vertex to the line.</li>
+                <li>Double tap to complete the measurement.</li>
                 <li>Press the New Measurement button to measure again.</li>
                 <li>
                   Units can be changed in the unit dropdown list. The default is
@@ -931,8 +930,8 @@ export default function Help({ open, onClose }: HelpProps) {
               <ul>
                 <li>Start measuring by single pressing on the map. </li>
                 <li>As the cursor moves on the map, the area will change.</li>
-                <li>Tap on the map against to add a vertex to the polygon.</li>
-                <li>Double tap to complete the measement.</li>
+                <li>Tap on the map again to add a vertex to the polygon.</li>
+                <li>Double tap to complete the measurement.</li>
                 <li>Press the New Measurement button to measure again.</li>
                 <li>
                   Units can be changed in the unit dropdown list. The default is
