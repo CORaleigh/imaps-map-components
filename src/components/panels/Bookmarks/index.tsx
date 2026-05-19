@@ -47,8 +47,7 @@ const Bookmarks: React.FC<BookmarksProps> = ({
         referenceElement={mapElement.current}
         showAddBookmarkButton
         showEditBookmarkButton
-        dragEnabled
-        defaultEditOptions={{ takeScreenshot: false }}
+        defaultEditOptions={{ takeScreenshot: true }}
         onarcgisReady={(event) => {
           const bookmarks = event.target;
           if (!bookmarks) return;
