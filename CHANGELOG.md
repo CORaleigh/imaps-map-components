@@ -32,3 +32,6 @@
 
 ## Changes to layer persistence
 - previous version stored entire web map JSON, this version stores properties for the visible layers which is used to control which layers are visible on load.
+
+## Dark/Light theme toggle moved
+- the dark/light them toogle has been moved from the menu to the bottom of the action bar on the right side.
