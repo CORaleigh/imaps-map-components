@@ -61,7 +61,7 @@ export default function Help({ open, onClose }: HelpProps) {
           id: "map-tools",
           title: "Map Tools",
           sections: [
-            { id: "zoom-tools", title: "Zoom Tools" },
+            { id: "zoom-tools", title: "Zoom Tools", icon: "plus" },
             { id: "home-tool", title: "Home Tool", icon: "home" },
             {
               id: "compass-tool",
@@ -83,7 +83,11 @@ export default function Help({ open, onClose }: HelpProps) {
               title: "Streetview Tool",
               icon: "360-view",
             },
-            { id: "overview-map", title: "Overview Map" },
+            {
+              id: "overview-map",
+              title: "Overview Map",
+              icon: "arrow-up-left",
+            },
             {
               id: "coordinates-tool",
               title: "Coordinates Tool",
@@ -289,9 +293,13 @@ export default function Help({ open, onClose }: HelpProps) {
                   data-id={section.id}
                   expanded
                   iconStart={section.icon}
-                  onClick={(event) => {
-                    event.currentTarget.expanded = true;
-                    scrollToSection(section.id);
+                  oncalciteListItemSelect={(
+                    event: HTMLCalciteListItemElement["calciteListItemSelect"],
+                  ) => {
+                    const id = event.target.getAttribute("data-id");
+                    
+                    if (!id) return;
+                    scrollToSection(id);
                   }}
                 >
                   {section.sections && (
@@ -307,10 +315,6 @@ export default function Help({ open, onClose }: HelpProps) {
                           data-id={subSection.id}
                           expanded
                           iconStart={subSection.icon}
-                          onClick={(event) => {
-                            event.currentTarget.expanded = true;
-                            scrollToSection(subSection.id);
-                          }}
                         >
                           {subSection.sections && (
                             <calcite-list
@@ -325,10 +329,6 @@ export default function Help({ open, onClose }: HelpProps) {
                                   data-id={subSection1.id}
                                   expanded
                                   iconStart={subSection1.icon}
-                                  onClick={(event) => {
-                                    event.currentTarget.expanded = true;
-                                    scrollToSection(subSection1.id);
-                                  }}
                                 >
                                   {subSection1.sections && (
                                     <calcite-list
@@ -343,10 +343,6 @@ export default function Help({ open, onClose }: HelpProps) {
                                             key={subSection2.id}
                                             data-id={subSection2.id}
                                             expanded
-                                            onClick={(event) => {
-                                              event.currentTarget.expanded = true;
-                                              scrollToSection(subSection2.id);
-                                            }}
                                           ></calcite-list-item>
                                         ),
                                       )}
