@@ -66,7 +66,6 @@ export const useShell = (): UseShellProps => {
   const {
     mapElement,
     mapReady,
-    setMapReady,
     setGeometry,
     webMapId,
     selectedCondo,
@@ -170,10 +169,8 @@ export const useShell = (): UseShellProps => {
         }),
       );
 
-      setMapReady(true);
       event.target.addEventListener("arcgisViewChange", handleViewChange);
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [handleViewChange, webMapId],
   );
   const handleViewHold = useCallback(
