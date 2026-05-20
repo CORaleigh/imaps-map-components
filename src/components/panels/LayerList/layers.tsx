@@ -120,6 +120,7 @@ export const updatePropertyLabels = (
     
     if (selectedTitles.length === 0) {
        layer.labelingInfo = [];
+       localStorage.removeItem(`imaps_${webMapId}_property_labels`);
        return;
     }
     const selectedExpressions = propertyLabelExpressions.filter(
