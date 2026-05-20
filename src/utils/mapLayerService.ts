@@ -431,9 +431,8 @@ class LayerService {
   }
 
   async restorePersistedState() {
-    
     if (!this.view?.map) return;
-  
+
     const raw = localStorage.getItem(this.persistKey);
     if (!raw) return;
 
@@ -444,6 +443,21 @@ class LayerService {
       this.view.map.allLayers.toArray().map((l) => [l.title, l])
     );
 
+    // First, set all group layer visibilities and opacities (top-down)
+    for (const lp of state.layers) {
+      const layer = layerMap.get(lp.id);
+      if (!layer) continue;
+      if (!layer.loaded) {
+        await layer.load();
+      }
+      // Set group layer visibility and opacity first
+      if (layer instanceof GroupLayer) {
+        layer.visible = lp.visible;
+        layer.opacity = lp.opacity;
+      }
+    }
+
+    // Then, set all other layers and sublayers
     for (const lp of state.layers) {
       const layer = layerMap.get(lp.id);
       if (!layer) continue;
@@ -451,9 +465,13 @@ class LayerService {
         await layer.load();
       }
 
-      layer.visible = lp.visible;
-      layer.opacity = lp.opacity;
+      // Only set non-group layer visibility here, group layers already set above
+      if (!(layer instanceof GroupLayer)) {
+        layer.visible = lp.visible;
+        layer.opacity = lp.opacity;
+      }
 
+      // Now set sublayers for GroupLayer
       if (layer instanceof GroupLayer && layer.layers && lp.sublayers) {
         const sublayersArray = layer.layers.toArray();
         for (let idx = 0; idx < sublayersArray.length; idx++) {
@@ -465,20 +483,18 @@ class LayerService {
           }
         }
       }
-    if (layer instanceof MapImageLayer && layer.sublayers && lp.sublayers) {
-      const sublayersArray = layer.sublayers.toArray();
-
-      for (let idx = 0; idx < sublayersArray.length; idx++) {
-        const sl = sublayersArray[idx];
-        const slPersist = lp.sublayers[idx];
-        if (!slPersist) continue;
-
-        sl.visible = slPersist.visible;
-        console.log(sl.visible, layer.title, idx)
-        // MapImageLayer sublayers DO have opacity, but it's on the layer object
-        if (slPersist.opacity != null) sl.opacity = slPersist.opacity;
+      // And for MapImageLayer
+      if (layer instanceof MapImageLayer && layer.sublayers && lp.sublayers) {
+        const sublayersArray = layer.sublayers.toArray();
+        for (let idx = 0; idx < sublayersArray.length; idx++) {
+          const sl = sublayersArray[idx];
+          const slPersist = lp.sublayers[idx];
+          if (!slPersist) continue;
+          sl.visible = slPersist.visible;
+          // MapImageLayer sublayers DO have opacity, but it's on the layer object
+          if (slPersist.opacity != null) sl.opacity = slPersist.opacity;
+        }
       }
-    }      
     }
   }
 
