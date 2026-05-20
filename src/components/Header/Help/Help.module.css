@@ -6,11 +6,9 @@
 
 @media (max-width: 900px) {
   .col2 {
-      flex-direction: column;
-
+    flex-direction: column;
   }
 }
-
 
 .header calcite-icon {
   margin-left: 5px;

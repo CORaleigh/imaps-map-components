@@ -11,6 +11,7 @@ import "@esri/calcite-components/components/calcite-shell-panel";
 import "@esri/calcite-components/components/calcite-fab";
 import "@esri/calcite-components/components/calcite-icon";
 import "@esri/calcite-components/components/calcite-notice";
+
 import styles from "./Help.module.css";
 
 import { useEffect, useState } from "react";
@@ -387,7 +388,7 @@ export default function Help({ open, onClose, goToId }: HelpProps) {
             <h1 className={styles.header} id="using-map">
               Using Map
             </h1>
-            <hr/>
+            <hr />
             <h2 className={styles.header} id="navigating-map">
               Navigating Map
             </h2>
@@ -421,6 +422,7 @@ export default function Help({ open, onClose, goToId }: HelpProps) {
                 with two fingers and twist to rotate.
               </li>
             </ul>
+            <calcite-link target="_blank" href="https://developers.arcgis.com/javascript/latest/references/core/views/MapView/#mapview-navigation" alt="Link to ArcGIS documentation for navigation">Additional Documentation</calcite-link>
             <h2 className={styles.header} id="longpress-map">
               Long Press to Select Property
             </h2>
@@ -472,9 +474,9 @@ export default function Help({ open, onClose, goToId }: HelpProps) {
               The identify tool allows you to press on a feature on the map to
               view a popup with details about the feature.
             </p>
-            Identify Tool <calcite-icon icon={"360-view" as any}></calcite-icon>
+            Identify Tool 
             <h3 className={styles.header} id="streetview-tool">
-              Streetview Tool{" "}
+              Streetview Tool <calcite-icon icon={"360-view" as any}></calcite-icon>
             </h3>
             <p>
               The street view tool allows you to press on the map to view that
@@ -499,7 +501,7 @@ export default function Help({ open, onClose, goToId }: HelpProps) {
             <h1 className={styles.header} id="panels">
               Panels
             </h1>
-            <hr/>
+            <hr />
             <p>
               Panels appear on the right side of the map. To change panels,
               press on the button in the top half of the action bar on the
@@ -600,6 +602,11 @@ export default function Help({ open, onClose, goToId }: HelpProps) {
               button will appear. Press to view the well testing details in a
               new browser tab.
             </p>
+            <img
+              className={styles.helpImage}
+              src="./help/septic_well_links.png"
+              alt="Screenshot of septic and well link button"
+            ></img>
             <h5 className={styles.header} id="county-link">
               Other Counties
             </h5>
@@ -721,12 +728,16 @@ export default function Help({ open, onClose, goToId }: HelpProps) {
               <calcite-icon icon="legend"></calcite-icon> appears to the right
               side of the layer name. Pressing this button will display a legend
               for that layer and a transparency slider to adjust the
-              transparency of the layer. Slide to the left to make more
-              transparent, slide to the right to make more opaque.
+              transparency of the layer.
             </p>
             <h4 className={styles.header} id="layer-transparency">
               Layer Transparency
             </h4>
+            <img
+              className={styles.helpImage}
+              src="./help/transparency_slider.gif"
+              alt="Video showing how to adjust transparency of a layer"
+            ></img>
             <p>
               Slide to the left to make more transparent, slide to the right to
               make more opaque.
@@ -740,6 +751,16 @@ export default function Help({ open, onClose, goToId }: HelpProps) {
               labels that can be displayed on the map. Press on each type of
               label you would like to display. Press again to hide the label.
             </p>
+            <img
+              className={styles.helpImage}
+              src="./help/property_labels.gif"
+              alt="Video showing how to display property labels."
+            ></img>
+            <calcite-notice open>
+              <div slot="message">
+                <strong>Note: </strong> recommend not enabling every label at once.
+              </div>
+            </calcite-notice>
             <h3 className={styles.header} id="layer-reset">
               Resetting Layer Visibility
             </h3>
@@ -789,6 +810,11 @@ export default function Help({ open, onClose, goToId }: HelpProps) {
               transparent and to the right to make it less transparent.
             </p>
             <p>To disable the blending, uncheck the blend switch.</p>
+            <img
+              className={styles.helpImage}
+              src="./help/basemap_blending.gif"
+              alt="Video showing how to use the basemap blend tool"
+            ></img>
             <calcite-notice open>
               <div slot="message">
                 <strong>Note: </strong> when the selected base map changes, the
@@ -857,7 +883,7 @@ export default function Help({ open, onClose, goToId }: HelpProps) {
             <h1 className={styles.header} id="tools">
               Tools
             </h1>
-            <hr/>
+            <hr />
             <p>
               Tools appear in the top right corner of the map. To change tools,
               press on the button in the bottom half of the action bar on the
