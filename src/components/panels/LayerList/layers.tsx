@@ -111,7 +111,7 @@ export const createLabelToggles = (item: ListItem) => {
   }
 };
 
-export const watchLayerList = (item: ListItem, id: string) => {
+export const watchLayerList = (item: ListItem) => {
   reactiveUtils.watch(
     () => item.layer?.visible === true,
     (visible: boolean) => {
@@ -196,22 +196,4 @@ export const watchLayerList = (item: ListItem, id: string) => {
     }
   );
   if (!item.layer || !item.layer.opacity) return;
-  reactiveUtils.watch(
-    () => item.layer?.opacity as number,
-    (opacity: number) => {
-      const storage = JSON.parse(
-        localStorage.getItem(`imaps_components_visible_layers_${id}`) || "[]"
-      );
-      const layer = storage.find(
-        (l: LayerStorageInfo) => l.id === item.layer?.id
-      );
-      if (layer) {
-        layer.opacity = opacity;
-      }
-      localStorage.setItem(
-        `imaps_components_visible_layers_${id}`,
-        JSON.stringify(storage)
-      );
-    }
-  );
 };
