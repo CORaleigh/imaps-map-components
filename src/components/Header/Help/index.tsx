@@ -422,7 +422,7 @@ export default function Help({ open, onClose, goToId }: HelpProps) {
                 with two fingers and twist to rotate.
               </li>
             </ul>
-            <calcite-link target="_blank" href="https://developers.arcgis.com/javascript/latest/references/core/views/MapView/#mapview-navigation" alt="Link to ArcGIS documentation for navigation">Additional Documentation</calcite-link>
+            <calcite-link target="_blank" href="https://developers.arcgis.com/javascript/latest/references/core/views/MapView/#mapview-navigation" alt="Link to ArcGIS documentation for navigation">Map Navigation Documentation</calcite-link>
             <h2 className={styles.header} id="longpress-map">
               Long Press to Select Property
             </h2>
