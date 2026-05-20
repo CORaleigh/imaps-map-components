@@ -16,7 +16,6 @@
 
 ## Built in User Guide
 - the user guide has been built into iMAPS in place of PDF
-- animated GIFs added to show how to use tools
 - table of contents to easily navigate
 - added help action to the header of all panels and tools which opens the help to that section
 
@@ -32,6 +31,9 @@
 
 ## Changes to layer persistence
 - previous version stored entire web map JSON, this version stores properties for the visible layers which is used to control which layers are visible on load.
+
+## Property labels persistence
+- when property labels are enabled, the selected labels are storaged in local storage and will be visible next time iMAPS is visited.
 
 ## Dark/Light theme toggle moved
 - the dark/light them toogle has been moved from the menu to the bottom of the action bar on the right side.
