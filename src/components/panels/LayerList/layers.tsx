@@ -8,6 +8,8 @@ import Collection from "@arcgis/core/core/Collection";
 import type Layer from "@arcgis/core/layers/Layer";
 import type ListItem from "@arcgis/core/widgets/LayerList/ListItem";
 import type MapImageLayer from "@arcgis/core/layers/MapImageLayer";
+import type FeatureLayer from "@arcgis/core/layers/FeatureLayer";
+import LabelClass from "@arcgis/core/layers/support/LabelClass";
 export type LayerStorageInfo = {
   id: string | number;
   visible: boolean;
@@ -36,7 +38,7 @@ export const propertyLabelExpressions: LabelExpression[] = [
   {
     expression: `$feature['OWNER']`,
     title: "Owner",
-  },  
+  },
   {
     expression: `When(IsEmpty($feature["SALE_DATE"]),null, Concatenate(Month($feature["SALE_DATE"])+1, '/',Day($feature["SALE_DATE"]), '/',Year($feature["SALE_DATE"])))`,
     title: "Sale Date Labels",
@@ -48,7 +50,7 @@ export const propertyLabelExpressions: LabelExpression[] = [
 ];
 
 export const layerListReady = (
-  event: HTMLArcgisLayerListElement["arcgisReady"]
+  event: HTMLArcgisLayerListElement["arcgisReady"],
 ) => {
   console.log(event);
 };
@@ -62,8 +64,8 @@ export const createItemPanel = (item: ListItem) => {
     let addSlider = true;
     if (item.layer.type === "sublayer") {
       if (item.layer.parent?.type === "map-image") {
-        const capabilities = (item.layer.parent as MapImageLayer)
-          .capabilities.exportMap;
+        const capabilities = (item.layer.parent as MapImageLayer).capabilities
+          .exportMap;
         if (capabilities) {
           addSlider = capabilities.supportsDynamicLayers;
         }
@@ -73,11 +75,8 @@ export const createItemPanel = (item: ListItem) => {
     const root = createRoot(slider as HTMLDivElement);
     root.render(
       <Suspense fallback={""}>
-        <OpacitySlider
-          value={item.layer.opacity}
-          layer={item.layer as Layer}
-        />
-      </Suspense>
+        <OpacitySlider value={item.layer.opacity} layer={item.layer as Layer} />
+      </Suspense>,
     );
 
     const content: (string | HTMLElement)[] = ["legend"];
@@ -87,29 +86,80 @@ export const createItemPanel = (item: ListItem) => {
     item.panel = {
       content: content,
       open: false,
-      visible: item.visible
+      visible: item.visible,
     };
   }
 };
 
-export const createLabelToggles = (item: ListItem) => {
+export const createLabelToggles = (item: ListItem, webMapId: string ) => {
   if (!item.layer) return;
   if (item.layer.title === "Property" && item.layer.type === "feature") {
     item.actionsSections = new Collection([new Collection([])]);
+    const selectedTitles = localStorage.getItem(
+      `imaps_${webMapId}_property_labels`
+    )?.split(',') ?? [];
+    
     propertyLabelExpressions.forEach((expression) =>
-      item.actionsSections
-        .at(0)
-        ?.add(
-          new ActionToggle({
-            active: false,
-            value: false,
-            title: expression.title,
-            icon: "toggle-off"
-          })
-        )
+      item.actionsSections.at(0)?.add(
+        new ActionToggle({
+          active: false,
+          value: selectedTitles?.includes(expression.title),
+          title: expression.title,
+          icon:  selectedTitles?.includes(expression.title) ? "toggle-on" : "toggle-off",
+        }),
+      ),
     );
   }
 };
+
+export const updatePropertyLabels = (
+    layer: FeatureLayer,
+    selectedTitles: (string | null | undefined)[],
+    webMapId: string
+  ) => {
+    
+    if (selectedTitles.length === 0) {
+       layer.labelingInfo = [];
+       return;
+    }
+    const selectedExpressions = propertyLabelExpressions.filter(
+      (expression) => {
+        return selectedTitles?.includes(expression.title);
+      },
+    );
+    const expressions = selectedExpressions.map((expression) => {
+      return expression.expression;
+    });
+    const expression = expressions.join("+ TextFormatting.NewLine+");
+    layer.labelingInfo = [];
+    
+
+    localStorage.setItem(
+      `imaps_${webMapId}_property_labels`,
+      selectedTitles.toString(),
+    );
+    layer.labelsVisible = true;
+    layer.labelingInfo = [
+      new LabelClass({
+        symbol: {
+          type: "text",
+          color: "black",
+          haloColor: "white",
+          haloSize: 1,
+          font: {
+            family: "AvenirNext LT Pro Regular",
+            style: "normal",
+            weight: "bold",
+          },
+        },
+        labelExpressionInfo: {
+          expression: expression,
+        },
+        maxScale: 0,
+        minScale: 5000,
+      }),
+    ];
+  };
 
 export const watchLayerList = (item: ListItem) => {
   reactiveUtils.watch(
@@ -119,15 +169,14 @@ export const watchLayerList = (item: ListItem) => {
         item.panel.visible = visible;
       }
       if (item.layer && item.layer.parent && item.parent) {
-
         if (item.layer.parent instanceof GroupLayer) {
           const parentVisible = visible
             ? true
             : !(item.layer.parent as GroupLayer).layers?.filter(
-                (sublayer) => sublayer.visible
-              ).length
-            ? false
-            : true;
+                  (sublayer) => sublayer.visible,
+                ).length
+              ? false
+              : true;
           (item.layer.parent as GroupLayer).visible = parentVisible;
           //item.parent.open = parentVisible;
         }
@@ -193,7 +242,7 @@ export const watchLayerList = (item: ListItem) => {
       // if (item.layer?.type === "group") {
       //   item.open = visible;
       // }
-    }
+    },
   );
   if (!item.layer || !item.layer.opacity) return;
 };

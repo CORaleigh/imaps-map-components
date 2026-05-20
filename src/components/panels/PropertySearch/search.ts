@@ -393,6 +393,8 @@ export const getProperty = async (
   const propertyLayer = getLayerByTitle(mapElement, "Property");
   if (oids) {
     if (!condoTable || !propertyLayer) return [];
+    
+
     const relationship = condoTable.relationships?.find((r) => {
       return r.name === "CONDO_PROPERTY";
     });

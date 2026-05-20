@@ -22,6 +22,7 @@ import type Geometry from "@arcgis/core/geometry/Geometry";
 import type Graphic from "@arcgis/core/Graphic";
 import type ActionButton from "@arcgis/core/support/actions/ActionButton";
 import type Polygon from "@arcgis/core/geometry/Polygon";
+import { updatePropertyLabels } from "../components/panels/LayerList/layers";
 
 export type MapMode =
   | "identify"
@@ -153,7 +154,14 @@ export const MapProvider: React.FC<{ children: React.ReactNode }> = ({
           } as ActionButton,
         ]);
       }
+      
+      const selectedTitles =
+        localStorage
+          .getItem(`imaps_${webMapId.current}_property_labels`)
+          ?.split(",") ?? [];
+      updatePropertyLabels(propertyLayer, selectedTitles, webMapId.current);
     }
+
     await reactiveUtils.whenOnce(() => mapElement.current.popup?.actions);
 
     mapElement.current.popup?.on("trigger-action", (event) => {
@@ -222,8 +230,8 @@ export const MapProvider: React.FC<{ children: React.ReactNode }> = ({
       const res = await fetch(`${app}.json`);
       const config = await res.json();
 
-
-      const mapId = params.get("id") ?? config.mapId ?? "95092428774c4b1fb6a3b6f5fed9fbc4";
+      const mapId =
+        params.get("id") ?? config.mapId ?? "95092428774c4b1fb6a3b6f5fed9fbc4";
 
       console.log("creating web map");
       const { webmap, webmapTemplate } =

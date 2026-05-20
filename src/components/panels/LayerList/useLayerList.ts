@@ -8,12 +8,11 @@ import {
 import {
   createItemPanel,
   createLabelToggles,
-  propertyLabelExpressions,
+  updatePropertyLabels,
   watchLayerList,
 } from "./layers";
 import { layerService } from "../../../utils/mapLayerService";
 import { useMap } from "../../../context/useMap";
-import LabelClass from "@arcgis/core/layers/support/LabelClass";
 
 import type ActionToggle from "@arcgis/core/support/actions/ActionToggle";
 import GroupLayer from "@arcgis/core/layers/GroupLayer";
@@ -25,6 +24,7 @@ import type {
   ListItemModifier,
   ListItemModifierEvent,
 } from "@arcgis/core/widgets/LayerList/types.js";
+import Collection from "@arcgis/core/core/Collection";
 
 export interface UseLayerListProps {
   layerListElement: RefObject<HTMLArcgisLayerListElement | null>;
@@ -53,8 +53,9 @@ export const useLayerList = (
       }
       watchLayerList(item);
       createItemPanel(item);
-      createLabelToggles(item);
+      createLabelToggles(item, webMapId.current);
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [],
   );
   const handleTriggerAction = useCallback(
@@ -85,45 +86,20 @@ export const useLayerList = (
           return toggle.value;
         });
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const selectedTitles = selected?.map((section: any) => {
-        return (section as ActionToggle).title;
-      });
+      const selectedTitles =
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        selected?.map((section: any) => {
+          return (section as ActionToggle).title;
+        }) ?? new Collection([]);
 
-      const selectedExpressions = propertyLabelExpressions.filter(
-        (expression) => {
-          return selectedTitles?.includes(expression.title);
-        },
-      );
-      const expressions = selectedExpressions.map((expression) => {
-        return expression.expression;
-      });
-      const expression = expressions.join("+ TextFormatting.NewLine+");
-      layer.labelingInfo = [];
-
-      layer.labelingInfo = [
-        new LabelClass({
-          symbol: {
-            type: "text",
-            color: "black",
-            haloColor: "white",
-            haloSize: 1,
-            font: {
-              family: "AvenirNext LT Pro Regular",
-              style: "normal",
-              weight: "bold",
-            },
-          },
-          labelExpressionInfo: {
-            expression: expression,
-          },
-          maxScale: 0,
-          minScale: 5000,
-        }),
-      ];
+      updatePropertyLabels(layer, selectedTitles.toArray(), webMapId.current);
     },
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [],
   );
+
+  
 
   const handleResetLayers = useCallback(() => {
     if (!mapElement.current || !mapElement.current.map) return;
