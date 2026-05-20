@@ -51,7 +51,7 @@ export const useLayerList = (
       if (item.visible && item.parent && item.layer?.type !== "sublayer") {
         item.parent.open = item.parent.visible;
       }
-      watchLayerList(item, "");
+      watchLayerList(item);
       createItemPanel(item);
       createLabelToggles(item);
     },
