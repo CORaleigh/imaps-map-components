@@ -529,11 +529,6 @@ export default function Help({ open, onClose, goToId }: HelpProps) {
               will appear in a list below, once you see the suggestion you want,
               press on it.
             </p>
-            <img
-              className={styles.helpImage}
-              src="./help/property_search.gif"
-              alt="Video showing how to search by address"
-            />
             <p>
               If you press the enter key while typing, all properties containing
               what you have typed will be searched for.
@@ -602,11 +597,6 @@ export default function Help({ open, onClose, goToId }: HelpProps) {
               button will appear. Press to view the well testing details in a
               new browser tab.
             </p>
-            <img
-              className={styles.helpImage}
-              src="./help/septic_well_links.png"
-              alt="Screenshot of septic and well link button"
-            ></img>
             <h5 className={styles.header} id="county-link">
               Other Counties
             </h5>
@@ -733,11 +723,6 @@ export default function Help({ open, onClose, goToId }: HelpProps) {
             <h4 className={styles.header} id="layer-transparency">
               Layer Transparency
             </h4>
-            <img
-              className={styles.helpImage}
-              src="./help/transparency_slider.gif"
-              alt="Video showing how to adjust transparency of a layer"
-            ></img>
             <p>
               Slide to the left to make more transparent, slide to the right to
               make more opaque.
@@ -751,11 +736,6 @@ export default function Help({ open, onClose, goToId }: HelpProps) {
               labels that can be displayed on the map. Press on each type of
               label you would like to display. Press again to hide the label.
             </p>
-            <img
-              className={styles.helpImage}
-              src="./help/property_labels.gif"
-              alt="Video showing how to display property labels."
-            ></img>
             <calcite-notice open>
               <div slot="message">
                 <strong>Note: </strong> recommend not enabling every label at once.
@@ -810,11 +790,6 @@ export default function Help({ open, onClose, goToId }: HelpProps) {
               transparent and to the right to make it less transparent.
             </p>
             <p>To disable the blending, uncheck the blend switch.</p>
-            <img
-              className={styles.helpImage}
-              src="./help/basemap_blending.gif"
-              alt="Video showing how to use the basemap blend tool"
-            ></img>
             <calcite-notice open>
               <div slot="message">
                 <strong>Note: </strong> when the selected base map changes, the
@@ -957,11 +932,6 @@ export default function Help({ open, onClose, goToId }: HelpProps) {
                 </li>
               </ul>
             </ul>
-            <img
-              className={styles.helpImage}
-              src="./help/property_select.gif"
-              alt="Video showing how to select by drawing a polygon."
-            />
             <h3 className={styles.header} id="select-buffer">
               Specifying a Buffer
             </h3>
@@ -969,11 +939,6 @@ export default function Help({ open, onClose, goToId }: HelpProps) {
               To apply a buffer distance to the shape, enter a distance in feet
               in the input box, then draw the shape on the map.
             </p>
-            <img
-              className={styles.helpImage}
-              src="./help/property_select_buffer.gif"
-              alt="Video showing how to select by buffering the drawn shape."
-            ></img>
             <h3 className={styles.header} id="select-buffer">
               Buffer Selected Property
             </h3>
@@ -983,11 +948,6 @@ export default function Help({ open, onClose, goToId }: HelpProps) {
               Properties within that distance of the property boundary will be
               selected.
             </p>
-            <img
-              className={styles.helpImage}
-              src="./help/property_buffer.gif"
-              alt="Video showing how to select by buffering the selected property"
-            ></img>
             <h2 className={styles.header} id="location-search">
               Location Search <calcite-icon icon="pin"></calcite-icon>
             </h2>
@@ -1025,11 +985,6 @@ export default function Help({ open, onClose, goToId }: HelpProps) {
               the selected street name will appear in a dropdown list. Selecting
               from the dropdown list will zoom the map to that intersection.
             </p>
-            <img
-              className={styles.helpImage}
-              src="./help/intersection_search.gif"
-              alt="Video showing how to search by intersection."
-            ></img>
             <h2 className={styles.header} id="measure">
               Measure <calcite-icon icon="measure-line"></calcite-icon>
             </h2>
