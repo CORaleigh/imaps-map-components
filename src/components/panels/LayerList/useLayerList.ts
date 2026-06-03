@@ -25,6 +25,8 @@ import type {
   ListItemModifierEvent,
 } from "@arcgis/core/widgets/LayerList/types.js";
 import Collection from "@arcgis/core/core/Collection";
+import * as reactiveUtils from "@arcgis/core/core/reactiveUtils.js";
+import type ListItem from "@arcgis/core/widgets/LayerList/ListItem";
 
 export interface UseLayerListProps {
   layerListElement: RefObject<HTMLArcgisLayerListElement | null>;
@@ -34,6 +36,9 @@ export interface UseLayerListProps {
   ) => void;
   handleResetLayers: () => void;
   loaded: boolean;
+  handleLayerListReady: (
+    event: HTMLArcgisLayerListElement["arcgisReady"],
+  ) => void;
 }
 
 export const useLayerList = (
@@ -47,7 +52,9 @@ export const useLayerList = (
   const listItemCreatedFunction = useCallback(
     (event: ListItemModifierEvent) => {
       const item = event.item;
-
+      if (item.visible) {
+        console.log(item.title);
+      }
       if (item.visible && item.parent && item.layer?.type !== "sublayer") {
         item.parent.open = item.parent.visible;
       }
@@ -99,8 +106,63 @@ export const useLayerList = (
     [],
   );
 
-  
+  const collapseNonVisibleGroups = (items: Collection<ListItem>) => {
+    items.forEach((item) => {
+      if (item.children?.length > 0) {
+        item.open = item.visible;
 
+        collapseNonVisibleGroups(item.children);
+      }
+    });
+  };
+
+  const updateGroupState = (item: ListItem, filterText: string): boolean => {
+    const filter = filterText.trim().toLowerCase();
+
+    const selfMatches =
+      filter === "" || item.title.toLowerCase().includes(filter);
+
+    let descendantMatches = false;
+
+    item.children.forEach((child) => {
+      if (updateGroupState(child, filterText)) {
+        descendantMatches = true;
+      }
+    });
+
+    const hasMatch = selfMatches || descendantMatches;
+
+    if (item.children?.length > 0) {
+      item.open = hasMatch;
+    }
+
+    return hasMatch;
+  };
+
+  const handleLayerListReady = useCallback(
+    (event: HTMLArcgisLayerListElement["arcgisReady"]) => {
+      reactiveUtils.watch(
+        () => event.target.filterText,
+        (filterText) => {
+          const value = filterText?.trim() ?? "";
+          const items = event.target.operationalItems;
+
+          // CASE 1: reset / too short → collapse everything except visible layers
+          if (value.length === 0) {
+            collapseNonVisibleGroups(items);
+            return;
+          }
+
+          // CASE 2: filtering → expand matches recursively
+          items.forEach((item) => {
+            updateGroupState(item, value);
+          });
+        },
+      );
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
+  );
   const handleResetLayers = useCallback(() => {
     if (!mapElement.current || !mapElement.current.map) return;
     const map = mapElement.current.map;
@@ -192,5 +254,6 @@ export const useLayerList = (
     handleTriggerAction,
     handleResetLayers,
     loaded,
+    handleLayerListReady,
   };
 };

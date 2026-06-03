@@ -28,6 +28,7 @@ const LayerList: React.FC<LayerListProps> = ({
     handleTriggerAction,
     handleResetLayers,
     loaded,
+    handleLayerListReady
   } = useLayerList(mapElement);
   return (
     <>
@@ -67,6 +68,7 @@ const LayerList: React.FC<LayerListProps> = ({
             visibilityAppearance="checkbox"
             listItemCreatedFunction={listItemCreatedFunction}
             onarcgisTriggerAction={handleTriggerAction}
+            onarcgisReady={handleLayerListReady}
           ></arcgis-layer-list>
         )}
       </calcite-panel>
