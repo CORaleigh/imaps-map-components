@@ -259,6 +259,18 @@ export default function Help({ open, onClose, goToId }: HelpProps) {
             { id: "print-exports", title: "Exports Tab" },
           ],
         },
+        {
+          id: "coordinate-conversion",
+          title: "Coordinate Tool",
+          icon: "crosshair",
+          sections: [
+            { id: "coordinate-cursor", title: "Display Cursor Coordinates" },
+            { id: "coordinate-point", title: "Display Point Coordinates" },
+            { id: "coordinates-units", title: "Selecting Units" },
+            { id: "coordinates-copy", title: "Copy Coordinates" },
+            { id: "coordinates-search", title: "Search Coordinates" },
+          ],
+        },
       ],
     },
   ];
@@ -508,8 +520,13 @@ export default function Help({ open, onClose, goToId }: HelpProps) {
               </h3>
               <p>
                 The coordinates tool displays the coordinates for the location
-                of your mouse cursor. Refer to the section under Tools for
-                additional features.
+                of your mouse cursor. Refer to the{" "}
+                <calcite-link
+                  onClick={() => scrollToSection("coordinate-conversion")}
+                >
+                  section
+                </calcite-link>{" "}
+                section under Tools for additional details.
               </p>
               <h1 className={styles.header} id="panels">
                 Panels
@@ -966,7 +983,7 @@ export default function Help({ open, onClose, goToId }: HelpProps) {
               <LazyVideo
                 src="help/property_select.mp4"
                 caption="How to select a property by drawing a polygon on the map"
-              />              
+              />
               <h3 className={styles.header} id="select-buffer">
                 Specifying a Buffer
               </h3>
@@ -977,7 +994,7 @@ export default function Help({ open, onClose, goToId }: HelpProps) {
               <LazyVideo
                 src="help/buffer_select.mp4"
                 caption="How to select properties by drawing a polygon on the map using a buffer distance"
-              />                 
+              />
               <h3 className={styles.header} id="select-buffer">
                 Buffer Selected Property
               </h3>
@@ -990,7 +1007,7 @@ export default function Help({ open, onClose, goToId }: HelpProps) {
               <LazyVideo
                 src="help/buffer_property.mp4"
                 caption="How to select properties by buffering a selected property"
-              />                    
+              />
               <h2 className={styles.header} id="location-search">
                 Location Search <calcite-icon icon="pin"></calcite-icon>
               </h2>
@@ -1174,6 +1191,76 @@ export default function Help({ open, onClose, goToId }: HelpProps) {
                   redownload for a limited amount of time.
                 </div>
               </calcite-notice>
+              <h2 className={styles.header} id="coordinate-conversion">
+                Coordinate Tool <calcite-icon icon="crosshair"></calcite-icon>
+              </h2>
+              <p>
+                The coordinates tool display the coordinate for the location of
+                your mouse cursor or at point clicked on the map. It can also be
+                used to search for coordinates in different formats and copy
+                coordinates to your clipboard.
+              </p>
+              <h3 className={styles.header} id="coordinate-cursor">
+                Display Cursor Coordinates
+              </h3>
+              <p>
+                By default, the coordinates are displayed based on the location
+                of your mouse cursor. As you move your mouse, the coordinates
+                will update.
+              </p>
+              <LazyVideo
+                src="help/coordinates_cursor.mp4"
+                caption="How to display cursor coordinates"
+              />
+              <h3 className={styles.header} id="coordinate-point">
+                Display Point Coordinates
+              </h3>
+              <p>
+                To display the coordinates for a specific point on the map,
+                press the <calcite-icon icon="pin"></calcite-icon> button and
+                press a location on the map. To return to the default behavior
+                of displaying coordinates for the mouse cursor, press the button
+                again to disable.
+              </p>
+              <LazyVideo
+                src="help/coordinates_point.mp4"
+                caption="How to display point coordinates"
+              />
+              <h3 className={styles.header} id="coordinate-units">
+                Selecting Units
+              </h3>
+              <p>
+                By default, the coordinates are displayed in decimal degrees. To
+                change the units, press the settings button{" "}
+                <calcite-icon icon="gear"></calcite-icon> and select the desired
+                units from the dropdown list.
+              </p>
+              <h3 className={styles.header} id="coordinates-copy">
+                Copy Coordinates
+              </h3>
+              <p>
+                To copy the current coordinates to your clipboard, press the
+                copy button{" "}
+                <calcite-icon icon="copy-to-clipboard"></calcite-icon>.
+              </p>
+              <LazyVideo
+                src="help/coordinates_copy.mp4"
+                caption="How to copy coordinates to clipboard"
+              />
+              <h3 className={styles.header} id="coordinates-search">
+                Search Coordinates
+              </h3>
+              <p>
+                To search for a location by coordinates, press the search button{" "}
+                <calcite-icon icon="search"></calcite-icon> and enter the
+                coordinates in the input box. The format of the coordinates must
+                match the selected format in the settings. The map will zoom to
+                the location of the coordinates entered.
+              </p>
+              <LazyVideo
+                src="help/coordinates_search.mp4"
+                caption="How to search for a location by coordinates"
+              />
             </div>
           </calcite-panel>
         </calcite-shell>
@@ -1181,6 +1268,7 @@ export default function Help({ open, onClose, goToId }: HelpProps) {
     </calcite-dialog>
   );
 }
+
 function useLazyVideoSrc(src: string) {
   const ref = useRef<HTMLVideoElement>(null);
   const [activeSrc, setActiveSrc] = useState<string | undefined>();
