@@ -963,6 +963,10 @@ export default function Help({ open, onClose, goToId }: HelpProps) {
                   </li>
                 </ul>
               </ul>
+              <LazyVideo
+                src="help/property_select.mp4"
+                caption="How to select a property by drawing a polygon on the map"
+              />              
               <h3 className={styles.header} id="select-buffer">
                 Specifying a Buffer
               </h3>
@@ -970,6 +974,10 @@ export default function Help({ open, onClose, goToId }: HelpProps) {
                 To apply a buffer distance to the shape, enter a distance in
                 feet in the input box, then draw the shape on the map.
               </p>
+              <LazyVideo
+                src="help/buffer_select.mp4"
+                caption="How to select properties by drawing a polygon on the map using a buffer distance"
+              />                 
               <h3 className={styles.header} id="select-buffer">
                 Buffer Selected Property
               </h3>
@@ -979,6 +987,10 @@ export default function Help({ open, onClose, goToId }: HelpProps) {
                 Properties within that distance of the property boundary will be
                 selected.
               </p>
+              <LazyVideo
+                src="help/buffer_property.mp4"
+                caption="How to select properties by buffering a selected property"
+              />                    
               <h2 className={styles.header} id="location-search">
                 Location Search <calcite-icon icon="pin"></calcite-icon>
               </h2>
@@ -1017,6 +1029,10 @@ export default function Help({ open, onClose, goToId }: HelpProps) {
                 Selecting from the dropdown list will zoom the map to that
                 intersection.
               </p>
+              <LazyVideo
+                src="help/intersections.mp4"
+                caption="How to search for an intersection"
+              />
               <h2 className={styles.header} id="measure">
                 Measure <calcite-icon icon="measure-line"></calcite-icon>
               </h2>
