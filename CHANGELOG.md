@@ -16,6 +16,7 @@
 
 ## Built in User Guide
 - the user guide has been built into iMAPS in place of PDF
+- videos embedded in the help guide
 - table of contents to easily navigate
 - added help action to the header of all panels and tools which opens the help to that section
 

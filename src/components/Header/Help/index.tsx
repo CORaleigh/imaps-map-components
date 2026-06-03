@@ -1232,7 +1232,7 @@ const LazyVideo = memo(function LazyVideo({
         muted
         preload="none"
         src={activeSrc}
-        style={{ width: "100%", maxWidth: "600px" }}
+        style={{ width: "100%", maxWidth: "700px" }}
       />
       <figcaption>{caption}</figcaption>
     </figure>
