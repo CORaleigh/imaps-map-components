@@ -422,7 +422,13 @@ export default function Help({ open, onClose, goToId }: HelpProps) {
                 with two fingers and twist to rotate.
               </li>
             </ul>
-            <calcite-link target="_blank" href="https://developers.arcgis.com/javascript/latest/references/core/views/MapView/#mapview-navigation" alt="Link to ArcGIS documentation for navigation">Map Navigation Documentation</calcite-link>
+            <calcite-link
+              target="_blank"
+              href="https://developers.arcgis.com/javascript/latest/references/core/views/MapView/#mapview-navigation"
+              alt="Link to ArcGIS documentation for navigation"
+            >
+              Map Navigation Documentation
+            </calcite-link>
             <h2 className={styles.header} id="longpress-map">
               Long Press to Select Property
             </h2>
@@ -474,9 +480,10 @@ export default function Help({ open, onClose, goToId }: HelpProps) {
               The identify tool allows you to press on a feature on the map to
               view a popup with details about the feature.
             </p>
-            Identify Tool 
+            Identify Tool
             <h3 className={styles.header} id="streetview-tool">
-              Streetview Tool <calcite-icon icon={"360-view" as any}></calcite-icon>
+              Streetview Tool{" "}
+              <calcite-icon icon={"360-view" as any}></calcite-icon>
             </h3>
             <p>
               The street view tool allows you to press on the map to view that
@@ -539,6 +546,15 @@ export default function Help({ open, onClose, goToId }: HelpProps) {
               attribute you are interested in. Select All to search by all
               attributes.
             </p>
+            <figure>
+              <figcaption>How to search for a property by address</figcaption>
+              <video
+                controls
+                src="help/address_search.mp4"
+                style={{ width: "100%", maxWidth: "600px" }}
+              >
+              </video>
+            </figure>
             <p>
               To view your last ten searches, press the clock button{" "}
               <calcite-icon icon="clock"></calcite-icon>. Press on a search term
@@ -738,7 +754,8 @@ export default function Help({ open, onClose, goToId }: HelpProps) {
             </p>
             <calcite-notice open>
               <div slot="message">
-                <strong>Note: </strong> recommend not enabling every label at once.
+                <strong>Note: </strong> recommend not enabling every label at
+                once.
               </div>
             </calcite-notice>
             <h3 className={styles.header} id="layer-reset">
