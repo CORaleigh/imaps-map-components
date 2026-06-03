@@ -394,16 +394,23 @@ export const useCoordinateConversion = (
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mapElement, isOpen, mode, convertMapPoint]);
 
-  useEffect(() => {
-    if (!mapElement.current.map || initializedRef.current) return;
+useEffect(() => {
+  if (!mapElement.current || initializedRef.current) return;
+
+  mapElement.current.view.when(() => {
+    const map = mapElement.current?.map;
+    if (!map || initializedRef.current) return;
+
     graphicsLayer.current = new GraphicsLayer({
       id: "coordinate-graphics",
       listMode: "hide",
     });
 
-    mapElement.current.map?.add(graphicsLayer.current);
+    map.add(graphicsLayer.current);
     initializedRef.current = true;
-  }, [mapElement]);
+  });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, []);
 
   useEffect(() => {
     if (!isOpen) {
