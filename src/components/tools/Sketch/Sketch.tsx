@@ -31,7 +31,12 @@ interface SketchProps {
   onHelpClick: (id: string) => void;
 }
 
-const Sketch: React.FC<SketchProps> = ({ mapElement, closed, onToolClose, onHelpClick }) => {
+const Sketch: React.FC<SketchProps> = ({
+  mapElement,
+  closed,
+  onToolClose,
+  onHelpClick,
+}) => {
   const {
     mapMode,
     pointSymbol,
@@ -48,6 +53,12 @@ const Sketch: React.FC<SketchProps> = ({ mapElement, closed, onToolClose, onHelp
     handleTextSymbolChange,
     clearSketches,
     handleDeleteSelectedGraphics,
+    selectedWebSymbol,
+    setSelectedWebSymbol,
+    pointColor,
+    setPointColor,
+    pointSize,
+    setPointSize,
   } = useSketch(mapElement, closed);
 
   return (
@@ -136,22 +147,19 @@ const Sketch: React.FC<SketchProps> = ({ mapElement, closed, onToolClose, onHelp
           {(mapMode === "point" || selectedGraphicsType === "point") && (
             <calcite-block heading="Point Style" label="Point Style" expanded>
               <PointSymbolPicker
-                symbol={pointSymbol}
-                onSymbolChange={handlePointSymbolChange}
-              ></PointSymbolPicker>
-              <FillSymbolPicker
                 symbol={pointSymbol!}
                 onSymbolChange={handlePointSymbolChange}
-              ></FillSymbolPicker>
-
-              <LineSymbolPicker
-                symbol={pointSymbol!}
-                onSymbolChange={handlePointSymbolChange}
-              ></LineSymbolPicker>
+                selectedWebSymbol={selectedWebSymbol}
+                setSelectedWebSymbol={setSelectedWebSymbol}
+                pointColor={pointColor}
+                setPointColor={setPointColor}
+                pointSize={pointSize}
+                setPointSize={setPointSize}
+              />
             </calcite-block>
           )}
           {(mapMode === "polyline" || selectedGraphicsType === "polyline") && (
-            <calcite-block heading="Point Style" label="Point Style" expanded>
+            <calcite-block heading="Line Style" label="Line Style" expanded>
               <LineSymbolPicker
                 symbol={polylineSymbol}
                 onSymbolChange={handlePolylineSymbolChange}

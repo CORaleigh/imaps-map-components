@@ -11,10 +11,12 @@ import type { MapMode } from "../../../context/MapContext";
 import type Graphic from "@arcgis/core/Graphic";
 import type GraphicsLayer from "@arcgis/core/layers/GraphicsLayer";
 import type { CreateEvent } from "@arcgis/core/widgets/Sketch/types";
+import type PictureMarkerSymbol from "@arcgis/core/symbols/PictureMarkerSymbol";
+import type WebStyleSymbol from "@arcgis/core/symbols/WebStyleSymbol";
 
 export interface UseSketchProps {
   mapMode: MapMode;
-  pointSymbol: SimpleMarkerSymbol;
+  pointSymbol: SimpleMarkerSymbol | undefined;
   polylineSymbol: SimpleLineSymbol;
   polygonSymbol: SimpleFillSymbol;
   textSymbol: TextSymbol;
@@ -25,38 +27,47 @@ export interface UseSketchProps {
   handlePointSymbolChange: (
     symbol:
       | SimpleMarkerSymbol
+      | PictureMarkerSymbol
       | SimpleLineSymbol
       | SimpleFillSymbol
-      | TextSymbol
+      | TextSymbol,
   ) => void;
   handlePolylineSymbolChange: (
     symbol:
       | SimpleMarkerSymbol
       | SimpleLineSymbol
       | SimpleFillSymbol
-      | TextSymbol
+      | TextSymbol,
   ) => void;
   handlePolygonSymbolChange: (
     symbol:
       | SimpleMarkerSymbol
       | SimpleLineSymbol
       | SimpleFillSymbol
-      | TextSymbol
+      | TextSymbol,
   ) => void;
   handleTextSymbolChange: (
     symbol:
       | SimpleMarkerSymbol
       | SimpleLineSymbol
       | SimpleFillSymbol
-      | TextSymbol
+      | TextSymbol,
   ) => void;
   clearSketches: () => void;
   handleDeleteSelectedGraphics: () => void;
+  selectedWebSymbol: WebStyleSymbol | undefined;
+  setSelectedWebSymbol: React.Dispatch<
+    React.SetStateAction<WebStyleSymbol | undefined>
+  >;
+  pointColor: string;
+  setPointColor: React.Dispatch<React.SetStateAction<string>>;
+  pointSize: number;
+  setPointSize: React.Dispatch<React.SetStateAction<number>>;
 }
 
 export const useSketch = (
   mapElement: React.RefObject<HTMLArcgisMapElement>,
-  closed: boolean
+  closed: boolean,
 ): UseSketchProps => {
   const { mapMode, setMapMode } = useMap();
 
@@ -64,32 +75,36 @@ export const useSketch = (
     new MapNotesLayer({
       id: "sketch-layer",
       listMode: "hide",
-    })
+    }),
   );
 
   const pointSketchVm = useRef<SketchViewModel>(null);
   const lineSketchVm = useRef<SketchViewModel>(null);
   const polygonSketchVm = useRef<SketchViewModel>(null);
   const textSketchVm = useRef<SketchViewModel>(null);
-
-  const [pointSymbol, setPointSymbol] = useState<SimpleMarkerSymbol>(
-    new SimpleMarkerSymbol({ color: "#FF0000", size: 8 })
-  );
+  const [selectedWebSymbol, setSelectedWebSymbol] = useState<
+    WebStyleSymbol | undefined
+  >(undefined);
+  const [pointColor, setPointColor] = useState<string>("#ff0000");
+  const [pointSize, setPointSize] = useState<number>(12);
+  const [pointSymbol, setPointSymbol] = useState<
+    SimpleMarkerSymbol | undefined
+  >();
   const [polylineSymbol, setLineSymbol] = useState<SimpleLineSymbol>(
-    new SimpleLineSymbol({ color: "#FF0000", width: 2 })
+    new SimpleLineSymbol({ color: "#FF0000", width: 2 }),
   );
   const [polygonSymbol, setPolygonSymbol] = useState<SimpleFillSymbol>(
     new SimpleFillSymbol({
       color: [255, 0, 0, 0.5],
       outline: { color: "#FF0000", width: 2 },
-    })
+    }),
   );
   const [textSymbol, setTextSymbol] = useState<TextSymbol>(
     new TextSymbol({
       color: "#000000",
       text: "",
       font: { size: 12, family: "Arial", weight: "normal" },
-    })
+    }),
   );
 
   const selectedGraphics = useRef<Graphic[]>([]);
@@ -161,7 +176,7 @@ export const useSketch = (
           break;
       }
     },
-    [mapElement, mapMode, setMapMode]
+    [mapElement, mapMode, setMapMode],
   );
 
   const createSketchVm = (layer: GraphicsLayer | null | undefined) => {
@@ -217,7 +232,7 @@ export const useSketch = (
     return sketchVm;
   };
 
-const handleSketchCreate = (event: CreateEvent) => {
+  const handleSketchCreate = (event: CreateEvent) => {
     //   mapElement.current.popupDisabled = true;
     // }
     if (event.state === "complete") {
@@ -247,9 +262,10 @@ const handleSketchCreate = (event: CreateEvent) => {
   const handlePointSymbolChange = (
     symbol:
       | SimpleMarkerSymbol
+      | PictureMarkerSymbol
       | SimpleLineSymbol
       | SimpleFillSymbol
-      | TextSymbol
+      | TextSymbol,
   ) => {
     if (!pointSketchVm.current) return;
     pointSketchVm.current.pointSymbol = symbol as SimpleMarkerSymbol;
@@ -264,7 +280,7 @@ const handleSketchCreate = (event: CreateEvent) => {
       | SimpleMarkerSymbol
       | SimpleLineSymbol
       | SimpleFillSymbol
-      | TextSymbol
+      | TextSymbol,
   ) => {
     if (!lineSketchVm.current) return;
     lineSketchVm.current.polylineSymbol = symbol as SimpleLineSymbol;
@@ -279,7 +295,7 @@ const handleSketchCreate = (event: CreateEvent) => {
       | SimpleMarkerSymbol
       | SimpleLineSymbol
       | SimpleFillSymbol
-      | TextSymbol
+      | TextSymbol,
   ) => {
     if (!polygonSketchVm.current) return;
     polygonSketchVm.current.polygonSymbol = symbol as SimpleFillSymbol;
@@ -294,7 +310,7 @@ const handleSketchCreate = (event: CreateEvent) => {
       | SimpleMarkerSymbol
       | SimpleLineSymbol
       | SimpleFillSymbol
-      | TextSymbol
+      | TextSymbol,
   ) => {
     if (!textSketchVm.current) return;
 
@@ -328,25 +344,25 @@ const handleSketchCreate = (event: CreateEvent) => {
       case "point":
         pointSketchVm.current?.removeGraphics(selectedGraphics.current);
         (pointSketchVm.current?.layer as GraphicsLayer).removeMany(
-          selectedGraphics.current
+          selectedGraphics.current,
         );
         break;
       case "polyline":
         lineSketchVm.current?.removeGraphics(selectedGraphics.current);
         (lineSketchVm.current?.layer as GraphicsLayer).removeMany(
-          selectedGraphics.current
+          selectedGraphics.current,
         );
         break;
       case "polygon":
         polygonSketchVm.current?.removeGraphics(selectedGraphics.current);
         (polygonSketchVm.current?.layer as GraphicsLayer).removeMany(
-          selectedGraphics.current
+          selectedGraphics.current,
         );
         break;
       case "text":
         textSketchVm.current?.removeGraphics(selectedGraphics.current);
         (textSketchVm.current?.layer as GraphicsLayer).removeMany(
-          selectedGraphics.current
+          selectedGraphics.current,
         );
         break;
     }
@@ -366,7 +382,7 @@ const handleSketchCreate = (event: CreateEvent) => {
     mapElement.current.map?.add(mapNotesLayer.current);
     pointSketchVm.current = createSketchVm(mapNotesLayer.current.pointLayer);
     polygonSketchVm.current = createSketchVm(
-      mapNotesLayer.current.polygonLayer
+      mapNotesLayer.current.polygonLayer,
     );
     lineSketchVm.current = createSketchVm(mapNotesLayer.current.polylineLayer);
     textSketchVm.current = createSketchVm(mapNotesLayer.current.textLayer);
@@ -395,5 +411,11 @@ const handleSketchCreate = (event: CreateEvent) => {
     handleTextSymbolChange,
     clearSketches,
     handleDeleteSelectedGraphics,
+    selectedWebSymbol,
+    setSelectedWebSymbol,
+    pointColor,
+    setPointColor,
+    pointSize,
+    setPointSize,
   };
 };
