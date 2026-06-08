@@ -1280,7 +1280,6 @@ function useLazyVideoSrc(src: string) {
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
-          console.log(`Loading video: ${src}`);
           setActiveSrc(src);
           observer.disconnect();
         }

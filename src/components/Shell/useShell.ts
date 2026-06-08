@@ -235,6 +235,7 @@ export const useShell = (): UseShellProps => {
 
   const handleHelpClick = (id: string) => {
     setShowHelp(true);
+    console.log(id);
     setHelpId(id);
   };
 
