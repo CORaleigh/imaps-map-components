@@ -279,7 +279,7 @@ export default function Help({ open, onClose, goToId }: HelpProps) {
     const element = document.getElementById(id);
 
     if (element) {
-      element.scrollIntoView({ behavior: "smooth", block: "start" });
+      element.scrollIntoView({ behavior: "auto", block: "start" });
     }
   };
 
