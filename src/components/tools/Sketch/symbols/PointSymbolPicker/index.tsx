@@ -27,6 +27,7 @@ import "@esri/calcite-components/components/calcite-color-picker-swatch";
 import "@esri/calcite-components/components/calcite-popover";
 import * as symbolUtils from "@arcgis/core/symbols/support/symbolUtils";
 import type WebStyleSymbol from "@arcgis/core/symbols/WebStyleSymbol";
+import { useMap } from "../../../../../context/useMap";
 
 interface PointSymbolPickerProps {
   symbol: SimpleMarkerSymbol;
@@ -102,9 +103,10 @@ const SymbolItemDisplay = ({
     });
   }, [previewCache, webSymbol]);
 
+  const {webMapId} = useMap();
   const handleSelect = useCallback(async () => {
     setSelectedWebSymbol(webSymbol);
-    await applySymbolProperties(webSymbol, color, size, onSymbolSelect);
+    await applySymbolProperties(webSymbol, color, size, onSymbolSelect, webMapId.current);
     onClose();
   }, [setSelectedWebSymbol, webSymbol, color, size, onSymbolSelect, onClose]);
 
@@ -157,7 +159,7 @@ const PointSymbolPicker: React.FC<PointSymbolPickerProps> = ({
   const selectedSymbolTitle = selectedGroup?.symbols.find(
     (item) => item.symbol.name === selectedWebSymbolProp?.name,
   )?.title;
-
+  const {webMapId} = useMap();
   useEffect(() => {
     if (!selectedWebSymbolProp) return;
     applySymbolProperties(
@@ -165,8 +167,9 @@ const PointSymbolPicker: React.FC<PointSymbolPickerProps> = ({
       pointColorProp,
       pointSizeProp,
       onSymbolChange,
+      webMapId.current
     );
-  }, [onSymbolChange, pointColorProp, pointSizeProp, selectedWebSymbolProp]);
+  }, [pointColorProp, pointSizeProp, selectedWebSymbolProp]);
 
   return (
     <calcite-flow>
@@ -184,7 +187,7 @@ const PointSymbolPicker: React.FC<PointSymbolPickerProps> = ({
               }}
               onClick={handleShowFlow}
             >
-              {selectedWebSymbolProp ? <div ref={selectedPreviewRef} /> : <></>}
+              {selectedWebSymbolProp ? <div ref={selectedPreviewRef} /> : <div style={{width: '50px'}}></div>}
               <span style={{ flex: 1 }}>{selectedSymbolTitle ?? ""}</span>
               <calcite-icon icon="chevron-right" />
             </div>

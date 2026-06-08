@@ -13,6 +13,9 @@ import WebStyleSymbol from "@arcgis/core/symbols/WebStyleSymbol";
 import Color from "@arcgis/core/Color";
 import CIMSymbol from "@arcgis/core/symbols/CIMSymbol";
 import * as symbolUtils from "@arcgis/core/symbols/support/symbolUtils";
+import { useMap } from "../../../../../context/useMap";
+import { loadSketchSymbols, updateSketchSymbol } from "../../utils/symbolStore";
+import * as cimSymbolUtils from "@arcgis/core/symbols/support/cimSymbolUtils";
 
 export type OnSymbolChange = (
   symbol:
@@ -28,6 +31,7 @@ export const applySymbolProperties = async (
   color: string,
   size: number,
   onSymbolSelect: OnSymbolChange,
+  webMapId: string,
 ) => {
   const fetchedSymbol = await webSymbol.fetchSymbol();
   const arcgisColor = new Color(color);
@@ -38,48 +42,47 @@ export const applySymbolProperties = async (
     Math.round(arcgisColor.a * 255),
   ];
 
+  const replaceColors = (obj: any) => {
+    if (!obj || typeof obj !== "object") return;
+    if (Array.isArray(obj.color) && obj.color.length === 4) {
+      const [r, g, b] = obj.color;
+      const isLight = r > 200 && g > 200 && b > 200;
+      if (!isLight) {
+        obj.color = colorArray;
+      }
+    }
+    Object.values(obj).forEach((val) => {
+      if (Array.isArray(val)) val.forEach(replaceColors);
+      else if (typeof val === "object") replaceColors(val);
+    });
+  };
+
   if (fetchedSymbol.type === "cim") {
     const json = fetchedSymbol.toJSON();
 
-    const replaceColors = (obj: any) => {
-      if (!obj || typeof obj !== "object") return;
-      if (Array.isArray(obj.color) && obj.color.length === 4) {
-        obj.color = colorArray;
-      }
-      Object.values(obj).forEach((val) => {
-        if (Array.isArray(val)) val.forEach(replaceColors);
-        else if (typeof val === "object") replaceColors(val);
-      });
-    };
+    const outerLayer =
+      json.symbol?.symbolLayers?.[json.symbol.symbolLayers.length - 1];
+    if (outerLayer) {
+      replaceColors(outerLayer);
+    }
 
-    const replaceSize = (obj: any) => {
-      if (!obj || typeof obj !== "object") return;
-      if (obj.symbolLayers && Array.isArray(obj.symbolLayers)) {
-        const layers = obj.symbolLayers.filter(
-          (l: any) =>
-            l.type === "CIMVectorMarker" || l.type === "CIMPictureMarker",
-        );
-        if (layers.length > 0) {
-          const mainLayer = layers.reduce((prev: any, curr: any) =>
-            curr.size > prev.size ? curr : prev,
-          );
-          mainLayer.size = size;
-          return;
-        }
-      }
-      Object.values(obj).forEach((val) => {
-        if (Array.isArray(val)) val.forEach(replaceSize);
-        else if (typeof val === "object") replaceSize(val);
-      });
-    };
-
-    replaceColors(json);
-    replaceSize(json);
-    onSymbolSelect(CIMSymbol.fromJSON(json) as unknown as SimpleMarkerSymbol);
+    const cimSymbol = CIMSymbol.fromJSON(json);
+    cimSymbolUtils.scaleCIMSymbolTo(cimSymbol, size);
+    updateSketchSymbol(webMapId, "point", {
+      color: color,
+      size: size,
+      webSymbol: webSymbol.toJSON(),
+    });
+    onSymbolSelect(cimSymbol as unknown as SimpleMarkerSymbol);
   } else {
     const sym = fetchedSymbol as unknown as SimpleMarkerSymbol;
     sym.color = arcgisColor;
     sym.size = size;
+    updateSketchSymbol(webMapId, "point", {
+      color: color,
+      size: size,
+      webSymbol: webSymbol.toJSON(),
+    });
     onSymbolSelect(sym);
   }
 };
@@ -123,6 +126,7 @@ export const usePointSymbolPicker = (
   );
   const previewCache = useRef<Map<string, string>>(new Map());
   const selectedPreviewRef = useRef<HTMLDivElement>(null);
+  const { webMapId } = useMap();
 
   useEffect(() => {
     if (!selectedPreviewRef.current || !selectedWebSymbol) return;
@@ -136,22 +140,33 @@ export const usePointSymbolPicker = (
         Math.round(arcgisColor.a * 255),
       ];
 
+      const replaceColors = (obj: any) => {
+        if (!obj || typeof obj !== "object") return;
+        if (Array.isArray(obj.color) && obj.color.length === 4) {
+          const [r, g, b] = obj.color;
+          const isLight = r > 200 && g > 200 && b > 200;
+          if (!isLight) {
+            obj.color = colorArray;
+          }
+        }
+        Object.values(obj).forEach((val) => {
+          if (Array.isArray(val)) val.forEach(replaceColors);
+          else if (typeof val === "object") replaceColors(val);
+        });
+      };
+
       let symbolToRender = fetchedSymbol;
 
       if (fetchedSymbol.type === "cim") {
         const json = fetchedSymbol.toJSON();
-        const replaceColors = (obj: any) => {
-          if (!obj || typeof obj !== "object") return;
-          if (Array.isArray(obj.color) && obj.color.length === 4) {
-            obj.color = colorArray;
-          }
-          Object.values(obj).forEach((val) => {
-            if (Array.isArray(val)) val.forEach(replaceColors);
-            else if (typeof val === "object") replaceColors(val);
-          });
-        };
-        replaceColors(json);
-        symbolToRender = CIMSymbol.fromJSON(json);
+        const outerLayer =
+          json.symbol?.symbolLayers?.[json.symbol.symbolLayers.length - 1];
+        if (outerLayer) {
+          replaceColors(outerLayer);
+        }
+        const cimSymbol = CIMSymbol.fromJSON(json);
+        cimSymbolUtils.scaleCIMSymbolTo(cimSymbol, 12);
+        symbolToRender = cimSymbol;
       } else {
         (symbolToRender as unknown as SimpleMarkerSymbol).color = arcgisColor;
       }
@@ -188,7 +203,6 @@ export const usePointSymbolPicker = (
     },
     [symbolGroups],
   );
-
   const handleSizeInput = useCallback(
     (event: HTMLCalciteInputNumberElement["calciteInputNumberChange"]) => {
       if (!symbol) return;
@@ -200,6 +214,7 @@ export const usePointSymbolPicker = (
           pointColor,
           newSize,
           onSymbolChange,
+          webMapId.current,
         );
       } else if (symbol.type === "simple-marker") {
         const newSymbol = symbol.clone();
@@ -207,7 +222,7 @@ export const usePointSymbolPicker = (
         onSymbolChange(newSymbol);
       }
     },
-    [onSymbolChange, symbol, selectedWebSymbol, pointColor, setSize],
+    [symbol, selectedWebSymbol, pointColor],
   );
 
   useEffect(() => {
@@ -221,8 +236,14 @@ export const usePointSymbolPicker = (
     if (!selectedWebSymbol) return;
     if (pointSymbolInitialized) return;
     setPointSymbolInitialized(true);
-    applySymbolProperties(selectedWebSymbol, pointColor, size, onSymbolChange);
-  }, [onSymbolChange, pointColor, pointSymbolInitialized, selectedWebSymbol, setPointSymbolInitialized, size]);
+    applySymbolProperties(
+      selectedWebSymbol,
+      pointColor,
+      size,
+      onSymbolChange,
+      webMapId.current,
+    );
+  }, [selectedWebSymbol]);
 
   const getSymbols = async () => {
     const ids = [
@@ -252,14 +273,23 @@ export const usePointSymbolPicker = (
     setSelectedGroup(symbols[0]);
 
     if (!pointSymbolInitialized) {
-      setSelectedWebSymbol(symbols[0]?.symbols[0]?.symbol);
+      const stored = loadSketchSymbols(webMapId.current);
+
+      if (stored.point) {
+        const restoredSymbol = WebStyleSymbol.fromJSON(stored.point.webSymbol);
+        setPointColor(stored.point.color);
+        setSize(stored.point.size);
+        setSelectedWebSymbol(restoredSymbol); // set last so useEffect fires with correct color/size
+      } else {
+        setSelectedWebSymbol(symbols[0]?.symbols[0]?.symbol);
+      }
     }
   };
 
   useEffect(() => {
     if (symbolGroups.length > 0) return;
     getSymbols();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return {

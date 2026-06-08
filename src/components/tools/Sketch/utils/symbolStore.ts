@@ -1,11 +1,17 @@
 import type TextSymbol from "@arcgis/core/symbols/TextSymbol";
-import type SimpleMarkerSymbol from "@arcgis/core/symbols/SimpleMarkerSymbol";
 import type SimpleLineSymbol from "@arcgis/core/symbols/SimpleLineSymbol";
 import type SimpleFillSymbol from "@arcgis/core/symbols/SimpleFillSymbol";
+import type WebStyleSymbol from "@arcgis/core/symbols/WebStyleSymbol";
 
+export type SketchPointSymbol = {
+    color: string,
+    size: number,
+    webSymbol: WebStyleSymbol
+
+}
 export type SketchSymbolStore = {
   text?: TextSymbol["toJSON"];
-  point?: SimpleMarkerSymbol["toJSON"];
+  point?: SketchPointSymbol;
   line?: SimpleLineSymbol["toJSON"];
   polygon?: SimpleFillSymbol["toJSON"];
 };

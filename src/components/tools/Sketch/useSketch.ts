@@ -281,7 +281,7 @@ export const useSketch = (
       graphic.symbol = symbol.clone();
       symbol.toJSON();
     });
-    updateSketchSymbol(webMapId.current, "point", symbol.toJSON());
+   // updateSketchSymbol(webMapId.current, "point", symbol.toJSON());
   };
 
   const handlePolylineSymbolChange = (
@@ -405,12 +405,12 @@ export const useSketch = (
     const stored = loadSketchSymbols(webMapId.current);
     if (!stored) return;
 
-    if (stored.point) {
-      const symbol = SimpleMarkerSymbol.fromJSON(stored.point);
-      setPointSymbol(symbol);
+    // if (stored.point) {
+    //   const symbol = CIMSymbol.fromJSON(stored.point) as SimpleMarkerSymbol;
+    //   setPointSymbol(symbol);
 
-      pointSketchVm.current!.pointSymbol = symbol;
-    }
+    //   pointSketchVm.current!.pointSymbol = symbol;
+    // }
 
     if (stored.line) {
       const symbol = SimpleLineSymbol.fromJSON(stored.line);
