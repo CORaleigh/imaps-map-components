@@ -115,7 +115,9 @@ export const MapProvider: React.FC<{ children: React.ReactNode }> = ({
 
     reactiveUtils.watch(
       () => view.map!.basemap!,
-      (basemap: Basemap) => {
+      async (basemap: Basemap) => {
+        await reactiveUtils.whenOnce(() => basemap.loadStatus == "loaded");
+        console.log(basemap.baseLayers.length);
         localStorage.setItem(
           `imaps_${webMapId.current}_basemap`,
           JSON.stringify(basemap.toJSON()),
@@ -154,7 +156,7 @@ export const MapProvider: React.FC<{ children: React.ReactNode }> = ({
           } as ActionButton,
         ]);
       }
-      
+
       const selectedTitles =
         localStorage
           .getItem(`imaps_${webMapId.current}_property_labels`)
