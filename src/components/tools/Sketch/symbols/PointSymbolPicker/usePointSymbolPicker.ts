@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 // usePointSymbolPicker.ts
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useCallback, useEffect, useRef } from "react";
@@ -26,6 +27,19 @@ export type OnSymbolChange = (
     | TextSymbol,
 ) => void;
 
+const replaceColors = (obj: any, colorArray: number[]) => {
+  if (!obj || typeof obj !== "object") return;
+  if (Array.isArray(obj.color) && obj.color.length === 4) {
+    const [r, g, b] = obj.color;
+    const isLight = r > 200 && g > 200 && b > 200;
+    if (!isLight) obj.color = colorArray;
+  }
+  Object.values(obj).forEach((val) => {
+    if (Array.isArray(val)) val.forEach((v) => replaceColors(v, colorArray));
+    else if (typeof val === "object") replaceColors(val, colorArray);
+  });
+};
+
 export const applySymbolProperties = async (
   webSymbol: WebStyleSymbol,
   color: string,
@@ -42,28 +56,13 @@ export const applySymbolProperties = async (
     Math.round(arcgisColor.a * 255),
   ];
 
-  const replaceColors = (obj: any) => {
-    if (!obj || typeof obj !== "object") return;
-    if (Array.isArray(obj.color) && obj.color.length === 4) {
-      const [r, g, b] = obj.color;
-      const isLight = r > 200 && g > 200 && b > 200;
-      if (!isLight) {
-        obj.color = colorArray;
-      }
-    }
-    Object.values(obj).forEach((val) => {
-      if (Array.isArray(val)) val.forEach(replaceColors);
-      else if (typeof val === "object") replaceColors(val);
-    });
-  };
-
   if (fetchedSymbol.type === "cim") {
     const json = fetchedSymbol.toJSON();
 
     const outerLayer =
       json.symbol?.symbolLayers?.[json.symbol.symbolLayers.length - 1];
     if (outerLayer) {
-      replaceColors(outerLayer);
+      replaceColors(outerLayer, colorArray);
     }
 
     const cimSymbol = CIMSymbol.fromJSON(json);
@@ -121,9 +120,7 @@ export const usePointSymbolPicker = (
 ): UsePointSymbolPicker => {
   const [symbolGroups, setSymbolGroups] = useState<SymbolGroup[]>([]);
   const [showFlow, setShowFlow] = useState(false);
-  const [selectedGroup, setSelectedGroup] = useState<SymbolGroup | undefined>(
-    undefined,
-  );
+  const [selectedGroup, setSelectedGroup] = useState<SymbolGroup>();
   const previewCache = useRef<Map<string, string>>(new Map());
   const selectedPreviewRef = useRef<HTMLDivElement>(null);
   const { webMapId } = useMap();
@@ -140,21 +137,6 @@ export const usePointSymbolPicker = (
         Math.round(arcgisColor.a * 255),
       ];
 
-      const replaceColors = (obj: any) => {
-        if (!obj || typeof obj !== "object") return;
-        if (Array.isArray(obj.color) && obj.color.length === 4) {
-          const [r, g, b] = obj.color;
-          const isLight = r > 200 && g > 200 && b > 200;
-          if (!isLight) {
-            obj.color = colorArray;
-          }
-        }
-        Object.values(obj).forEach((val) => {
-          if (Array.isArray(val)) val.forEach(replaceColors);
-          else if (typeof val === "object") replaceColors(val);
-        });
-      };
-
       let symbolToRender = fetchedSymbol;
 
       if (fetchedSymbol.type === "cim") {
@@ -162,7 +144,7 @@ export const usePointSymbolPicker = (
         const outerLayer =
           json.symbol?.symbolLayers?.[json.symbol.symbolLayers.length - 1];
         if (outerLayer) {
-          replaceColors(outerLayer);
+          replaceColors(outerLayer, colorArray);
         }
         const cimSymbol = CIMSymbol.fromJSON(json);
         cimSymbolUtils.scaleCIMSymbolTo(cimSymbol, 12);
@@ -189,7 +171,7 @@ export const usePointSymbolPicker = (
     (event: HTMLCalciteColorPickerElement["calciteColorPickerChange"]) => {
       setPointColor(event.target.value as string);
     },
-    [setPointColor],
+    [],
   );
 
   const handleSymbolGroupChange = useCallback(
@@ -205,7 +187,7 @@ export const usePointSymbolPicker = (
   );
   const handleSizeInput = useCallback(
     (event: HTMLCalciteInputNumberElement["calciteInputNumberChange"]) => {
-      if (!symbol) return;
+      if (!symbol || !pointColor) return;
       const newSize = Number(event.target.value);
       setSize(newSize);
       if (selectedWebSymbol) {
@@ -230,7 +212,7 @@ export const usePointSymbolPicker = (
     if (symbol && symbol.type === "simple-marker" && symbol.size) {
       setSize(symbol.size);
     }
-  }, [symbol, selectedWebSymbol, setSize]);
+  }, [symbol, selectedWebSymbol]);
 
   useEffect(() => {
     if (!selectedWebSymbol) return;
@@ -281,6 +263,7 @@ export const usePointSymbolPicker = (
         setSize(stored.point.size);
         setSelectedWebSymbol(restoredSymbol); // set last so useEffect fires with correct color/size
       } else {
+        setPointColor("#FF0000");
         setSelectedWebSymbol(symbols[0]?.symbols[0]?.symbol);
       }
     }
@@ -289,7 +272,6 @@ export const usePointSymbolPicker = (
   useEffect(() => {
     if (symbolGroups.length > 0) return;
     getSymbols();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return {

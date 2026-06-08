@@ -38,16 +38,15 @@ export const useHeader = (webMapId: string): UseHeaderProps => {
     const height = groupHeight * groups.length + itemHeight * items.length;
     wrapper?.setAttribute("style", `min-height: ${height}px`);
   };
+  
   const handleClearStorage = () => {
-    localStorage.removeItem(`imaps_${webMapId}_basemap`);
-    localStorage.removeItem(`imaps_${webMapId}_bookmarks`);
-    localStorage.removeItem(`imaps_${webMapId}_layerVisibility`);
-    localStorage.removeItem(`imaps_${webMapId}_extent`);
-    localStorage.removeItem(`imaps_${webMapId}_history`);
-
-    localStorage.removeItem(`imaps_theme_mode`);
+    const prefix = `imaps_${webMapId}`;
+    Object.keys(localStorage)
+      .filter((key) => key.startsWith(prefix) || key.startsWith("imaps_theme"))
+      .forEach((key) => localStorage.removeItem(key));
     window.location.reload();
   };
+
   useEffect(() => {
     (async () => {
       const params = new URLSearchParams(window.location.search);

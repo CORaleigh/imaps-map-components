@@ -89,7 +89,7 @@ export const useSketch = (
   const [selectedWebSymbol, setSelectedWebSymbol] = useState<
     WebStyleSymbol | undefined
   >(undefined);
-  const [pointColor, setPointColor] = useState<string>("#ff0000");
+  const [pointColor, setPointColor] = useState<string>("");
   const [pointSize, setPointSize] = useState<number>(12);
   const [pointSymbol, setPointSymbol] = useState<
     SimpleMarkerSymbol | undefined

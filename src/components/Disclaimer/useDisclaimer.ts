@@ -12,8 +12,8 @@ export const useDisclaimer = (): UseDisclaimerProps => {
 
   const [open, setOpen] = useState<boolean>(() => {
     const stored = localStorage.getItem("imaps_hide_disclaimer");
-
-    return stored !== "true";
+    
+    return stored !== "true" || !stored;
   });
 
   const handleDialogClose = () => {

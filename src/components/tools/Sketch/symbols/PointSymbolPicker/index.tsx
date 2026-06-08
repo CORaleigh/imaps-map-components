@@ -60,6 +60,7 @@ const SymbolItemDisplay = ({
   size,
   setSelectedWebSymbol,
   onClose,
+  webMapId,
 }: {
   webSymbol: WebStyleSymbol;
   title: string;
@@ -78,6 +79,7 @@ const SymbolItemDisplay = ({
     React.SetStateAction<WebStyleSymbol | undefined>
   >;
   onClose: () => void;
+  webMapId: string;
 }) => {
   const previewRef = useRef<HTMLDivElement>(null);
 
@@ -101,14 +103,21 @@ const SymbolItemDisplay = ({
         );
       }
     });
-  }, [previewCache, webSymbol]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [webSymbol]);
 
-  const {webMapId} = useMap();
   const handleSelect = useCallback(async () => {
     setSelectedWebSymbol(webSymbol);
-    await applySymbolProperties(webSymbol, color, size, onSymbolSelect, webMapId.current);
+    await applySymbolProperties(
+      webSymbol,
+      color,
+      size,
+      onSymbolSelect,
+      webMapId,
+    );
     onClose();
-  }, [setSelectedWebSymbol, webSymbol, color, size, onSymbolSelect, onClose]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [webSymbol, color, size, onSymbolSelect, onClose]);
 
   return (
     <calcite-list-item
@@ -159,7 +168,7 @@ const PointSymbolPicker: React.FC<PointSymbolPickerProps> = ({
   const selectedSymbolTitle = selectedGroup?.symbols.find(
     (item) => item.symbol.name === selectedWebSymbolProp?.name,
   )?.title;
-  const {webMapId} = useMap();
+  const { webMapId } = useMap();
   useEffect(() => {
     if (!selectedWebSymbolProp) return;
     applySymbolProperties(
@@ -167,78 +176,86 @@ const PointSymbolPicker: React.FC<PointSymbolPickerProps> = ({
       pointColorProp,
       pointSizeProp,
       onSymbolChange,
-      webMapId.current
+      webMapId.current,
     );
-  }, [pointColorProp, pointSizeProp, selectedWebSymbolProp]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pointColorProp]);
 
   return (
     <calcite-flow>
+      {}
       <calcite-flow-item selected={!showFlow}>
-        <calcite-block expanded>
-          <calcite-label>
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "8px",
-                outline: "solid 1px",
-                height: "32px",
-                padding: "0 8px",
-              }}
-              onClick={handleShowFlow}
-            >
-              {selectedWebSymbolProp ? <div ref={selectedPreviewRef} /> : <div style={{width: '50px'}}></div>}
-              <span style={{ flex: 1 }}>{selectedSymbolTitle ?? ""}</span>
-              <calcite-icon icon="chevron-right" />
-            </div>
-          </calcite-label>
-          <calcite-label>
-            Size
-            <calcite-input-number
-              value={pointSizeProp.toString()}
-              min={6}
-              max={100}
-              oncalciteInputNumberInput={handleSizeInput}
-              suffixText="px"
-            />
-          </calcite-label>
-          <calcite-label>
-            Color
-            <calcite-button
-              width="half"
-              iconEnd="pencil"
-              appearance="outline"
-              kind="neutral"
-              id="web-symbol-color"
-            >
-              <calcite-color-picker-swatch
-                color={pointColorProp}
-                style={{ width: "82px" }}
+        {pointColorProp !== "" && (
+          <calcite-block expanded>
+            <calcite-label>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px",
+                  outline: "solid 1px",
+                  height: "32px",
+                  padding: "0 8px",
+                }}
+                onClick={handleShowFlow}
+              >
+                {selectedWebSymbolProp ? (
+                  <div ref={selectedPreviewRef} />
+                ) : (
+                  <div style={{ width: "50px" }}></div>
+                )}
+                <span style={{ flex: 1 }}>{selectedSymbolTitle ?? ""}</span>
+                <calcite-icon icon="chevron-right" />
+              </div>
+            </calcite-label>
+            <calcite-label>
+              Size
+              <calcite-input-number
+                value={pointSizeProp.toString()}
+                min={6}
+                max={100}
+                oncalciteInputNumberInput={handleSizeInput}
+                suffixText="px"
               />
-            </calcite-button>
-          </calcite-label>
-          <calcite-popover
-            label="Symbol Color"
-            referenceElement="web-symbol-color"
-            pointerDisabled
-            overlayPositioning="fixed"
-            heading="Symbol Color"
-            closable
-          >
-            <calcite-color-picker
-              value={pointColorProp}
-              oncalciteColorPickerChange={handlePointColorChange}
-            />
-          </calcite-popover>
-        </calcite-block>
+            </calcite-label>
+            <calcite-label>
+              Color
+              <calcite-button
+                width="half"
+                iconEnd="pencil"
+                appearance="outline"
+                kind="neutral"
+                id="web-symbol-color"
+              >
+                <calcite-color-picker-swatch
+                  color={pointColorProp}
+                  style={{ width: "82px" }}
+                />
+              </calcite-button>
+            </calcite-label>
+            <calcite-popover
+              label="Symbol Color"
+              referenceElement="web-symbol-color"
+              pointerDisabled
+              overlayPositioning="fixed"
+              heading="Symbol Color"
+              closable
+            >
+              <calcite-color-picker
+                value={pointColorProp}
+                oncalciteColorPickerChange={handlePointColorChange}
+              />
+            </calcite-popover>
+          </calcite-block>
+        )}
       </calcite-flow-item>
-      <calcite-flow-item
-        selected={showFlow}
-        id="web-symbols"
-        heading="Symbols"
-
-      >
-        <calcite-action slot="actions-start" icon="chevron-left" text="Back" onClick={handleShowFlow}></calcite-action>
+      <calcite-flow-item selected={showFlow} id="web-symbols" heading="Symbols">
+        <calcite-action
+          slot="actions-start"
+          icon="chevron-left"
+          text="Back"
+          onClick={handleShowFlow}
+        ></calcite-action>
         <calcite-block expanded>
           <calcite-dropdown
             label="Select"
@@ -287,6 +304,7 @@ const PointSymbolPicker: React.FC<PointSymbolPickerProps> = ({
                 size={pointSizeProp}
                 setSelectedWebSymbol={setSelectedWebSymbolProp}
                 onClose={handleShowFlow}
+                webMapId={webMapId.current}
               />
             ))}
           </calcite-list>
