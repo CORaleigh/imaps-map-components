@@ -39,11 +39,15 @@ interface PointSymbolPickerProps {
       | TextSymbol,
   ) => void;
   selectedWebSymbol: WebStyleSymbol | undefined;
-  setSelectedWebSymbol: React.Dispatch<React.SetStateAction<WebStyleSymbol | undefined>>;
+  setSelectedWebSymbol: React.Dispatch<
+    React.SetStateAction<WebStyleSymbol | undefined>
+  >;
   pointColor: string;
   setPointColor: React.Dispatch<React.SetStateAction<string>>;
   pointSize: number;
   setPointSize: React.Dispatch<React.SetStateAction<number>>;
+  pointSymbolInitialized: boolean;
+  setPointSymbolInitialized: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const SymbolItemDisplay = ({
@@ -54,6 +58,7 @@ const SymbolItemDisplay = ({
   color,
   size,
   setSelectedWebSymbol,
+  onClose,
 }: {
   webSymbol: WebStyleSymbol;
   title: string;
@@ -68,7 +73,10 @@ const SymbolItemDisplay = ({
   ) => void;
   color: string;
   size: number;
-  setSelectedWebSymbol: React.Dispatch<React.SetStateAction<WebStyleSymbol | undefined>>;
+  setSelectedWebSymbol: React.Dispatch<
+    React.SetStateAction<WebStyleSymbol | undefined>
+  >;
+  onClose: () => void;
 }) => {
   const previewRef = useRef<HTMLDivElement>(null);
 
@@ -92,12 +100,13 @@ const SymbolItemDisplay = ({
         );
       }
     });
-  }, [webSymbol]);
+  }, [previewCache, webSymbol]);
 
   const handleSelect = useCallback(async () => {
     setSelectedWebSymbol(webSymbol);
     await applySymbolProperties(webSymbol, color, size, onSymbolSelect);
-  }, [webSymbol, onSymbolSelect, color, size, setSelectedWebSymbol]);
+    onClose();
+  }, [setSelectedWebSymbol, webSymbol, color, size, onSymbolSelect, onClose]);
 
   return (
     <calcite-list-item
@@ -119,6 +128,8 @@ const PointSymbolPicker: React.FC<PointSymbolPickerProps> = ({
   setPointColor: setPointColorProp,
   pointSize: pointSizeProp,
   setPointSize: setPointSizeProp,
+  pointSymbolInitialized,
+  setPointSymbolInitialized,
 }) => {
   const {
     handleSizeInput,
@@ -139,6 +150,8 @@ const PointSymbolPicker: React.FC<PointSymbolPickerProps> = ({
     setPointColorProp,
     pointSizeProp,
     setPointSizeProp,
+    pointSymbolInitialized,
+    setPointSymbolInitialized,
   );
 
   const selectedSymbolTitle = selectedGroup?.symbols.find(
@@ -147,8 +160,13 @@ const PointSymbolPicker: React.FC<PointSymbolPickerProps> = ({
 
   useEffect(() => {
     if (!selectedWebSymbolProp) return;
-    applySymbolProperties(selectedWebSymbolProp, pointColorProp, pointSizeProp, onSymbolChange);
-  }, [pointColorProp]);
+    applySymbolProperties(
+      selectedWebSymbolProp,
+      pointColorProp,
+      pointSizeProp,
+      onSymbolChange,
+    );
+  }, [onSymbolChange, pointColorProp, pointSizeProp, selectedWebSymbolProp]);
 
   return (
     <calcite-flow>
@@ -166,12 +184,8 @@ const PointSymbolPicker: React.FC<PointSymbolPickerProps> = ({
               }}
               onClick={handleShowFlow}
             >
-              {selectedWebSymbolProp ? (
-                <div ref={selectedPreviewRef} />
-              ) : (
-                <calcite-icon icon="circle" />
-              )}
-              <span style={{ flex: 1 }}>{selectedSymbolTitle ?? "Point Symbol"}</span>
+              {selectedWebSymbolProp ? <div ref={selectedPreviewRef} /> : <></>}
+              <span style={{ flex: 1 }}>{selectedSymbolTitle ?? ""}</span>
               <calcite-icon icon="chevron-right" />
             </div>
           </calcite-label>
@@ -219,10 +233,10 @@ const PointSymbolPicker: React.FC<PointSymbolPickerProps> = ({
       <calcite-flow-item
         selected={showFlow}
         id="web-symbols"
-        heading="Web Symbols"
-        closable
-        oncalciteFlowItemClose={handleShowFlow}
+        heading="Symbols"
+
       >
+        <calcite-action slot="actions-start" icon="chevron-left" text="Back" onClick={handleShowFlow}></calcite-action>
         <calcite-block expanded>
           <calcite-dropdown
             label="Select"
@@ -270,6 +284,7 @@ const PointSymbolPicker: React.FC<PointSymbolPickerProps> = ({
                 color={pointColorProp}
                 size={pointSizeProp}
                 setSelectedWebSymbol={setSelectedWebSymbolProp}
+                onClose={handleShowFlow}
               />
             ))}
           </calcite-list>

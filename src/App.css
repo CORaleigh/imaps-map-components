@@ -7,6 +7,7 @@ body {
   --calcite-shell-panel-width: 390px;
   --calcite-shell-panel-max-width: 50vw;
   --calcite-z-index-header: unset;
+  --calcite-flow-background-color: var(--calcite-color-foreground-1);
 }
 
 

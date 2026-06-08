@@ -63,6 +63,8 @@ export interface UseSketchProps {
   setPointColor: React.Dispatch<React.SetStateAction<string>>;
   pointSize: number;
   setPointSize: React.Dispatch<React.SetStateAction<number>>;
+  pointSymbolInitialized: boolean;
+  setPointSymbolInitialized: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export const useSketch = (
@@ -106,6 +108,7 @@ export const useSketch = (
       font: { size: 12, family: "Arial", weight: "normal" },
     }),
   );
+  const [pointSymbolInitialized, setPointSymbolInitialized] = useState(false);
 
   const selectedGraphics = useRef<Graphic[]>([]);
   const [selectedGraphicIds, setSelectedGraphicIds] = useState<string[]>([]);
@@ -417,5 +420,7 @@ export const useSketch = (
     setPointColor,
     pointSize,
     setPointSize,
+    pointSymbolInitialized,
+    setPointSymbolInitialized,
   };
 };

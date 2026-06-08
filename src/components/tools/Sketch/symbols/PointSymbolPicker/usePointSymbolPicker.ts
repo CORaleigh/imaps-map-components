@@ -53,11 +53,11 @@ export const applySymbolProperties = async (
     };
 
     const replaceSize = (obj: any) => {
-      
       if (!obj || typeof obj !== "object") return;
       if (obj.symbolLayers && Array.isArray(obj.symbolLayers)) {
         const layers = obj.symbolLayers.filter(
-          (l: any) => l.type === "CIMVectorMarker" || l.type === "CIMPictureMarker",
+          (l: any) =>
+            l.type === "CIMVectorMarker" || l.type === "CIMPictureMarker",
         );
         if (layers.length > 0) {
           const mainLayer = layers.reduce((prev: any, curr: any) =>
@@ -106,15 +106,21 @@ export const usePointSymbolPicker = (
   symbol: SimpleMarkerSymbol,
   onSymbolChange: OnSymbolChange,
   selectedWebSymbol: WebStyleSymbol | undefined,
-  setSelectedWebSymbol: React.Dispatch<React.SetStateAction<WebStyleSymbol | undefined>>,
+  setSelectedWebSymbol: React.Dispatch<
+    React.SetStateAction<WebStyleSymbol | undefined>
+  >,
   pointColor: string,
   setPointColor: React.Dispatch<React.SetStateAction<string>>,
   size: number,
   setSize: React.Dispatch<React.SetStateAction<number>>,
+  pointSymbolInitialized: boolean,
+  setPointSymbolInitialized: React.Dispatch<React.SetStateAction<boolean>>,
 ): UsePointSymbolPicker => {
   const [symbolGroups, setSymbolGroups] = useState<SymbolGroup[]>([]);
   const [showFlow, setShowFlow] = useState(false);
-  const [selectedGroup, setSelectedGroup] = useState<SymbolGroup | undefined>(undefined);
+  const [selectedGroup, setSelectedGroup] = useState<SymbolGroup | undefined>(
+    undefined,
+  );
   const previewCache = useRef<Map<string, string>>(new Map());
   const selectedPreviewRef = useRef<HTMLDivElement>(null);
 
@@ -150,7 +156,9 @@ export const usePointSymbolPicker = (
         (symbolToRender as unknown as SimpleMarkerSymbol).color = arcgisColor;
       }
 
-      const html = await symbolUtils.renderPreviewHTML(symbolToRender, { size: 12 });
+      const html = await symbolUtils.renderPreviewHTML(symbolToRender, {
+        size: 12,
+      });
       if (html && selectedPreviewRef.current) {
         selectedPreviewRef.current.innerHTML = "";
         selectedPreviewRef.current.appendChild(html);
@@ -187,7 +195,12 @@ export const usePointSymbolPicker = (
       const newSize = Number(event.target.value);
       setSize(newSize);
       if (selectedWebSymbol) {
-        applySymbolProperties(selectedWebSymbol, pointColor, newSize, onSymbolChange);
+        applySymbolProperties(
+          selectedWebSymbol,
+          pointColor,
+          newSize,
+          onSymbolChange,
+        );
       } else if (symbol.type === "simple-marker") {
         const newSymbol = symbol.clone();
         newSymbol.size = newSize;
@@ -202,12 +215,14 @@ export const usePointSymbolPicker = (
     if (symbol && symbol.type === "simple-marker" && symbol.size) {
       setSize(symbol.size);
     }
-  }, [symbol]);
+  }, [symbol, selectedWebSymbol, setSize]);
 
   useEffect(() => {
     if (!selectedWebSymbol) return;
+    if (pointSymbolInitialized) return;
+    setPointSymbolInitialized(true);
     applySymbolProperties(selectedWebSymbol, pointColor, size, onSymbolChange);
-  }, [selectedWebSymbol]);
+  }, [onSymbolChange, pointColor, pointSymbolInitialized, selectedWebSymbol, setPointSymbolInitialized, size]);
 
   const getSymbols = async () => {
     const ids = [
@@ -233,15 +248,18 @@ export const usePointSymbolPicker = (
         return { name: item.title, symbols: webSymbols };
       }),
     );
-
     setSymbolGroups(symbols);
     setSelectedGroup(symbols[0]);
-    setSelectedWebSymbol(symbols[0]?.symbols[0]?.symbol);
+
+    if (!pointSymbolInitialized) {
+      setSelectedWebSymbol(symbols[0]?.symbols[0]?.symbol);
+    }
   };
 
   useEffect(() => {
     if (symbolGroups.length > 0) return;
     getSymbols();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return {

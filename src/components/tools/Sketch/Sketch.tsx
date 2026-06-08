@@ -59,11 +59,13 @@ const Sketch: React.FC<SketchProps> = ({
     setPointColor,
     pointSize,
     setPointSize,
+    pointSymbolInitialized,
+    setPointSymbolInitialized,
   } = useSketch(mapElement, closed);
 
   return (
     <>
-      <div>
+      <div >
         <calcite-panel
           heading="Sketch"
           closable
@@ -145,7 +147,7 @@ const Sketch: React.FC<SketchProps> = ({
             </calcite-action-bar>
           </div>
           {(mapMode === "point" || selectedGraphicsType === "point") && (
-            <calcite-block heading="Point Style" label="Point Style" expanded>
+            <calcite-block heading="Point Style" label="Point Style" expanded >
               <PointSymbolPicker
                 symbol={pointSymbol!}
                 onSymbolChange={handlePointSymbolChange}
@@ -155,6 +157,8 @@ const Sketch: React.FC<SketchProps> = ({
                 setPointColor={setPointColor}
                 pointSize={pointSize}
                 setPointSize={setPointSize}
+                pointSymbolInitialized={pointSymbolInitialized}
+                setPointSymbolInitialized={setPointSymbolInitialized}
               />
             </calcite-block>
           )}
