@@ -7,18 +7,13 @@ import type SimpleMarkerSymbol from "@arcgis/core/symbols/SimpleMarkerSymbol";
 import type TextSymbol from "@arcgis/core/symbols/TextSymbol";
 
 interface TextSymbolPickerProps {
-  symbol:
-    | SimpleFillSymbol
-    | SimpleLineSymbol
-    | SimpleMarkerSymbol
-    | TextSymbol;
+  symbol: SimpleFillSymbol | SimpleLineSymbol | SimpleMarkerSymbol | TextSymbol;
   onSymbolChange: (
     symbol:
       | SimpleFillSymbol
-
       | SimpleLineSymbol
       | SimpleMarkerSymbol
-      | TextSymbol
+      | TextSymbol,
   ) => void;
 }
 
@@ -26,8 +21,20 @@ const TextSymbolPicker: React.FC<TextSymbolPickerProps> = ({
   symbol,
   onSymbolChange,
 }) => {
-  const { color, size, text, handleColorChange, handleSizeInput, handleTextInput } =
-    useTextSymbolPicker(symbol, onSymbolChange);
+  const {
+    color,
+    size,
+    text,
+    haloEnabled,
+    haloColor,
+    haloSize,
+    handleColorChange,
+    handleSizeInput,
+    handleTextInput,
+    handleHaloToggle,
+    handleHaloColorChange,
+    handleHaloSizeInput,
+  } = useTextSymbolPicker(symbol, onSymbolChange);
   return (
     <>
       <calcite-label>
@@ -35,8 +42,10 @@ const TextSymbolPicker: React.FC<TextSymbolPickerProps> = ({
         <calcite-text-area
           value={text}
           oncalciteTextAreaInput={handleTextInput}
-        >{text}</calcite-text-area>
-      </calcite-label>    
+        >
+          {text}
+        </calcite-text-area>
+      </calcite-label>
       <calcite-label>
         Color
         <calcite-button
@@ -44,7 +53,6 @@ const TextSymbolPicker: React.FC<TextSymbolPickerProps> = ({
           iconEnd="pencil"
           appearance="outline"
           kind="neutral"
-          style={{ width: "130px" }}
           id="text-color"
         >
           <calcite-color-picker-swatch
@@ -76,6 +84,58 @@ const TextSymbolPicker: React.FC<TextSymbolPickerProps> = ({
           value={color}
         ></calcite-color-picker>
       </calcite-popover>
+
+      <calcite-label layout="inline">
+        Halo
+        <calcite-switch
+          checked={haloEnabled}
+          oncalciteSwitchChange={handleHaloToggle}
+        />
+      </calcite-label>
+      {haloEnabled && (
+        <>
+          <calcite-label>
+            Halo Color
+            <calcite-button
+              width="half"
+              iconEnd="pencil"
+              appearance="outline"
+              kind="neutral"
+              id="halo-color"
+            >
+              <calcite-color-picker-swatch
+                color={haloColor}
+                style={{ width: "82px" }}
+              />
+            </calcite-button>
+          </calcite-label>
+
+          <calcite-label>
+            Halo Size
+            <calcite-input-number
+              value={haloSize.toString()}
+              min={1}
+              max={10}
+              suffixText="px"
+              oncalciteInputNumberInput={handleHaloSizeInput}
+            />
+          </calcite-label>
+
+          <calcite-popover
+            label="Halo Color"
+            referenceElement="halo-color"
+            pointerDisabled
+            overlayPositioning="fixed"
+            heading="Halo Color"
+            closable
+          >
+            <calcite-color-picker
+              value={haloColor}
+              oncalciteColorPickerChange={handleHaloColorChange}
+            />
+          </calcite-popover>
+        </>
+      )}
     </>
   );
 };

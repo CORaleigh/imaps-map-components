@@ -13,6 +13,7 @@ import type GraphicsLayer from "@arcgis/core/layers/GraphicsLayer";
 import type { CreateEvent } from "@arcgis/core/widgets/Sketch/types";
 import type PictureMarkerSymbol from "@arcgis/core/symbols/PictureMarkerSymbol";
 import type WebStyleSymbol from "@arcgis/core/symbols/WebStyleSymbol";
+import { updateSketchSymbol, loadSketchSymbols } from "./utils/symbolStore";
 
 export interface UseSketchProps {
   mapMode: MapMode;
@@ -72,6 +73,7 @@ export const useSketch = (
   closed: boolean,
 ): UseSketchProps => {
   const { mapMode, setMapMode } = useMap();
+  const { webMapId } = useMap();
 
   const mapNotesLayer = useRef<MapNotesLayer>(
     new MapNotesLayer({
@@ -106,6 +108,8 @@ export const useSketch = (
       color: "#000000",
       text: "",
       font: { size: 12, family: "Arial", weight: "normal" },
+      haloSize: 2,
+      haloColor: "#FFFFFF",
     }),
   );
   const [pointSymbolInitialized, setPointSymbolInitialized] = useState(false);
@@ -275,7 +279,9 @@ export const useSketch = (
     setPointSymbol(symbol as SimpleMarkerSymbol);
     selectedGraphics.current.forEach((graphic) => {
       graphic.symbol = symbol.clone();
+      symbol.toJSON();
     });
+    updateSketchSymbol(webMapId.current, "point", symbol.toJSON());
   };
 
   const handlePolylineSymbolChange = (
@@ -291,6 +297,7 @@ export const useSketch = (
     selectedGraphics.current.forEach((graphic) => {
       graphic.symbol = symbol.clone();
     });
+    updateSketchSymbol(webMapId.current, "line", symbol.toJSON());
   };
 
   const handlePolygonSymbolChange = (
@@ -306,6 +313,7 @@ export const useSketch = (
     selectedGraphics.current.forEach((graphic) => {
       graphic.symbol = symbol.clone();
     });
+    updateSketchSymbol(webMapId.current, "polygon", symbol.toJSON());
   };
 
   const handleTextSymbolChange = (
@@ -333,6 +341,7 @@ export const useSketch = (
         yoffset: (symbol as TextSymbol).yoffset,
       });
     });
+    updateSketchSymbol(webMapId.current, "text", symbol.toJSON());
   };
 
   const clearSketches = () => {
@@ -391,6 +400,38 @@ export const useSketch = (
     textSketchVm.current = createSketchVm(mapNotesLayer.current.textLayer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mapElement]);
+
+  useEffect(() => {
+    const stored = loadSketchSymbols(webMapId.current);
+    if (!stored) return;
+
+    if (stored.point) {
+      const symbol = SimpleMarkerSymbol.fromJSON(stored.point);
+      setPointSymbol(symbol);
+
+      pointSketchVm.current!.pointSymbol = symbol;
+    }
+
+    if (stored.line) {
+      const symbol = SimpleLineSymbol.fromJSON(stored.line);
+      setLineSymbol(symbol);
+
+      lineSketchVm.current!.polylineSymbol = symbol;
+    }
+
+    if (stored.polygon) {
+      const symbol = SimpleFillSymbol.fromJSON(stored.polygon);
+      setPolygonSymbol(symbol);
+
+      polygonSketchVm.current!.polygonSymbol = symbol;
+    }
+
+    if (stored.text) {
+      const symbol = TextSymbol.fromJSON(stored.text);
+      setTextSymbol(symbol);
+      textSketchVm.current!.textSymbol = symbol;
+    }
+  }, [webMapId]);
 
   useEffect(() => {
     if (closed) {
