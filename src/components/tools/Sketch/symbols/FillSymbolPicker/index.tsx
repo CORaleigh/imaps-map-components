@@ -6,15 +6,9 @@ import type SimpleLineSymbol from "@arcgis/core/symbols/SimpleLineSymbol";
 import type SimpleMarkerSymbol from "@arcgis/core/symbols/SimpleMarkerSymbol";
 
 interface FillSymbolPickerProps {
-  symbol:
-    | SimpleFillSymbol
-    | SimpleLineSymbol
-    | SimpleMarkerSymbol;
+  symbol: SimpleFillSymbol | SimpleLineSymbol | SimpleMarkerSymbol;
   onSymbolChange: (
-    symbol:
-      | SimpleFillSymbol
-      | SimpleLineSymbol
-      | SimpleMarkerSymbol
+    symbol: SimpleFillSymbol | SimpleLineSymbol | SimpleMarkerSymbol,
   ) => void;
 }
 

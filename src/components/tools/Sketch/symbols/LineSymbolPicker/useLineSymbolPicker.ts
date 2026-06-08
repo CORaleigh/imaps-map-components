@@ -11,33 +11,27 @@ export interface UseLineSymbolPicker {
   lineWidth: number;
   lineTransparency: number;
   handleLineColorChange: (
-    event: HTMLCalciteColorPickerElement["calciteColorPickerChange"]
+    event: HTMLCalciteColorPickerElement["calciteColorPickerChange"],
   ) => void;
   handleLineSliderInput: (
-    event: HTMLCalciteSliderElement["calciteSliderChange"]
+    event: HTMLCalciteSliderElement["calciteSliderChange"],
   ) => void;
   handleLineWidthInput: (
-    event: HTMLCalciteInputNumberElement["calciteInputNumberChange"]
+    event: HTMLCalciteInputNumberElement["calciteInputNumberChange"],
   ) => void;
   handleLineTransparencySliderInput: (
-    event: HTMLCalciteSliderElement["calciteSliderChange"]
+    event: HTMLCalciteSliderElement["calciteSliderChange"],
   ) => void;
   handleLineTransparencyInput: (
-    event: HTMLCalciteInputNumberElement["calciteInputNumberChange"]
+    event: HTMLCalciteInputNumberElement["calciteInputNumberChange"],
   ) => void;
 }
 
 export const useLineSymbolPicker = (
-  symbol:
-    | SimpleFillSymbol
-    | SimpleLineSymbol
-    | SimpleMarkerSymbol,
+  symbol: SimpleFillSymbol | SimpleLineSymbol | SimpleMarkerSymbol,
   onSymbolChange: (
-    symbol:
-      | SimpleFillSymbol
-      | SimpleLineSymbol
-      | SimpleMarkerSymbol
-  ) => void
+    symbol: SimpleFillSymbol | SimpleLineSymbol | SimpleMarkerSymbol,
+  ) => void,
 ): UseLineSymbolPicker => {
   const [lineColor, setLineColor] = useState("#FF0000");
   const [lineWidth, setLineWidth] = useState(2);
@@ -65,11 +59,11 @@ export const useLineSymbolPicker = (
       }
       onSymbolChange(symbol);
     },
-    [lineTransparency, onSymbolChange, symbol]
+    [lineTransparency, onSymbolChange, symbol],
   );
 
   const handleLineSliderInput = (
-    event: HTMLCalciteSliderElement["calciteSliderChange"]
+    event: HTMLCalciteSliderElement["calciteSliderChange"],
   ) => {
     if (!event.target.value) return;
     const width = parseFloat(event.target.value.toString());
@@ -88,7 +82,7 @@ export const useLineSymbolPicker = (
   };
 
   const handleLineWidthInput = (
-    event: HTMLCalciteInputNumberElement["calciteInputNumberChange"]
+    event: HTMLCalciteInputNumberElement["calciteInputNumberChange"],
   ) => {
     if (!event.target.value) return;
     const width = parseFloat(event.target.value.toString());
@@ -141,7 +135,7 @@ export const useLineSymbolPicker = (
       }
       onSymbolChange(symbol);
     },
-    [onSymbolChange, symbol]
+    [onSymbolChange, symbol],
   );
 
   const handleLineTransparencyInput = useCallback(
@@ -172,12 +166,12 @@ export const useLineSymbolPicker = (
       }
       onSymbolChange(symbol);
     },
-    [onSymbolChange, symbol]
+    [onSymbolChange, symbol],
   );
   useEffect(() => {
     if (symbol.type === "simple-line" && symbol.color) {
       setLineColor(symbol.color.toHex());
-      setLineTransparency(100 - symbol.color.a * 100);
+      setLineTransparency(Math.round(100 - symbol.color.a * 100));
       setLineWidth(symbol.width);
     }
     if (
@@ -186,7 +180,7 @@ export const useLineSymbolPicker = (
       symbol.outline.color
     ) {
       setLineColor(symbol.outline.color.toHex());
-      setLineTransparency(100 - symbol.outline.color.a * 100);
+      setLineTransparency(Math.round(100 - symbol.color.a * 100));
       setLineWidth(symbol.outline.width);
     }
   }, [symbol]);

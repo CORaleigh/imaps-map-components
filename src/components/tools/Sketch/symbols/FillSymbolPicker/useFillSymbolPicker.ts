@@ -79,7 +79,7 @@ export const useFillSymbolPicker = (
   useEffect(() => {
     if (symbol && symbol.color) {
       setFillColor(symbol.color.toHex());
-      setFillTransparency(100 - symbol.color.a * 100);
+      setFillTransparency(Math.round(100 - symbol.color.a * 100));
     }
   }, [symbol]);
 
