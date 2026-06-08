@@ -38,7 +38,6 @@ const FillSymbolPicker: React.FC<FillSymbolPickerProps> = ({
           iconEnd="pencil"
           appearance="outline"
           kind="neutral"
-          style={{ width: "130px" }}
           id="fill-color"
         >
           <calcite-color-picker-swatch

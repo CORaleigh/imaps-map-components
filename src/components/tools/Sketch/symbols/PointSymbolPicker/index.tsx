@@ -206,7 +206,6 @@ const PointSymbolPicker: React.FC<PointSymbolPickerProps> = ({
               iconEnd="pencil"
               appearance="outline"
               kind="neutral"
-              style={{ width: "130px" }}
               id="web-symbol-color"
             >
               <calcite-color-picker-swatch

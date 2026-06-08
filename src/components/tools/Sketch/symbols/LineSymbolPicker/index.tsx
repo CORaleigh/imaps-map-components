@@ -41,7 +41,6 @@ const LineSymbolPicker: React.FC<LineSymbolPickerProps> = ({
           iconEnd="pencil"
           appearance="outline"
           kind="neutral"
-          style={{ width: "130px" }}
           id="line-color"
         >
           <calcite-color-picker-swatch
