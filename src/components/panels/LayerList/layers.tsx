@@ -10,6 +10,7 @@ import type ListItem from "@arcgis/core/widgets/LayerList/ListItem";
 import type MapImageLayer from "@arcgis/core/layers/MapImageLayer";
 import type FeatureLayer from "@arcgis/core/layers/FeatureLayer";
 import LabelClass from "@arcgis/core/layers/support/LabelClass";
+import type SimpleRenderer from "@arcgis/core/renderers/SimpleRenderer";
 export type LayerStorageInfo = {
   id: string | number;
   visible: boolean;
@@ -91,21 +92,57 @@ export const createItemPanel = (item: ListItem) => {
   }
 };
 
-export const createLabelToggles = (item: ListItem, webMapId: string ) => {
+export const createPropertyOutlineToggle = (item: ListItem) => {
+  if (
+    !item.layer ||
+    item.layer.title !== "Property" ||
+    item.layer.type !== "feature"
+  )
+    return;
+  const layer: FeatureLayer = item.layer as FeatureLayer;
+  if (!layer.renderer || layer.renderer.type !== "simple") return;
+  const renderer = layer.renderer as SimpleRenderer;
+  if (
+    !renderer.symbol ||
+    renderer.symbol.type !== "simple-fill" ||
+    !renderer.symbol.outline ||
+    !renderer.symbol.outline.color
+  )
+    return;
+  const isDark = renderer.symbol.outline.color.toHex() === "#000000";
+  item.actionsSections.add(
+    new Collection(
+      new Collection([
+        new ActionToggle({
+          active: false,
+          value: !isDark,
+          title: "Light Outline",
+          icon: !isDark
+            ? "toggle-on"
+            : "toggle-off",          
+        }),
+      ]),
+    ),
+  );
+};
+
+export const createLabelToggles = (item: ListItem, webMapId: string) => {
   if (!item.layer) return;
   if (item.layer.title === "Property" && item.layer.type === "feature") {
     item.actionsSections = new Collection([new Collection([])]);
-    const selectedTitles = localStorage.getItem(
-      `imaps_${webMapId}_property_labels`
-    )?.split(',') ?? [];
-    
+    const selectedTitles =
+      localStorage.getItem(`imaps_${webMapId}_property_labels`)?.split(",") ??
+      [];
+
     propertyLabelExpressions.forEach((expression) =>
       item.actionsSections.at(0)?.add(
         new ActionToggle({
           active: false,
           value: selectedTitles?.includes(expression.title),
           title: expression.title,
-          icon:  selectedTitles?.includes(expression.title) ? "toggle-on" : "toggle-off",
+          icon: selectedTitles?.includes(expression.title)
+            ? "toggle-on"
+            : "toggle-off",
         }),
       ),
     );
@@ -113,54 +150,50 @@ export const createLabelToggles = (item: ListItem, webMapId: string ) => {
 };
 
 export const updatePropertyLabels = (
-    layer: FeatureLayer,
-    selectedTitles: (string | null | undefined)[],
-    webMapId: string
-  ) => {
-    
-    if (selectedTitles.length === 0) {
-       layer.labelingInfo = [];
-       localStorage.removeItem(`imaps_${webMapId}_property_labels`);
-       return;
-    }
-    const selectedExpressions = propertyLabelExpressions.filter(
-      (expression) => {
-        return selectedTitles?.includes(expression.title);
-      },
-    );
-    const expressions = selectedExpressions.map((expression) => {
-      return expression.expression;
-    });
-    const expression = expressions.join("+ TextFormatting.NewLine+");
+  layer: FeatureLayer,
+  selectedTitles: (string | null | undefined)[],
+  webMapId: string,
+) => {
+  if (selectedTitles.length === 0) {
     layer.labelingInfo = [];
-    
+    localStorage.removeItem(`imaps_${webMapId}_property_labels`);
+    return;
+  }
+  const selectedExpressions = propertyLabelExpressions.filter((expression) => {
+    return selectedTitles?.includes(expression.title);
+  });
+  const expressions = selectedExpressions.map((expression) => {
+    return expression.expression;
+  });
+  const expression = expressions.join("+ TextFormatting.NewLine+");
+  layer.labelingInfo = [];
 
-    localStorage.setItem(
-      `imaps_${webMapId}_property_labels`,
-      selectedTitles.toString(),
-    );
-    layer.labelsVisible = true;
-    layer.labelingInfo = [
-      new LabelClass({
-        symbol: {
-          type: "text",
-          color: "black",
-          haloColor: "white",
-          haloSize: 1,
-          font: {
-            family: "AvenirNext LT Pro Regular",
-            style: "normal",
-            weight: "bold",
-          },
+  localStorage.setItem(
+    `imaps_${webMapId}_property_labels`,
+    selectedTitles.toString(),
+  );
+  layer.labelsVisible = true;
+  layer.labelingInfo = [
+    new LabelClass({
+      symbol: {
+        type: "text",
+        color: "black",
+        haloColor: "white",
+        haloSize: 1,
+        font: {
+          family: "AvenirNext LT Pro Regular",
+          style: "normal",
+          weight: "bold",
         },
-        labelExpressionInfo: {
-          expression: expression,
-        },
-        maxScale: 0,
-        minScale: 5000,
-      }),
-    ];
-  };
+      },
+      labelExpressionInfo: {
+        expression: expression,
+      },
+      maxScale: 0,
+      minScale: 5000,
+    }),
+  ];
+};
 
 export const watchLayerList = (item: ListItem) => {
   reactiveUtils.watch(

@@ -8,6 +8,7 @@ import {
 import {
   createItemPanel,
   createLabelToggles,
+  createPropertyOutlineToggle,
   updatePropertyLabels,
   watchLayerList,
 } from "./layers";
@@ -27,6 +28,8 @@ import type {
 import Collection from "@arcgis/core/core/Collection";
 import * as reactiveUtils from "@arcgis/core/core/reactiveUtils.js";
 import type ListItem from "@arcgis/core/widgets/LayerList/ListItem";
+import type SimpleRenderer from "@arcgis/core/renderers/SimpleRenderer";
+import type SimpleFillSymbol from "@arcgis/core/symbols/SimpleFillSymbol";
 
 export interface UseLayerListProps {
   layerListElement: RefObject<HTMLArcgisLayerListElement | null>;
@@ -61,10 +64,24 @@ export const useLayerList = (
       watchLayerList(item);
       createItemPanel(item);
       createLabelToggles(item, webMapId.current);
+      createPropertyOutlineToggle(item);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [],
   );
+
+  const togglePropertyOutlineColor = (
+    outlineToggle: ActionToggle,
+    layer: FeatureLayer,
+  ) => {
+    if (!layer.renderer || layer.renderer.type !== "simple") return;
+    const renderer = layer.renderer as SimpleRenderer;
+    if (!renderer.symbol || renderer.symbol.type !== "simple-fill") return;
+    const symbol = renderer.symbol as SimpleFillSymbol;
+    if (!symbol.outline) return;
+    symbol.outline.color = outlineToggle.value ? "#FFFFFF" : "#000000";
+  };
+
   const handleTriggerAction = useCallback(
     (event: HTMLArcgisLayerListElement["arcgisTriggerAction"]) => {
       const item = event.detail.item;
@@ -98,8 +115,12 @@ export const useLayerList = (
         selected?.map((section: any) => {
           return (section as ActionToggle).title;
         }) ?? new Collection([]);
-
       updatePropertyLabels(layer, selectedTitles.toArray(), webMapId.current);
+
+      const outlineToggle = item.actionsSections
+        .getItemAt(1)
+        ?.getItemAt(0) as ActionToggle;
+      togglePropertyOutlineColor(outlineToggle, layer);
     },
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
