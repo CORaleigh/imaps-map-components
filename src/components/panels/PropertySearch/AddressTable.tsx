@@ -35,6 +35,7 @@ const AddressTable: React.FC<AddressTableProps> = ({
         className={styles.featureTable}
         ref={addressTableElement}
         filterGeometry={feature.geometry}
+        definitionExpression="ADDRESS IS NOT NULL"
         referenceElement={mapElement.current}
         onarcgisReady={onReady}
         onarcgisPropertyChange={onPropertyChange}
@@ -45,6 +46,8 @@ const AddressTable: React.FC<AddressTableProps> = ({
         hideMenuItemsRefreshData
         hideMenuItemsToggleColumns
         style={{ marginBottom: "1em" }}
+        hideColumnMenuItemsSortAscending
+        hideColumnMenuItemsSortDescending
         menuConfig={{
           items: [
             {

@@ -238,6 +238,7 @@ export const usePropertySearch = (
       visible: false,
       listMode: "hide",
       outFields: ["ADDRESS", "FEATURETYPE"],
+      definitionExpression: "1=1",
       title: "Addresses",
     });
     await addresses.load();
@@ -282,6 +283,7 @@ export const usePropertySearch = (
   const handleAddressCellClick = async (
     event: HTMLArcgisFeatureTableElement["arcgisCellClick"],
   ) => {
+    if (!event.detail.objectId) return;
     addressTableElement.current.highlightIds = new Collection([
       event.detail.objectId as number,
     ]);
