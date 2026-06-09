@@ -198,6 +198,8 @@ export const useSketch = (
       textSymbol: textSymbol,
     });
 
+    
+
     sketchVm.on("create", handleSketchCreate);
 
     sketchVm.on("update", (event) => {
@@ -243,6 +245,11 @@ export const useSketch = (
     //   mapElement.current.popupDisabled = true;
     // }
     if (event.state === "complete") {
+      if (
+        event.graphic?.symbol?.type === "text" &&
+        !(event.graphic.symbol as TextSymbol).text
+      )
+        return;
       event.graphic?.setAttribute("id", crypto.randomUUID());
       switch (event.graphic?.geometry?.type) {
         case "point":
@@ -281,7 +288,7 @@ export const useSketch = (
       graphic.symbol = symbol.clone();
       symbol.toJSON();
     });
-   // updateSketchSymbol(webMapId.current, "point", symbol.toJSON());
+    // updateSketchSymbol(webMapId.current, "point", symbol.toJSON());
   };
 
   const handlePolylineSymbolChange = (
@@ -324,7 +331,6 @@ export const useSketch = (
       | TextSymbol,
   ) => {
     if (!textSketchVm.current) return;
-
     // update the sketch tool
     textSketchVm.current.textSymbol = symbol as TextSymbol;
     setTextSymbol(symbol as TextSymbol);
@@ -342,6 +348,15 @@ export const useSketch = (
       });
     });
     updateSketchSymbol(webMapId.current, "text", symbol.toJSON());
+    textSketchVm.current.tooltipOptions = {
+      enabled: (symbol as TextSymbol).text.length === 0,
+      visibleElements: {
+        coordinates: false,
+        helpMessage: true,
+      },
+      helpMessage: "No text entered",
+      helpMessageIcon: "exclamation-mark-triangle",
+    };
   };
 
   const clearSketches = () => {
@@ -398,6 +413,14 @@ export const useSketch = (
     );
     lineSketchVm.current = createSketchVm(mapNotesLayer.current.polylineLayer);
     textSketchVm.current = createSketchVm(mapNotesLayer.current.textLayer);
+    textSketchVm.current.tooltipOptions = {
+      enabled: textSketchVm.current.textSymbol.text.length === 0,
+      visibleElements: {
+        coordinates: false,
+        helpMessage: true,
+      }, helpMessage:  "No text entered",
+      helpMessageIcon: "exclamation-mark-triangle"
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mapElement]);
 
