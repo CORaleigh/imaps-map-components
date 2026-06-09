@@ -23,6 +23,8 @@ import type Graphic from "@arcgis/core/Graphic";
 import type ActionButton from "@arcgis/core/support/actions/ActionButton";
 import type Polygon from "@arcgis/core/geometry/Polygon";
 import { updatePropertyLabels } from "../components/panels/LayerList/layers";
+import esriConfig from '@arcgis/core/config';
+
 
 export type MapMode =
   | "identify"
@@ -227,6 +229,7 @@ export const MapProvider: React.FC<{ children: React.ReactNode }> = ({
     initialized.current = true;
 
     async function initMap() {
+      esriConfig.request.useIdentity = false;
       const params = new URLSearchParams(window.location.search);
       const app = params.get("app") ?? "config";
       const res = await fetch(`${app}.json`);
