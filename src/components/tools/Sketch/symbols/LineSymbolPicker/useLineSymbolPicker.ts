@@ -180,7 +180,7 @@ export const useLineSymbolPicker = (
       symbol.outline.color
     ) {
       setLineColor(symbol.outline.color.toHex());
-      setLineTransparency(Math.round(100 - symbol.color.a * 100));
+      setLineTransparency(Math.round(100 - symbol.outline.color.a * 100));
       setLineWidth(symbol.outline.width);
     }
   }, [symbol]);
