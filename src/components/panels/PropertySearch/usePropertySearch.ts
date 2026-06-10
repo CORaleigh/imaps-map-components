@@ -12,10 +12,7 @@ import { createTableLayer, getTableTemplate } from "./table";
 import { useMap } from "../../../context/useMap";
 import { createTemplate, getPhotos } from "./popupTemplate/popupTemplate";
 import Collection from "@arcgis/core/core/Collection";
-import TableTemplate from "@arcgis/core/widgets/FeatureTable/support/TableTemplate";
 import FeatureLayer from "@arcgis/core/layers/FeatureLayer";
-import PictureMarkerSymbol from "@arcgis/core/symbols/PictureMarkerSymbol";
-import GraphicsLayer from "@arcgis/core/layers/GraphicsLayer";
 import * as reactiveUtils from "@arcgis/core/core/reactiveUtils.js";
 import { executeArcade } from "./popupTemplate/popupContent";
 import { arcadeExpressionInfos } from "./popupTemplate/arcadeExpressions";
@@ -49,15 +46,6 @@ export interface UsePropertySearchProps {
   ) => void;
   handleTabChange: (
     event: HTMLCalciteTabNavElement["calciteTabChange"],
-  ) => void;
-  handleAddressTableReady: (
-    event: HTMLArcgisFeatureTableElement["arcgisReady"],
-  ) => void;
-  handleAddressTableChange: (
-    event: HTMLArcgisFeatureTableElement["arcgisPropertyChange"],
-  ) => void;
-  handleAddressCellClick: (
-    event: HTMLArcgisFeatureTableElement["arcgisCellClick"],
   ) => void;
   handleClearClick: () => void;
   handleHistoryClick: (
@@ -207,111 +195,6 @@ export const usePropertySearch = (
     }
   };
 
-  const handleAddressTableReady = async (
-    event: HTMLArcgisFeatureTableElement["arcgisReady"],
-  ) => {
-    console.log("address table ready");
-    event.target.tableTitle = `0 addresses`;
-
-    const table = event.target;
-    const tableTemplate: TableTemplate = new TableTemplate({
-      columnTemplates: [
-        {
-          fieldName: "ADDRESS",
-          label: "Address",
-          type: "field",
-          direction: "asc",
-        },
-        {
-          fieldName: "FEATURETYPE",
-          label: "Type",
-          type: "field",
-        },
-      ],
-    });
-    table.tableTemplate = tableTemplate;
-
-    const addresses = new FeatureLayer({
-      portalItem: {
-        id: "4d7f78186b0649d081ac56058b041fb7",
-      },
-      visible: false,
-      listMode: "hide",
-      outFields: ["ADDRESS", "FEATURETYPE"],
-      definitionExpression: "1=1",
-      title: "Addresses",
-    });
-    await addresses.load();
-    table.layer = addresses;
-    await table.refresh();
-    if (!mapElement.current.map?.findLayerById("address-graphics")) {
-      mapElement.current.map?.add(
-        new GraphicsLayer({
-          id: "address-graphics",
-          listMode: "hide",
-        }),
-      );
-    }
-    const grid =
-      table.shadowRoot?.querySelector(".esri-grid__grid")?.shadowRoot;
-    const style = document.createElement("style");
-    style.textContent = `
-        [part~="cell"] {
-          white-space: normal !important;
-          overflow-wrap: anywhere !important;
-          line-height: 1.3 !important;
-          padding: 4px !important;
-          max-width: 50%;
-        }
-                  
-      `;
-
-    grid?.appendChild(style);
-  };
-  const handleAddressTableChange = (
-    event: HTMLArcgisFeatureTableElement["arcgisPropertyChange"],
-  ) => {
-    if (event.detail.name === "size") {
-      event.target.style.maxHeight = "500px";
-      event.target.style.height = `${(event.target.size + 2) * 40 + 100}px`;
-      event.target.tableTitle = `${event.target.size} ${
-        event.target.size === 1 ? "address" : "addresses"
-      }`;
-    }
-  };
-
-  const handleAddressCellClick = async (
-    event: HTMLArcgisFeatureTableElement["arcgisCellClick"],
-  ) => {
-    if (!event.detail.objectId) return;
-    addressTableElement.current.highlightIds = new Collection([
-      event.detail.objectId as number,
-    ]);
-    const results = await (
-      addressTableElement.current.layer as FeatureLayer
-    ).queryFeatures({
-      objectIds: [event.detail.objectId as number],
-      outFields: [],
-      returnGeometry: true,
-    });
-    if (results.features.length) {
-      const feature = results.features.at(0);
-      if (feature) {
-        feature.symbol = new PictureMarkerSymbol({
-          url: "pin.svg",
-          height: 24,
-          width: 24,
-        });
-        clearAddressPoints(mapElement.current);
-        (
-          mapElement.current.map?.findLayerById(
-            "address-graphics",
-          ) as GraphicsLayer
-        ).add(feature);
-        mapElement.current.goTo({ target: feature });
-      }
-    }
-  };
   const handleSearchComplete = async (
     event: HTMLArcgisSearchElement["arcgisSearchComplete"],
   ) => {
@@ -591,9 +474,6 @@ export const usePropertySearch = (
     handleTableReady,
     handleTableCellClick,
     handleTabChange,
-    handleAddressTableReady,
-    handleAddressTableChange,
-    handleAddressCellClick,
     handleClearClick,
     handleHistoryClick,
     handleExport,

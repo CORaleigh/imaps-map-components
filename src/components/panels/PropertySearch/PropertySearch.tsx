@@ -48,9 +48,6 @@ const PropertySearch: React.FC<PropertySearchProps> = ({
     handleTableReady,
     handleTableCellClick,
     handleTabChange,
-    handleAddressTableReady,
-    handleAddressTableChange,
-    handleAddressCellClick,
     handleClearClick,
     handleHistoryClick,
     handleExport,
@@ -135,9 +132,6 @@ const PropertySearch: React.FC<PropertySearchProps> = ({
                   addressTableElement={addressTableElement}
                   mapElement={mapElement}
                   feature={selectedCondo}
-                  onReady={handleAddressTableReady}
-                  onCellClick={handleAddressCellClick}
-                  onPropertyChange={handleAddressTableChange}
                   onExportClick={handleExportAddresses}
                 ></AddressTable>
               </>
