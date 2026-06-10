@@ -56,7 +56,7 @@ const Shell: React.FC = () => {
     handleHelpClick,
     helpId,
     mapElement,
-    mapReady,
+    mapReady
   } = useShell();
   const { open, checkbox, handleDialogClose, handleDialogOpen } =
     useDisclaimer();

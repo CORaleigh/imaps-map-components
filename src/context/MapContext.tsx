@@ -23,8 +23,7 @@ import type Graphic from "@arcgis/core/Graphic";
 import type ActionButton from "@arcgis/core/support/actions/ActionButton";
 import type Polygon from "@arcgis/core/geometry/Polygon";
 import { updatePropertyLabels } from "../components/panels/LayerList/layers";
-import esriConfig from '@arcgis/core/config';
-
+import esriConfig from "@arcgis/core/config";
 
 export type MapMode =
   | "identify"
@@ -145,6 +144,31 @@ export const MapProvider: React.FC<{ children: React.ReactNode }> = ({
     },
     [],
   );
+
+  // Handle Identify to query streets always
+  const addStreets = (mapElement: HTMLArcgisMapElement) => {
+    try {
+      let streets = mapElement.map?.findLayerById("streets-popup-layer");
+      if (!streets) {
+        streets = new FeatureLayer({
+          portalItem: {
+            id: "0dd28958f9a344dba14d1c4500b4842d",
+          },
+          id: "streets-popup-layer",
+          opacity: 0,
+          visible: true,
+          listMode: "hide",
+          legendEnabled: false,
+        });
+        mapElement.map?.add(streets);
+      } else {
+        streets.listMode = "hide";
+      }
+    } catch {
+      console.log("cannot add streets layer");
+    }
+  };
+
   const customizePopup = async () => {
     const propertyLayer = getLayerByTitle(mapElement.current, "Property");
     if (propertyLayer && propertyLayer instanceof FeatureLayer) {
@@ -186,7 +210,7 @@ export const MapProvider: React.FC<{ children: React.ReactNode }> = ({
     await layerService.attachView(view);
 
     await layerService.restorePersistedState();
-
+    addStreets(mapElement.current);
     persistBasemap();
     customizePopup();
     addClusterLayer(mapElement.current);
@@ -203,6 +227,7 @@ export const MapProvider: React.FC<{ children: React.ReactNode }> = ({
 
   // Handle enabling/disabling popup and StreetView click listener
   useEffect(() => {
+    console.log(mapMode);
     const viewEl = mapElement.current;
     if (!viewEl) return;
 
@@ -217,6 +242,7 @@ export const MapProvider: React.FC<{ children: React.ReactNode }> = ({
     if (!mapMode) {
       setMapMode("identify");
     }
+
 
     return () => {
       viewEl.removeEventListener("arcgisViewClick", handleStreetViewMapClick);
