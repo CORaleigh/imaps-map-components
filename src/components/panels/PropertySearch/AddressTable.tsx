@@ -192,6 +192,8 @@ const AddressTable: React.FC<AddressTableProps> = ({
         style={{ marginBottom: "1em" }}
         hideColumnMenuItemsSortAscending
         hideColumnMenuItemsSortDescending
+        hideMenuItemsSelectedRecordsShowAllToggle
+        hideMenuItemsSelectedRecordsShowSelectedToggle
         menuConfig={{
           items: [
             {
