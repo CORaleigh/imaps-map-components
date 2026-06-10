@@ -225,6 +225,12 @@ export default function Help({ open, onClose, goToId }: HelpProps) {
           icon: "pencil",
           sections: [
             { id: "sketch-draw", title: "Sketching on Map" },
+            { id: "sketch-styles", title: "Changing Sketch Style" },
+            {
+              id: "sketch-update-styles",
+              title: "Updating Styles for Graphics",
+            },
+            { id: "sketch-modify", title: "Modifying Graphics" },
             { id: "sketch-delete", title: "Deleting a Sketch" },
             { id: "sketch-clear", title: "Clearing all sketches" },
           ],
@@ -1110,15 +1116,294 @@ export default function Help({ open, onClose, goToId }: HelpProps) {
               <h2 className={styles.header} id="sketch">
                 Sketch <calcite-icon icon="pencil"></calcite-icon>
               </h2>
+              <p>The sketch tool allows for graphics to be drawn on the map.</p>
               <h3 className={styles.header} id="sketch-draw">
                 Sketching on Map
               </h3>
+              <p>The following types of graphics can be drawn on the map:</p>
+              <ul>
+                <li>
+                  Point markers
+                  <ul>
+                    <li>
+                      Press the <calcite-icon icon="pin"></calcite-icon> button
+                      and then single press on the map.
+                    </li>
+                  </ul>
+                </li>
+                <LazyVideo
+                  src="help/sketch_points.mp4"
+                  caption="How to draw a point on the map"
+                />
+                <li>
+                  Lines
+                  <ul>
+                    <li>
+                      Press the <calcite-icon icon="line"></calcite-icon> button
+                      and then single press each vertex of the line, double
+                      press to complete the sketch.
+                    </li>
+                  </ul>
+                </li>
+                <LazyVideo
+                  src="help/sketch_lines.mp4"
+                  caption="How to draw a line on the map"
+                />
+                <li>
+                  Polygons
+                  <ul>
+                    <li>
+                      Press the <calcite-icon icon="polygon"></calcite-icon>{" "}
+                      button and then single press each vertex of the polygon,
+                      double press to complete..
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  Rectangles
+                  <ul>
+                    <li>
+                      Press the <calcite-icon icon="rectangle"></calcite-icon>{" "}
+                      button and left click and drag a rectangle on the map,
+                      release to complete.
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  Circles
+                  <ul>
+                    <li>
+                      Press the <calcite-icon icon="circle"></calcite-icon>{" "}
+                      button and left click and drag a rectangle on the map,
+                      release to complete.
+                    </li>
+                  </ul>
+                </li>
+                <LazyVideo
+                  src="help/sketch_polygons.mp4"
+                  caption="How to draw a polygon, rectangle or circle on the map"
+                />
+                <li>
+                  Text
+                  <ul>
+                    <li>
+                      Press the <calcite-icon icon="text"></calcite-icon> and
+                      enter text in the text area, then single click on the map
+                      to place the text.
+                    </li>
+                  </ul>
+                </li>
+                <LazyVideo
+                  src="help/sketch_text.mp4"
+                  caption="How to draw text on the map"
+                />
+              </ul>
+              <h3 className={styles.header} id="sketch-styles">
+                Changing Sketch Style
+              </h3>
+              <p>The styles for the graphics can be customized.</p>
+              <ul>
+                <li>
+                  Point Styles
+                  <ul>
+                    Selecting a marker symbol
+                    <li>
+                      Press the box that displays the current marker symbol
+                    </li>
+                    <li>Select from the Symbol Types dropdown</li>
+                    <li>Select a symbol from the list</li>
+                  </ul>
+                  <li>
+                    Point Size
+                    <ul>
+                      <li>
+                        Type a pixel size in the input box or use the up down
+                        arrows to increase or decrease by 1.
+                      </li>
+                    </ul>
+                  </li>
+                  <li>
+                    Color
+                    <ul>
+                      <li>
+                        Press the color swatch or{" "}
+                        <calcite-icon icon="pencil"></calcite-icon> icon.
+                      </li>
+                      <li>
+                        Select a color using the color picker that appears,
+                        press the X to dismiss the color picker.
+                      </li>
+                    </ul>
+                  </li>
+                </li>
+                <li>
+                  Line Styles
+                  <ul>
+                    <li>
+                      Color
+                      <ul>
+                        <li>
+                          Press the color swatch or{" "}
+                          <calcite-icon icon="pencil"></calcite-icon> icon.
+                        </li>
+                        <li>
+                          Select a color using the color picker that appears,
+                          press the X to dismiss the color picker.
+                        </li>
+                      </ul>
+                    </li>
+                    <li>
+                      Width
+                      <ul>
+                        <li>
+                          Type a pixel size in the input box or use the up down
+                          arrows to increase or decrease by 1.
+                        </li>
+                      </ul>
+                    </li>
+                    <li>
+                      Transparency
+                      <ul>
+                        <li>
+                          Type a percentage or drag the slider to the left or
+                          right. The higher the number the more transparent.
+                        </li>
+                      </ul>
+                    </li>
+                  </ul>
+                </li>
+
+                <li>
+                  Polygon Styles
+                  <ul>
+                    <li>
+                      Color - Fill and Outline
+                      <ul>
+                        <li>
+                          Press the color swatch or{" "}
+                          <calcite-icon icon="pencil"></calcite-icon> icon.
+                        </li>
+                        <li>
+                          Select a color using the color picker that appears,
+                          press the X to dismiss the color picker.
+                        </li>
+                      </ul>
+                    </li>
+                    <li>
+                      Transparency - Fill and Outline
+                      <ul>
+                        <li>
+                          Type a percentage or drag the slider to the left or
+                          right. The higher the number the more transparent.
+                        </li>
+                      </ul>
+                    </li>
+                    <li>
+                      Outline Width
+                      <ul>
+                        <li>
+                          Type a pixel size in the input box or use the up down
+                          arrows to increase or decrease by 1.
+                        </li>
+                      </ul>
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  Text Styles
+                  <ul>
+                    <li>
+                      Color
+                      <ul>
+                        <li>
+                          Press the color swatch or{" "}
+                          <calcite-icon icon="pencil"></calcite-icon> icon.
+                        </li>
+                        <li>
+                          Select a color using the color picker that appears,
+                          press the X to dismiss the color picker.
+                        </li>
+                      </ul>
+                    </li>
+                    <li>
+                      Size
+                      <ul>
+                        <li>
+                          Type a pixel size in the input box or use the up down
+                          arrows to increase or decrease by 1.
+                        </li>
+                      </ul>
+                    </li>
+                    <li>
+                      Halo{" "}
+                      <ul>
+                        <li>
+                          {" "}
+                          A halo can be applied to the text symbol by checking
+                          the halo switch, uncheck to not apply a halo.
+                        </li>
+                        <li>
+                          The color of the halo can be changed using the halo
+                          color picker
+                        </li>
+
+                        <li>
+                          The width of the halo can be increased or decreased
+                          using the halo size number input.
+                        </li>
+                      </ul>
+                    </li>
+                  </ul>
+                </li>
+              </ul>
+              <h3 className={styles.header} id="sketch-update-styles">
+                Updating Styles for Graphics
+              </h3>
+              <p>
+                If you want to change the style for a graphic that is already on
+                the map, press the select{" "}
+                <calcite-icon icon="select"></calcite-icon> button, then single
+                press on a graphic. This will display the style options for the
+                type of graphic.{" "}
+                <p>
+                  Multiple graphic's styles can be adjusted by holding the
+                  Control key when selecting graphics. However, all of the
+                  selected graphics must be of the same type.
+                </p>
+              </p>
+              <h3 className={styles.header} id="sketch-modify">
+                Modifying Graphics
+              </h3>
+              <p>
+                The shape and location of graphics can also be modified by
+                pressing the select button and selecting a graphic on the map.
+                For details on how to do so, please refer to the Pointer and
+                keyboard gestures on Esri's{" "}
+                <calcite-link
+                  href="https://developers.arcgis.com/javascript/latest/references/core/widgets/Sketch/SketchViewModel/"
+                  target="_blank"
+                >
+                  documentation
+                </calcite-link>
+                .
+              </p>
               <h3 className={styles.header} id="sketch-delete">
                 Deleting a Sketch
               </h3>
+              <p>
+                To delete a sketch, press the{" "}
+                <calcite-icon icon="select"></calcite-icon> button and click on
+                a graphic on the map. To delete multiple graphics, hold the
+                Control key and click on multiple graphics. Then press the red
+                delete graphic button.
+              </p>
               <h3 className={styles.header} id="sketch-clear">
                 Clearing all sketches
               </h3>
+              <p>
+                To clear all sketches that have been drawn on the map press the{" "}
+                <calcite-icon icon="trash"></calcite-icon> button.
+              </p>
               <h2 className={styles.header} id="print">
                 Print <calcite-icon icon="print"></calcite-icon>
               </h2>
