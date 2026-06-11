@@ -240,7 +240,7 @@ export const usePropertySearch = (
   const handleTabChange = useCallback(
     (event: HTMLCalciteTabNavElement["calciteTabChange"]) => {
       setSelectedTab(
-        event.target.selectedTitle.getAttribute("label") === "list"
+        event.target.selectedTitle?.getAttribute("label") === "list"
           ? "list"
           : "info",
       );

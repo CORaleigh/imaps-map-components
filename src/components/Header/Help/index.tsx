@@ -11,10 +11,11 @@ import "@esri/calcite-components/components/calcite-shell-panel";
 import "@esri/calcite-components/components/calcite-fab";
 import "@esri/calcite-components/components/calcite-icon";
 import "@esri/calcite-components/components/calcite-notice";
+import "@esri/calcite-components/components/calcite-tooltip";
 
 import styles from "./Help.module.css";
 
-import { memo, useEffect, useRef, useState } from "react";
+import { memo, useCallback, useEffect, useRef, useState } from "react";
 
 interface HelpSection {
   id: string;
@@ -53,6 +54,7 @@ export default function Help({ open, onClose, goToId }: HelpProps) {
 
   const isSmall = useMediaQuery("(max-width: 768px)");
   const [showToc, setShowToc] = useState<boolean>(!isSmall);
+  const [showScrollTop, setShowScrollTop] = useState<boolean>(false);
 
   const sections: HelpSection[] = [
     {
@@ -289,6 +291,19 @@ export default function Help({ open, onClose, goToId }: HelpProps) {
     }
   };
 
+  const handlePanelScroll = useCallback(
+    (event: HTMLCalcitePanelElement["calcitePanelScroll"]) => {
+      const wrapper =
+        event.currentTarget.shadowRoot?.querySelector(".content-wrapper");
+
+      if (!wrapper) return;
+
+      const shouldShow = wrapper.scrollTop > 300;
+
+      setShowScrollTop((prev) => (prev === shouldShow ? prev : shouldShow));
+    },
+    [],
+  );
   return (
     <calcite-dialog
       open={open}
@@ -309,6 +324,8 @@ export default function Help({ open, onClose, goToId }: HelpProps) {
                 label={"Table of Contents"}
                 selectionMode="none"
                 displayMode="nested"
+                filterEnabled
+                filterPlaceholder="Filter topics by title"
               >
                 {sections.map((section) => (
                   <calcite-list-item
@@ -393,14 +410,31 @@ export default function Help({ open, onClose, goToId }: HelpProps) {
             </calcite-panel>
           </calcite-shell-panel>
 
-          <calcite-panel>
+          <calcite-panel oncalcitePanelScroll={handlePanelScroll}>
             <calcite-fab
               slot="fab"
               scale="l"
               style={{ position: "fixed", left: "10px", bottom: "10px" }}
               icon={showToc ? "x" : "sub-fields"}
               onClick={() => setShowToc((prev) => !prev)}
+              id="toc-button"
             ></calcite-fab>
+
+            <calcite-fab
+              slot="fab"
+              scale="l"
+              style={{ position: "fixed", right: "10px", bottom: "10px" }}
+              icon={"arrow-up"}
+              onClick={() => scrollToSection("using-map")}
+              id="scroll-top"
+              className={`${styles.scrollTopFab} ${
+                showScrollTop ? styles.visible : styles.hidden
+              }`}
+            ></calcite-fab>
+
+            <calcite-tooltip referenceElement="scroll-top">
+              <span>Scroll to top</span>
+            </calcite-tooltip>
             <div
               onClick={() => {
                 if (isSmall) {
@@ -1126,8 +1160,8 @@ export default function Help({ open, onClose, goToId }: HelpProps) {
                   Point markers
                   <ul>
                     <li>
-                      Press the <calcite-icon icon="pin"></calcite-icon> button
-                      and then single press on the map.
+                      Press the point <calcite-icon icon="pin"></calcite-icon>{" "}
+                      button and then single press on the map.
                     </li>
                   </ul>
                 </li>
@@ -1139,9 +1173,9 @@ export default function Help({ open, onClose, goToId }: HelpProps) {
                   Lines
                   <ul>
                     <li>
-                      Press the <calcite-icon icon="line"></calcite-icon> button
-                      and then single press each vertex of the line, double
-                      press to complete the sketch.
+                      Press the line <calcite-icon icon="line"></calcite-icon>{" "}
+                      button and then single press each vertex of the line,
+                      double press to complete the sketch.
                     </li>
                   </ul>
                 </li>
@@ -1153,9 +1187,10 @@ export default function Help({ open, onClose, goToId }: HelpProps) {
                   Polygons
                   <ul>
                     <li>
-                      Press the <calcite-icon icon="polygon"></calcite-icon>{" "}
-                      button and then single press each vertex of the polygon,
-                      double press to complete..
+                      Press the polygon{" "}
+                      <calcite-icon icon="polygon"></calcite-icon> button and
+                      then single press each vertex of the polygon, double press
+                      to complete..
                     </li>
                   </ul>
                 </li>
@@ -1163,9 +1198,10 @@ export default function Help({ open, onClose, goToId }: HelpProps) {
                   Rectangles
                   <ul>
                     <li>
-                      Press the <calcite-icon icon="rectangle"></calcite-icon>{" "}
-                      button and left click and drag a rectangle on the map,
-                      release to complete.
+                      Press the rectangle{" "}
+                      <calcite-icon icon="rectangle"></calcite-icon> button and
+                      left click and drag a rectangle on the map, release to
+                      complete.
                     </li>
                   </ul>
                 </li>
@@ -1173,9 +1209,10 @@ export default function Help({ open, onClose, goToId }: HelpProps) {
                   Circles
                   <ul>
                     <li>
-                      Press the <calcite-icon icon="circle"></calcite-icon>{" "}
-                      button and left click and drag a rectangle on the map,
-                      release to complete.
+                      Press the circle{" "}
+                      <calcite-icon icon="circle"></calcite-icon> button and
+                      left click and drag a rectangle on the map, release to
+                      complete.
                     </li>
                   </ul>
                 </li>
@@ -1187,9 +1224,9 @@ export default function Help({ open, onClose, goToId }: HelpProps) {
                   Text
                   <ul>
                     <li>
-                      Press the <calcite-icon icon="text"></calcite-icon> and
-                      enter text in the text area, then single click on the map
-                      to place the text.
+                      Press the text <calcite-icon icon="text"></calcite-icon>{" "}
+                      button and enter text in the text area, then single click
+                      on the map to place the text.
                     </li>
                   </ul>
                 </li>
@@ -1206,36 +1243,43 @@ export default function Help({ open, onClose, goToId }: HelpProps) {
                 <li>
                   Point Styles
                   <ul>
-                    Selecting a marker symbol
                     <li>
-                      Press the box that displays the current marker symbol
+                      Selecting a marker symbol
+                      <ul>
+                        <li>
+                          Press the box that displays the current marker symbol
+                        </li>
+                        <li>Select from the Symbol Types dropdown</li>
+                        <li>Select a symbol from the list</li>
+                      </ul>
                     </li>
-                    <li>Select from the Symbol Types dropdown</li>
-                    <li>Select a symbol from the list</li>
+
+                    <li>
+                      Point Size
+                      <ul>
+                        <li>
+                          Type a pixel size in the input box or use the up down
+                          arrows to increase or decrease by 1.
+                        </li>
+                      </ul>
+                    </li>
+
+                    <li>
+                      Color
+                      <ul>
+                        <li>
+                          Press the color swatch or{" "}
+                          <calcite-icon icon="pencil"></calcite-icon> icon.
+                        </li>
+                        <li>
+                          Select a color using the color picker that appears,
+                          press the X to dismiss the color picker.
+                        </li>
+                      </ul>
+                    </li>
                   </ul>
-                  <li>
-                    Point Size
-                    <ul>
-                      <li>
-                        Type a pixel size in the input box or use the up down
-                        arrows to increase or decrease by 1.
-                      </li>
-                    </ul>
-                  </li>
-                  <li>
-                    Color
-                    <ul>
-                      <li>
-                        Press the color swatch or{" "}
-                        <calcite-icon icon="pencil"></calcite-icon> icon.
-                      </li>
-                      <li>
-                        Select a color using the color picker that appears,
-                        press the X to dismiss the color picker.
-                      </li>
-                    </ul>
-                  </li>
                 </li>
+
                 <li>
                   Line Styles
                   <ul>
@@ -1252,6 +1296,7 @@ export default function Help({ open, onClose, goToId }: HelpProps) {
                         </li>
                       </ul>
                     </li>
+
                     <li>
                       Width
                       <ul>
@@ -1261,6 +1306,7 @@ export default function Help({ open, onClose, goToId }: HelpProps) {
                         </li>
                       </ul>
                     </li>
+
                     <li>
                       Transparency
                       <ul>
@@ -1289,6 +1335,7 @@ export default function Help({ open, onClose, goToId }: HelpProps) {
                         </li>
                       </ul>
                     </li>
+
                     <li>
                       Transparency - Fill and Outline
                       <ul>
@@ -1298,6 +1345,7 @@ export default function Help({ open, onClose, goToId }: HelpProps) {
                         </li>
                       </ul>
                     </li>
+
                     <li>
                       Outline Width
                       <ul>
@@ -1309,6 +1357,7 @@ export default function Help({ open, onClose, goToId }: HelpProps) {
                     </li>
                   </ul>
                 </li>
+
                 <li>
                   Text Styles
                   <ul>
@@ -1325,6 +1374,7 @@ export default function Help({ open, onClose, goToId }: HelpProps) {
                         </li>
                       </ul>
                     </li>
+
                     <li>
                       Size
                       <ul>
@@ -1334,19 +1384,18 @@ export default function Help({ open, onClose, goToId }: HelpProps) {
                         </li>
                       </ul>
                     </li>
+
                     <li>
-                      Halo{" "}
+                      Halo
                       <ul>
                         <li>
-                          {" "}
                           A halo can be applied to the text symbol by checking
                           the halo switch, uncheck to not apply a halo.
                         </li>
                         <li>
                           The color of the halo can be changed using the halo
-                          color picker
+                          color picker.
                         </li>
-
                         <li>
                           The width of the halo can be increased or decreased
                           using the halo size number input.
@@ -1365,11 +1414,11 @@ export default function Help({ open, onClose, goToId }: HelpProps) {
                 <calcite-icon icon="select"></calcite-icon> button, then single
                 press on a graphic. This will display the style options for the
                 type of graphic.{" "}
-                <p>
-                  Multiple graphic's styles can be adjusted by holding the
-                  Control key when selecting graphics. However, all of the
-                  selected graphics must be of the same type.
-                </p>
+              </p>
+              <p>
+                Multiple graphic's styles can be adjusted by holding the Control
+                key when selecting graphics. However, all of the selected
+                graphics must be of the same type.
               </p>
               <h3 className={styles.header} id="sketch-modify">
                 Modifying Graphics

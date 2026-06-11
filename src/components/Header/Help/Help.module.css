@@ -14,7 +14,28 @@
   margin-left: 5px;
 }
 
-.helpImage {
-  width: 100%;
-  max-width: 400px;
+.scrollTopFab {
+  position: fixed;
+  right: 1rem;
+  bottom: 1rem;
+
+  opacity: 0;
+  transform: translateY(8px);
+  pointer-events: none;
+
+  transition:
+    opacity 200ms ease,
+    transform 200ms ease;
+}
+
+.visible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.hidden {
+  opacity: 0;
+  transform: translateY(8px);
+  pointer-events: none;
 }
