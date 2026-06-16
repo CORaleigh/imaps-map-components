@@ -1,6 +1,7 @@
 import React from "react";
 import "@esri/calcite-components/components/calcite-panel";
 import "@esri/calcite-components/components/calcite-alert";
+import "@esri/calcite-components/components/calcite-slider";
 
 import "@arcgis/map-components/components/arcgis-basemap-gallery";
 import { useBasemaps } from "./useBasemaps";
@@ -63,12 +64,21 @@ const Basemaps: React.FC<BasemapsProps> = ({
               ></calcite-switch>
               Blend
             </calcite-label>
-            <calcite-slider
-              ref={blendSlider}
-              hidden
-              oncalciteSliderInput={handleSliderInput}
-              value={50}
-            ></calcite-slider>
+
+            <calcite-label
+              style={{
+                visibility: blendEnabled ? "visible" : "hidden",
+                height: blendEnabled ? "auto" : 0,
+              }}
+            >
+              
+              <calcite-slider
+                ref={blendSlider}
+                oncalciteSliderInput={handleSliderInput}
+                value={50}
+                minLabel="Slider to control blend transparency"
+              ></calcite-slider>
+            </calcite-label>
           </div>
         )}
         <calcite-tabs

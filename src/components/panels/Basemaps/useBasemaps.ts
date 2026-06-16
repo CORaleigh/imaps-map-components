@@ -155,13 +155,12 @@ export const useBasemaps = (
       await refreshImageBasemaps();
     }
   };
-
   const handleBlendChange = useCallback(
     (event: HTMLCalciteSwitchElement["calciteSwitchChange"]) => {
       if (!blendSlider.current) return;
       const checked = event.target.checked;
-      setBlendEnabled(checked);
-      blendSlider.current.hidden = !checked;
+        setBlendEnabled(prev => !prev);
+      
 
       const view = mapElement.current?.view;
       if (!view) return;
@@ -198,7 +197,7 @@ export const useBasemaps = (
         mapElement.current.view.map?.basemap?.baseLayers.remove(
           blendLayer.current,
         );
-        setBlendEnabled(false);
+        setBlendEnabled(prev => !prev);
       }
       setShowBlendOption(!!imagesGallery.current?.activeBasemap);
     },

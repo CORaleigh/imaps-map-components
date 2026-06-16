@@ -34,7 +34,7 @@
   pointer-events: auto;
 }
 
-.hidden {
+.fabHidden {
   opacity: 0;
   transform: translateY(8px);
   pointer-events: none;

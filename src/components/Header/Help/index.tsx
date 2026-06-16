@@ -323,7 +323,7 @@ export default function Help({ open, onClose, goToId }: HelpProps) {
               <calcite-list
                 label={"Table of Contents"}
                 selectionMode="none"
-                displayMode="nested"
+                displayMode="nested" // Tells the root list to format nested children correctly
                 filterEnabled
                 filterPlaceholder="Filter topics by title"
               >
@@ -338,88 +338,65 @@ export default function Help({ open, onClose, goToId }: HelpProps) {
                       event: HTMLCalciteListItemElement["calciteListItemSelect"],
                     ) => {
                       const id = event.target.getAttribute("data-id");
-
                       if (!id) return;
                       scrollToSection(id);
                     }}
                   >
-                    {section.sections && (
-                      <calcite-list
-                        label={section.title}
-                        selectionMode="none"
-                        displayMode="nested"
-                      >
-                        {section.sections.map((subSection) => (
-                          <calcite-list-item
-                            label={subSection.title}
-                            key={subSection.id}
-                            data-id={subSection.id}
-                            expanded
-                            iconStart={subSection.icon}
-                          >
-                            {subSection.sections && (
-                              <calcite-list
-                                label={subSection.title}
-                                selectionMode="none"
-                                displayMode="nested"
+                    {/* REMOVED NESTED CALCITE-LIST WRAPPER HERE */}
+                    {section.sections &&
+                      section.sections.map((subSection) => (
+                        <calcite-list-item
+                          label={subSection.title}
+                          key={subSection.id}
+                          data-id={subSection.id}
+                          expanded
+                          iconStart={subSection.icon}
+                        >
+                          {/* REMOVED NESTED CALCITE-LIST WRAPPER HERE */}
+                          {subSection.sections &&
+                            subSection.sections.map((subSection1) => (
+                              <calcite-list-item
+                                label={subSection1.title}
+                                key={subSection1.id}
+                                data-id={subSection1.id}
+                                expanded
+                                iconStart={subSection1.icon}
                               >
-                                {subSection.sections.map((subSection1) => (
-                                  <calcite-list-item
-                                    label={subSection1.title}
-                                    key={subSection1.id}
-                                    data-id={subSection1.id}
-                                    expanded
-                                    iconStart={subSection1.icon}
-                                  >
-                                    {subSection1.sections && (
-                                      <calcite-list
-                                        label={subSection1.title}
-                                        selectionMode="none"
-                                        displayMode="nested"
-                                      >
-                                        {subSection1.sections.map(
-                                          (subSection2) => (
-                                            <calcite-list-item
-                                              label={subSection2.title}
-                                              key={subSection2.id}
-                                              data-id={subSection2.id}
-                                              expanded
-                                            ></calcite-list-item>
-                                          ),
-                                        )}
-                                      </calcite-list>
-                                    )}
-                                  </calcite-list-item>
-                                ))}
-                              </calcite-list>
-                            )}
-                          </calcite-list-item>
-                        ))}
-                      </calcite-list>
-                    )}
+                                {/* REMOVED NESTED CALCITE-LIST WRAPPER HERE */}
+                                {subSection1.sections &&
+                                  subSection1.sections.map((subSection2) => (
+                                    <calcite-list-item
+                                      label={subSection2.title}
+                                      key={subSection2.id}
+                                      data-id={subSection2.id}
+                                      expanded
+                                    />
+                                  ))}
+                              </calcite-list-item>
+                            ))}
+                        </calcite-list-item>
+                      ))}
                   </calcite-list-item>
                 ))}
               </calcite-list>
+
               <calcite-fab
                 slot="fab"
                 scale="l"
                 style={{ position: "fixed", left: "10px", bottom: "10px" }}
-                icon="sub-fields"
+                icon={showToc ? "x" : "sub-fields"}
                 onClick={() => setShowToc((prev) => !prev)}
+                id="toc-button"
+                text={`${showToc ? "Hide" : "Show "} table of contents`}
+                label={`${showToc ? "Hide" : "Show "} table of contents`}
               ></calcite-fab>
             </calcite-panel>
+            <calcite-tooltip referenceElement="toc-butto">
+              <span>{`${showToc ? "Hide" : "Show "} table of contents`}</span>
+            </calcite-tooltip>
           </calcite-shell-panel>
 
           <calcite-panel oncalcitePanelScroll={handlePanelScroll}>
-            <calcite-fab
-              slot="fab"
-              scale="l"
-              style={{ position: "fixed", left: "10px", bottom: "10px" }}
-              icon={showToc ? "x" : "sub-fields"}
-              onClick={() => setShowToc((prev) => !prev)}
-              id="toc-button"
-            ></calcite-fab>
-
             <calcite-fab
               slot="fab"
               scale="l"
@@ -428,8 +405,10 @@ export default function Help({ open, onClose, goToId }: HelpProps) {
               onClick={() => scrollToSection("using-map")}
               id="scroll-top"
               className={`${styles.scrollTopFab} ${
-                showScrollTop ? styles.visible : styles.hidden
+                showScrollTop ? styles.visible : styles.fabHidden
               }`}
+              text="Scroll to top"
+              label="Scroll to top"
             ></calcite-fab>
 
             <calcite-tooltip referenceElement="scroll-top">
@@ -629,16 +608,18 @@ export default function Help({ open, onClose, goToId }: HelpProps) {
                 After you have selected a property. Details about that property
                 are displayed including:
               </p>
-              <ul>Site Address</ul>
-              <ul>Links to Other Sites</ul>
-              <ul>General Details</ul>
-              <ul>Ownership</ul>
-              <ul>Property Values</ul>
-              <ul>Last Sale Details</ul>
-              <ul>Deeds</ul>
-              <ul>Building Details</ul>
-              <ul>Services</ul>
-              <ul>Addresses</ul>
+              <ul>
+                <li>Site Address</li>
+                <li>Links to Other Sites</li>
+                <li>General Details</li>
+                <li>Ownership</li>
+                <li>Property Values</li>
+                <li>Last Sale Details</li>
+                <li>Deeds</li>
+                <li>Building Details</li>
+                <li>Services</li>
+                <li>Addresses</li>
+              </ul>
               <h4 className={styles.header} id="property-links">
                 Property Links
               </h4>
@@ -976,49 +957,54 @@ export default function Help({ open, onClose, goToId }: HelpProps) {
                     <li>Single press a property on the map.</li>
                   </ul>
                 </li>
+
                 <li>
                   Line <calcite-icon icon="line"></calcite-icon>
+                  <ul>
+                    <li>
+                      Single press at each vertex of a line, double tap to
+                      complete.
+                    </li>
+                  </ul>
                 </li>
-                <ul>
-                  <li>
-                    Single press at each vertex of a line, double tap to
-                    complete.
-                  </li>
-                </ul>
 
                 <li>
                   Polygon <calcite-icon icon="polygon"></calcite-icon>
+                  <ul>
+                    <li>
+                      Single press at each vertex of the polygon, double tap to
+                      complete.
+                    </li>
+                  </ul>
                 </li>
-                <ul>
-                  <li>
-                    Single press at each vertex of the polygon, double tap to
-                    complete.
-                  </li>
-                </ul>
+
                 <li>
                   Rectangle <calcite-icon icon="rectangle"></calcite-icon>
+                  <ul>
+                    <li>
+                      Press and hold on the map and drag, release to complete.
+                    </li>
+                  </ul>
                 </li>
-                <ul>
-                  <li>
-                    Press and hold on the map and drag, release to complete.
-                  </li>
-                </ul>
+
                 <li>
                   Circle <calcite-icon icon="circle"></calcite-icon>
+                  <ul>
+                    <li>
+                      Press and hold on the map and drag, release to complete.
+                    </li>
+                  </ul>
                 </li>
-                <ul>
-                  <li>
-                    Press and hold on the map and drag, release to complete.
-                  </li>
-                </ul>
+
                 <li>
                   Multi-Point <calcite-icon icon="pins"></calcite-icon>
+                  <ul>
+                    <li>
+                      Single press on multiple properties, double tap to
+                      complete.
+                    </li>
+                  </ul>
                 </li>
-                <ul>
-                  <li>
-                    Single press on multiple properties, double tap to complete.
-                  </li>
-                </ul>
               </ul>
               <LazyVideo
                 src="help/property_select.mp4"
@@ -1099,53 +1085,57 @@ export default function Help({ open, onClose, goToId }: HelpProps) {
               <ul>
                 <li>
                   Distance <calcite-icon icon="measure-line"></calcite-icon>
+                  <ul>
+                    <li>Start measuring by single pressing on the map.</li>
+                    <li>
+                      As the cursor moves on the map, the distance will change.
+                    </li>
+                    <li>Tap on the map again to add a vertex to the line.</li>
+                    <li>Double tap to complete the measurement.</li>
+                    <li>Press the New Measurement button to measure again.</li>
+                    <li>
+                      Units can be changed in the unit dropdown list. The
+                      default is imperial.
+                    </li>
+                  </ul>
+                  <LazyVideo
+                    src="help/measure_distance.mp4"
+                    caption="How to measure a distance on the map"
+                  />
                 </li>
-                <ul>
-                  <li>Start measuring by single pressing on the map. </li>
-                  <li>
-                    As the cursor moves on the map, the distance will change.
-                  </li>
-                  <li>Tap on the map again to add a vertex to the line.</li>
-                  <li>Double tap to complete the measurement.</li>
-                  <li>Press the New Measurement button to measure again.</li>
-                  <li>
-                    Units can be changed in the unit dropdown list. The default
-                    is imperial.
-                  </li>
-                </ul>
-
-                <LazyVideo
-                  src="help/measure_distance.mp4"
-                  caption="How to measure a distance on the map"
-                />
 
                 <li>
                   Area <calcite-icon icon="measure-area"></calcite-icon>
+                  <ul>
+                    <li>Start measuring by single pressing on the map.</li>
+                    <li>
+                      As the cursor moves on the map, the area will change.
+                    </li>
+                    <li>
+                      Tap on the map again to add a vertex to the polygon.
+                    </li>
+                    <li>Double tap to complete the measurement.</li>
+                    <li>Press the New Measurement button to measure again.</li>
+                    <li>
+                      Units can be changed in the unit dropdown list. The
+                      default is imperial.
+                    </li>
+                  </ul>
+                  <LazyVideo
+                    src="help/measure_area.mp4"
+                    caption="How to measure an area on the map"
+                  />
                 </li>
-                <ul>
-                  <li>Start measuring by single pressing on the map. </li>
-                  <li>As the cursor moves on the map, the area will change.</li>
-                  <li>Tap on the map again to add a vertex to the polygon.</li>
-                  <li>Double tap to complete the measurement.</li>
-                  <li>Press the New Measurement button to measure again.</li>
-                  <li>
-                    Units can be changed in the unit dropdown list. The default
-                    is imperial.
-                  </li>
-                </ul>
-
-                <LazyVideo
-                  src="help/measure_area.mp4"
-                  caption="How to measure an area on the map"
-                />
 
                 <li>
                   Clear <calcite-icon icon="trash"></calcite-icon>
+                  <ul>
+                    <li>
+                      Press the clear button to stop measuring and remove the
+                      measurement from the map.
+                    </li>
+                  </ul>
                 </li>
-                <ul>
-                  Press the clear button to stop measuring and remove the
-                  measurement from the map.
-                </ul>
               </ul>
               <h2 className={styles.header} id="sketch">
                 Sketch <calcite-icon icon="pencil"></calcite-icon>
@@ -1164,11 +1154,12 @@ export default function Help({ open, onClose, goToId }: HelpProps) {
                       button and then single press on the map.
                     </li>
                   </ul>
+                  <LazyVideo
+                    src="help/sketch_points.mp4"
+                    caption="How to draw a point on the map"
+                  />
                 </li>
-                <LazyVideo
-                  src="help/sketch_points.mp4"
-                  caption="How to draw a point on the map"
-                />
+
                 <li>
                   Lines
                   <ul>
@@ -1178,11 +1169,12 @@ export default function Help({ open, onClose, goToId }: HelpProps) {
                       double press to complete the sketch.
                     </li>
                   </ul>
+                  <LazyVideo
+                    src="help/sketch_lines.mp4"
+                    caption="How to draw a line on the map"
+                  />
                 </li>
-                <LazyVideo
-                  src="help/sketch_lines.mp4"
-                  caption="How to draw a line on the map"
-                />
+
                 <li>
                   Polygons
                   <ul>
@@ -1194,6 +1186,8 @@ export default function Help({ open, onClose, goToId }: HelpProps) {
                     </li>
                   </ul>
                 </li>
+
+                {/* Rectangles Section */}
                 <li>
                   Rectangles
                   <ul>
@@ -1205,6 +1199,8 @@ export default function Help({ open, onClose, goToId }: HelpProps) {
                     </li>
                   </ul>
                 </li>
+
+                {/* Circles Section */}
                 <li>
                   Circles
                   <ul>
@@ -1215,11 +1211,14 @@ export default function Help({ open, onClose, goToId }: HelpProps) {
                       complete.
                     </li>
                   </ul>
+                  {/* CORRECT: Nested inside the circles li block since it applies to poly/rect/circle */}
+                  <LazyVideo
+                    src="help/sketch_polygons.mp4"
+                    caption="How to draw a polygon, rectangle or circle on the map"
+                  />
                 </li>
-                <LazyVideo
-                  src="help/sketch_polygons.mp4"
-                  caption="How to draw a polygon, rectangle or circle on the map"
-                />
+
+                {/* Text Section */}
                 <li>
                   Text
                   <ul>
@@ -1229,11 +1228,12 @@ export default function Help({ open, onClose, goToId }: HelpProps) {
                       on the map to place the text.
                     </li>
                   </ul>
+                  {/* CORRECT: Nested inside the text li block */}
+                  <LazyVideo
+                    src="help/sketch_text.mp4"
+                    caption="How to draw text on the map"
+                  />
                 </li>
-                <LazyVideo
-                  src="help/sketch_text.mp4"
-                  caption="How to draw text on the map"
-                />
               </ul>
               <h3 className={styles.header} id="sketch-styles">
                 Changing Sketch Style
@@ -1654,7 +1654,15 @@ const LazyVideo = memo(function LazyVideo({
         preload="none"
         src={activeSrc}
         style={{ width: "100%", maxWidth: "700px" }}
-      />
+      >
+        <track
+          kind="captions"
+          src="silent.vtt"
+          srcLang="en"
+          label="English"
+          default
+        />
+      </video>
       <figcaption>{caption}</figcaption>
     </figure>
   );
