@@ -477,7 +477,7 @@ const deedCreator: PopupTemplateContentCreator = async (e) => {
         const deedBtn = createButton("file-text", "Deeds");
         deedBtn.onclick = () => {
           window.open(
-            `https://rodtylerssdev.wake.gov/web/document/DOCC${deed}`, //`https://rodcrpi.wakegov.com/booksweb/pdfview.aspx?docid=${deed}&RecordDate=`,
+            `https://rodrecords.wake.gov/web/document/DOCC${deed}`, //`https://rodcrpi.wakegov.com/booksweb/pdfview.aspx?docid=${deed}&RecordDate=`,
             "deedwindow"
           );
         };
@@ -487,7 +487,7 @@ const deedCreator: PopupTemplateContentCreator = async (e) => {
         const bombtn = createButton("map", "Book of Maps");
         bombtn.onclick = () => {
           window.open(
-            `https://rodtylerssdev.wake.gov/web/document/DOCC${bom}`, //`https://rodcrpi.wakegov.com/booksweb/pdfview.aspx?docid=${bom}&RecordDate=`,
+            `https://rodrecords.wake.gov/web/document/DOCC${bom}`, //`https://rodcrpi.wakegov.com/booksweb/pdfview.aspx?docid=${bom}&RecordDate=`,
             "bomwindow"
           );
         };

@@ -28,6 +28,7 @@ const LocationSearch: React.FC<LocationSearchProps> = ({
     handleSelectResult,
     handleSearchClear,
     handleIntersectingStreetChange,
+    goToOverride
   } = useLocationSearch(mapElement, closed);
 
   return (
@@ -53,6 +54,7 @@ const LocationSearch: React.FC<LocationSearchProps> = ({
           onarcgisReady={handleSearchReady}
           onarcgisSelectResult={handleSelectResult}
           onarcgisSearchClear={handleSearchClear}
+          goToOverride={goToOverride}
         ></arcgis-search>
         <br />
         {showIntersection && (
