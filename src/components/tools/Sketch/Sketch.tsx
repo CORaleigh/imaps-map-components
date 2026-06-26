@@ -61,11 +61,13 @@ const Sketch: React.FC<SketchProps> = ({
     setPointSize,
     pointSymbolInitialized,
     setPointSymbolInitialized,
+    snappingEnabled,
+    handleSnappingChange
   } = useSketch(mapElement, closed);
 
   return (
     <>
-      <div >
+      <div>
         <calcite-panel
           heading="Sketch"
           closable
@@ -147,7 +149,7 @@ const Sketch: React.FC<SketchProps> = ({
             </calcite-action-bar>
           </div>
           {(mapMode === "point" || selectedGraphicsType === "point") && (
-            <calcite-block heading="Point Style" label="Point Style" expanded >
+            <calcite-block heading="Point Style" label="Point Style" expanded>
               <PointSymbolPicker
                 symbol={pointSymbol!}
                 onSymbolChange={handlePointSymbolChange}
@@ -196,6 +198,10 @@ const Sketch: React.FC<SketchProps> = ({
             </calcite-block>
           )}
           <div slot="content-bottom">
+            <calcite-label layout="inline" scale="s">
+              <calcite-switch scale="s" checked={snappingEnabled} oncalciteSwitchChange={handleSnappingChange}></calcite-switch>
+              Snapping
+            </calcite-label>
             {mapMode === "select" && selectedGraphicIds.length > 0 && (
               <calcite-button
                 iconStart="trash"

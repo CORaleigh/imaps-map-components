@@ -24,6 +24,7 @@ import type ActionButton from "@arcgis/core/support/actions/ActionButton";
 import type Polygon from "@arcgis/core/geometry/Polygon";
 import { updatePropertyLabels } from "../components/panels/LayerList/layers";
 import esriConfig from "@arcgis/core/config";
+import Portal from "@arcgis/core/portal/Portal";
 
 export type MapMode =
   | "identify"
@@ -71,6 +72,8 @@ export interface MapContextType {
   alert: Alert;
   setAlert: (alert: Alert) => void;
 }
+
+Portal.getDefault().units = "english"
 
 const MapContext = createContext<MapContextType | undefined>(undefined);
 

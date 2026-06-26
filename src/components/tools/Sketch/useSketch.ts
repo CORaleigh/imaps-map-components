@@ -14,6 +14,8 @@ import type { CreateEvent } from "@arcgis/core/widgets/Sketch/types";
 import type PictureMarkerSymbol from "@arcgis/core/symbols/PictureMarkerSymbol";
 import type WebStyleSymbol from "@arcgis/core/symbols/WebStyleSymbol";
 import { updateSketchSymbol, loadSketchSymbols } from "./utils/symbolStore";
+import { getLayerByTitle } from "../../../utils/layerHelper";
+import type FeatureLayer from "@arcgis/core/layers/FeatureLayer";
 
 export interface UseSketchProps {
   mapMode: MapMode;
@@ -66,6 +68,8 @@ export interface UseSketchProps {
   setPointSize: React.Dispatch<React.SetStateAction<number>>;
   pointSymbolInitialized: boolean;
   setPointSymbolInitialized: React.Dispatch<React.SetStateAction<boolean>>;
+  snappingEnabled: boolean;
+  handleSnappingChange: (event: HTMLCalciteSwitchElement["calciteSwitchChange"]) => void;
 }
 
 export const useSketch = (
@@ -113,6 +117,8 @@ export const useSketch = (
     }),
   );
   const [pointSymbolInitialized, setPointSymbolInitialized] = useState(false);
+
+  const [snappingEnabled, setSnappingEnabled] = useState(false);
 
   const selectedGraphics = useRef<Graphic[]>([]);
   const [selectedGraphicIds, setSelectedGraphicIds] = useState<string[]>([]);
@@ -196,10 +202,24 @@ export const useSketch = (
       polylineSymbol: polylineSymbol,
       polygonSymbol: polygonSymbol,
       textSymbol: textSymbol,
+      labelOptions: {
+        enabled: false,
+      },
+      snappingOptions: {
+        featureEnabled: true,
+        enabled: true,
+        selfEnabled: true,
+
+      },
     });
 
-    
-
+    const propertyLayer = getLayerByTitle(mapElement.current, "Property");
+    if (propertyLayer && propertyLayer.type === "feature") {
+      sketchVm.snappingOptions.featureSources = [{
+        layer: propertyLayer as FeatureLayer,
+        enabled: true
+      }]
+    }
     sketchVm.on("create", handleSketchCreate);
 
     sketchVm.on("update", (event) => {
@@ -273,6 +293,17 @@ export const useSketch = (
       }
     }
   };
+
+  const handleSnappingChange = (event: HTMLCalciteSwitchElement["calciteSwitchChange"]) => {
+    setSnappingEnabled(prev => !prev);
+    if (!polygonSketchVm.current || !pointSketchVm.current || !textSketchVm.current || !lineSketchVm.current) return;
+
+    polygonSketchVm.current.snappingOptions.enabled = event.target.checked;
+    pointSketchVm.current.snappingOptions.enabled = event.target.checked;
+    lineSketchVm.current.snappingOptions.enabled = event.target.checked;
+    textSketchVm.current.snappingOptions.enabled = event.target.checked;
+  };
+
   const handlePointSymbolChange = (
     symbol:
       | SimpleMarkerSymbol
@@ -418,9 +449,10 @@ export const useSketch = (
       visibleElements: {
         coordinates: false,
         helpMessage: true,
-      }, helpMessage:  "No text entered",
-      helpMessageIcon: "exclamation-mark-triangle"
-    }
+      },
+      helpMessage: "No text entered",
+      helpMessageIcon: "exclamation-mark-triangle",
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mapElement]);
 
@@ -486,5 +518,7 @@ export const useSketch = (
     setPointSize,
     pointSymbolInitialized,
     setPointSymbolInitialized,
+    snappingEnabled,
+    handleSnappingChange
   };
 };
