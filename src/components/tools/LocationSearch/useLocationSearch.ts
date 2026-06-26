@@ -9,7 +9,7 @@ import GraphicsLayer from "@arcgis/core/layers/GraphicsLayer";
 import Graphic from "@arcgis/core/Graphic";
 import SimpleFillSymbol from "@arcgis/core/symbols/SimpleFillSymbol";
 import Color from "@arcgis/core/Color";
-import type { GoToOverride, GoToParameters } from "@arcgis/core/widgets/support/types";
+import type { GoToOverride } from "@arcgis/core/widgets/support/types";
 
 export interface UseLocationSearchProps {
   showIntersection: boolean;
