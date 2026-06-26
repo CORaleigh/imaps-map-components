@@ -8,7 +8,7 @@ import SimpleMarkerSymbol from "@arcgis/core/symbols/SimpleMarkerSymbol";
 import TextSymbol from "@arcgis/core/symbols/TextSymbol";
 import { useMap } from "../../../context/useMap";
 import type { MapMode } from "../../../context/MapContext";
-import type Graphic from "@arcgis/core/Graphic";
+import Graphic from "@arcgis/core/Graphic";
 import type GraphicsLayer from "@arcgis/core/layers/GraphicsLayer";
 import type { CreateEvent } from "@arcgis/core/widgets/Sketch/types";
 import type PictureMarkerSymbol from "@arcgis/core/symbols/PictureMarkerSymbol";
@@ -16,6 +16,11 @@ import type WebStyleSymbol from "@arcgis/core/symbols/WebStyleSymbol";
 import { updateSketchSymbol, loadSketchSymbols } from "./utils/symbolStore";
 import { getLayerByTitle } from "../../../utils/layerHelper";
 import type FeatureLayer from "@arcgis/core/layers/FeatureLayer";
+
+interface SketchHistory {
+  mapMode: MapMode;
+  graphic: Graphic;
+}
 
 export interface UseSketchProps {
   mapMode: MapMode;
@@ -69,7 +74,10 @@ export interface UseSketchProps {
   pointSymbolInitialized: boolean;
   setPointSymbolInitialized: React.Dispatch<React.SetStateAction<boolean>>;
   snappingEnabled: boolean;
-  handleSnappingChange: (event: HTMLCalciteSwitchElement["calciteSwitchChange"]) => void;
+  handleSnappingChange: (
+    event: HTMLCalciteSwitchElement["calciteSwitchChange"],
+  ) => void;
+  handleUndo: () => void;
 }
 
 export const useSketch = (
@@ -86,6 +94,7 @@ export const useSketch = (
     }),
   );
 
+  const activeTool = useRef<string>("");
   const pointSketchVm = useRef<SketchViewModel>(null);
   const lineSketchVm = useRef<SketchViewModel>(null);
   const polygonSketchVm = useRef<SketchViewModel>(null);
@@ -125,9 +134,13 @@ export const useSketch = (
   const [selectedGraphicsType, setSelectedGraphicsType] = useState<
     string | undefined
   >(undefined);
+
+  const sketchHistory = useRef<SketchHistory[]>([]);
+
   const initializedRef = useRef(false);
 
   const handleToolClose = useCallback(() => {
+    
     setMapMode("identify");
   }, [setMapMode]);
 
@@ -147,7 +160,7 @@ export const useSketch = (
       }
 
       setMapMode(newMode);
-
+      activeTool.current = newMode as string;
       // Ensure all sketch VMs exist
       if (
         !pointSketchVm.current ||
@@ -203,22 +216,23 @@ export const useSketch = (
       polygonSymbol: polygonSymbol,
       textSymbol: textSymbol,
       labelOptions: {
-        enabled: false,
+        enabled: true,
       },
       snappingOptions: {
         featureEnabled: true,
-        enabled: true,
+        enabled: false,
         selfEnabled: true,
-
       },
     });
 
     const propertyLayer = getLayerByTitle(mapElement.current, "Property");
     if (propertyLayer && propertyLayer.type === "feature") {
-      sketchVm.snappingOptions.featureSources = [{
-        layer: propertyLayer as FeatureLayer,
-        enabled: true
-      }]
+      sketchVm.snappingOptions.featureSources = [
+        {
+          layer: propertyLayer as FeatureLayer,
+          enabled: true,
+        },
+      ];
     }
     sketchVm.on("create", handleSketchCreate);
 
@@ -261,48 +275,120 @@ export const useSketch = (
     return sketchVm;
   };
 
+  
+
   const handleSketchCreate = (event: CreateEvent) => {
     //   mapElement.current.popupDisabled = true;
-    // }
+    // }\
+    
     if (event.state === "complete") {
+      
       if (
         event.graphic?.symbol?.type === "text" &&
         !(event.graphic.symbol as TextSymbol).text
       )
         return;
       event.graphic?.setAttribute("id", crypto.randomUUID());
+
       switch (event.graphic?.geometry?.type) {
         case "point":
-          if (mapMode === "point") {
-            mapNotesLayer.current.pointLayer?.add(event.graphic);
+          
+          if (activeTool.current === "point") {
+            if (!mapNotesLayer.current.pointLayer) return;
+            mapNotesLayer.current.pointLayer.add(event.graphic);
+            sketchHistory.current.push({
+              mapMode: "point",
+              graphic: event.graphic,
+            });
           }
-          if (mapMode === "text") {
+          if (activeTool.current === "text") {
+            if (!mapNotesLayer.current.textLayer) return;
             const clone = event.graphic.symbol?.clone();
             event.graphic.symbol = clone;
-            mapNotesLayer.current.textLayer?.add(event.graphic);
+            mapNotesLayer.current.textLayer.add(event.graphic);
+            sketchHistory.current.push({
+              mapMode: "text",
+              graphic: event.graphic,
+            });
           }
           break;
         case "polyline":
-          mapNotesLayer.current.polylineLayer?.add(event.graphic);
+          if (!mapNotesLayer.current.polylineLayer) return;
 
+          mapNotesLayer.current.polylineLayer.add(event.graphic);
+          sketchHistory.current.push({
+            mapMode: "polyline",
+            graphic: event.graphic,
+          });
           break;
         case "polygon":
-          mapNotesLayer.current.polygonLayer?.add(event.graphic);
+          if (!mapNotesLayer.current.polygonLayer) return;
+
+          mapNotesLayer.current.polygonLayer.add(event.graphic);
+          sketchHistory.current.push({
+            mapMode: "polygon",
+            graphic: event.graphic,
+          });
 
           break;
       }
     }
   };
 
-  const handleSnappingChange = (event: HTMLCalciteSwitchElement["calciteSwitchChange"]) => {
-    setSnappingEnabled(prev => !prev);
-    if (!polygonSketchVm.current || !pointSketchVm.current || !textSketchVm.current || !lineSketchVm.current) return;
+  const handleUndo = () => {
+    // Removes and returns the last element in one step
+    const lastSketch = sketchHistory.current.pop();
 
-    polygonSketchVm.current.snappingOptions.enabled = event.target.checked;
-    pointSketchVm.current.snappingOptions.enabled = event.target.checked;
-    lineSketchVm.current.snappingOptions.enabled = event.target.checked;
-    textSketchVm.current.snappingOptions.enabled = event.target.checked;
+    // If the array was empty, stop execution
+    if (!lastSketch) return;
+
+    switch (lastSketch.mapMode) {
+      case "point":
+        pointSketchVm.current?.removeGraphic(lastSketch.graphic);
+        (pointSketchVm.current?.layer as GraphicsLayer).remove(
+          lastSketch.graphic,
+        );
+
+        break;
+      case "polygon":
+        polygonSketchVm.current?.removeGraphic(lastSketch.graphic);
+        (polygonSketchVm.current?.layer as GraphicsLayer).remove(
+          lastSketch.graphic,
+        );        
+        break;
+      case "polyline":
+        lineSketchVm.current?.removeGraphic(lastSketch.graphic);
+        (lineSketchVm.current?.layer as GraphicsLayer).remove(
+          lastSketch.graphic,
+        );
+        break;
+      case "text":
+        textSketchVm.current?.removeGraphic(lastSketch.graphic);
+        (textSketchVm.current?.layer as GraphicsLayer).remove(
+          lastSketch.graphic,
+        );  
+        break;
+    }
   };
+
+  const handleSnappingChange = useCallback(
+    (event: HTMLCalciteSwitchElement["calciteSwitchChange"]) => {
+      setSnappingEnabled((prev) => !prev);
+      if (
+        !polygonSketchVm.current ||
+        !pointSketchVm.current ||
+        !textSketchVm.current ||
+        !lineSketchVm.current
+      )
+        return;
+
+      polygonSketchVm.current.snappingOptions.enabled = event.target.checked;
+      pointSketchVm.current.snappingOptions.enabled = event.target.checked;
+      lineSketchVm.current.snappingOptions.enabled = event.target.checked;
+      textSketchVm.current.snappingOptions.enabled = event.target.checked;
+    },
+    [],
+  );
 
   const handlePointSymbolChange = (
     symbol:
@@ -519,6 +605,7 @@ export const useSketch = (
     pointSymbolInitialized,
     setPointSymbolInitialized,
     snappingEnabled,
-    handleSnappingChange
+    handleSnappingChange,
+    handleUndo,
   };
 };

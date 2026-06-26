@@ -62,7 +62,8 @@ const Sketch: React.FC<SketchProps> = ({
     pointSymbolInitialized,
     setPointSymbolInitialized,
     snappingEnabled,
-    handleSnappingChange
+    handleSnappingChange,
+    handleUndo
   } = useSketch(mapElement, closed);
 
   return (
@@ -139,7 +140,13 @@ const Sketch: React.FC<SketchProps> = ({
                 icon="select"
                 onClick={() => handleActionClick("select")}
                 active={mapMode === "select"}
-              ></calcite-action>
+              ></calcite-action>     
+              <calcite-action
+                id="sketch-undo-action"
+                text="Undo"
+                icon="undo"
+                onClick={handleUndo}
+              ></calcite-action>                    
               <calcite-action
                 id="sketch-clear-action"
                 text="Clear"
@@ -241,6 +248,9 @@ const Sketch: React.FC<SketchProps> = ({
       <calcite-tooltip closeOnClick reference-element="sketch-select-action">
         Select sketch
       </calcite-tooltip>
+      <calcite-tooltip closeOnClick reference-element="sketch-undo-action">
+        Undo
+      </calcite-tooltip>      
       <calcite-tooltip closeOnClick reference-element="sketch-clear-action">
         Clear sketch
       </calcite-tooltip>
