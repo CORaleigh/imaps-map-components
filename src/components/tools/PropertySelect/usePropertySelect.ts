@@ -243,7 +243,7 @@ export const usePropertySelect = (
     if (!view || !mapRef) return;
 
     // Add graphics layer
-    const layer = new GraphicsLayer({listMode: 'hide'});
+    const layer = new GraphicsLayer({id: 'select-graphics', listMode: 'hide'});
     mapRef.map?.add(layer);
     graphicsLayer.current = layer;
 
