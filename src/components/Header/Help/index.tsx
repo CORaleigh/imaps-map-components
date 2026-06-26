@@ -391,7 +391,7 @@ export default function Help({ open, onClose, goToId }: HelpProps) {
                 label={`${showToc ? "Hide" : "Show "} table of contents`}
               ></calcite-fab>
             </calcite-panel>
-            <calcite-tooltip referenceElement="toc-butto">
+            <calcite-tooltip referenceElement="toc-button">
               <span>{`${showToc ? "Hide" : "Show "} table of contents`}</span>
             </calcite-tooltip>
           </calcite-shell-panel>
