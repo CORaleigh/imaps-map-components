@@ -188,7 +188,7 @@ const AddressTable: React.FC<AddressTableProps> = ({
         onarcgisSelectionChange={handleSelectionChange}
         noDataMessage={"No addresses found"}
         hideMenuItemsRefreshData
-        hideMenuItemsToggleColumns
+        hideColumnVisibilityMenu
         style={{ marginBottom: "1em" }}
         hideColumnMenuItemsSortAscending
         hideColumnMenuItemsSortDescending
