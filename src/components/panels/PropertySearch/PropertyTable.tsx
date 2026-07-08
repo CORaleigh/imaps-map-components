@@ -45,8 +45,6 @@ const PropertyTable: React.FC<PropertyTableProps> = ({
             },
           ],
         }}
-  
-  
       ></arcgis-feature-table>
     </>
   );

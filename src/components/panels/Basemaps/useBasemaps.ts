@@ -217,12 +217,12 @@ export const useBasemaps = (
     if (!mapElement.current || initializedRef.current) return;
     // Initialize basemap logic only once
     initializedRef.current = true;
-
-    const handle = reactiveUtils.watch(
+    reactiveUtils.watch(
       () => mapElement.current.stationary,
       async (stationary) => {
         if (!imagesGallery.current) return;
         if (stationary) {
+    
           const isImageSelected = imageBasemapSelected(
             imagesGallery.current.source as PortalBasemapsSource,
             mapElement.current.basemap as Basemap,
@@ -254,13 +254,13 @@ export const useBasemaps = (
               autoCloseDuration: "fast",
               autoClose: true,
               kind: "warning",
-              icon: "imagery-layer",
+              icon: "image-layer",
             });
           }
         }
       },
     );
-    return () => handle.remove(); // cleanup
+    //return () => handle.remove(); // cleanup
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mapElement]);
 

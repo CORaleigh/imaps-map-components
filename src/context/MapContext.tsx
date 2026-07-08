@@ -73,7 +73,7 @@ export interface MapContextType {
   setAlert: (alert: Alert) => void;
 }
 
-Portal.getDefault().units = "english"
+Portal.getDefault().units = "english";
 
 const MapContext = createContext<MapContextType | undefined>(undefined);
 
@@ -246,7 +246,6 @@ export const MapProvider: React.FC<{ children: React.ReactNode }> = ({
       setMapMode("identify");
     }
 
-
     return () => {
       viewEl.removeEventListener("arcgisViewClick", handleStreetViewMapClick);
     };
@@ -286,6 +285,28 @@ export const MapProvider: React.FC<{ children: React.ReactNode }> = ({
       );
       if (storedExtent) {
         mapElement.current.view.extent = JSON.parse(storedExtent);
+      }
+
+      //check for old storage keys and reset if found
+      if (
+        localStorage.getItem(`imaps_webmap_`) ||
+        localStorage.getItem(`imaps_webmap_${webMapId.current}`)
+      ) {
+        //show alert to user
+        setAlert({
+          show: true,
+          message: `Layer storage has been reset due to a change in the storage process in the latest 
+          update to iMAPS.  Any layers visible in the previous session will need to be made visible again.`,
+          id: Date.now(),
+          title: "Layer Storage Reset",
+          autoCloseDuration: "slow",
+          autoClose: true,
+          kind: "brand",
+          icon: "information",
+        });
+        //remove old storage keys
+        localStorage.removeItem(`imaps_webmap_`);
+        localStorage.removeItem(`imaps_webmap_${webMapId.current}`);
       }
 
       setMapReady(true);
