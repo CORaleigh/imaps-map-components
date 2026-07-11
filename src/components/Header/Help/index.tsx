@@ -380,6 +380,14 @@ export default function Help({ open, onClose, goToId }: HelpProps) {
                 ))}
               </calcite-list>
 
+
+            </calcite-panel>
+            <calcite-tooltip referenceElement="toc-button">
+              <span>{`${showToc ? "Hide" : "Show "} table of contents`}</span>
+            </calcite-tooltip>
+          </calcite-shell-panel>
+
+          <calcite-panel oncalcitePanelScroll={handlePanelScroll}>
               <calcite-fab
                 slot="fab"
                 scale="l"
@@ -389,14 +397,7 @@ export default function Help({ open, onClose, goToId }: HelpProps) {
                 id="toc-button"
                 text={`${showToc ? "Hide" : "Show "} table of contents`}
                 label={`${showToc ? "Hide" : "Show "} table of contents`}
-              ></calcite-fab>
-            </calcite-panel>
-            <calcite-tooltip referenceElement="toc-button">
-              <span>{`${showToc ? "Hide" : "Show "} table of contents`}</span>
-            </calcite-tooltip>
-          </calcite-shell-panel>
-
-          <calcite-panel oncalcitePanelScroll={handlePanelScroll}>
+              ></calcite-fab>            
             <calcite-fab
               slot="fab"
               scale="l"
