@@ -50,11 +50,7 @@ export const propertyLabelExpressions: LabelExpression[] = [
   },
 ];
 
-export const layerListReady = (
-  event: HTMLArcgisLayerListElement["arcgisReady"],
-) => {
-  console.log(event);
-};
+
 
 export const createItemPanel = (item: ListItem) => {
   if (

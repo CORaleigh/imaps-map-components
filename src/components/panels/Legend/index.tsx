@@ -24,7 +24,7 @@ const Legend: React.FC<LegendProps> = ({ mapElement, closed, onPanelClose }) => 
       oncalcitePanelClose={() => onPanelClose()}
       closed={closed}
     >
-      <arcgis-legend className={styles.legend} referenceElement={mapElement.current}></arcgis-legend>
+      <arcgis-legend className={styles.legend} referenceElement={mapElement.current} ></arcgis-legend>
     </calcite-panel>
   );
 };

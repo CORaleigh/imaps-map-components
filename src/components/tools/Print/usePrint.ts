@@ -133,7 +133,6 @@ export const usePrint = (
       event.target.selectedItem.value === "current"
         ? mapElement.current.scale
         : scales.at(0)?.scale;
-    console.log(scale);
     setPrintOptions((prev) => ({
       ...prev,
       scaleType: event.target.selectedItem.value,
@@ -283,7 +282,6 @@ export const usePrint = (
       hidePrintFrame(mapElement.current);
       return;
     }
-    console.log(printOptions);
 
     const { layout, scale, showAttributes, showLegend } = printOptions;
     if (!layout) return;

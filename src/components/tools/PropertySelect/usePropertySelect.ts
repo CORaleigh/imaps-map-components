@@ -6,7 +6,7 @@ import GraphicsLayer from "@arcgis/core/layers/GraphicsLayer";
 import Graphic from "@arcgis/core/Graphic";
 import * as geodesicBufferOperator from "@arcgis/core/geometry/operators/geodesicBufferOperator.js";
 import { useMap } from "../../../context/useMap";
-import type { MapMode } from "../../../context/MapContext";
+import type { MapMode } from "../../../context/MapContext.types";
 import type Layer from "@arcgis/core/layers/Layer";
 import type FeatureLayerView from "@arcgis/core/views/layers/FeatureLayerView";
 import type FeatureLayer from "@arcgis/core/layers/FeatureLayer";

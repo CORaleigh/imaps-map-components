@@ -102,7 +102,7 @@ export const useBasemaps = (
       (basemap) =>
         basemap.portalItem?.title === mapElement.current.map?.basemap?.title,
     );
-
+    
     if (selected) {
       gallery.activeBasemap = selected;
       if (gallery.source === imageSource) {

@@ -10,21 +10,6 @@
     "images": "",
     "esri": ""
   },
-  "alert": {
-    "show": false,
-    "autoClose": false,
-    "duration": "fast",
-    "kind": "info",
-    "icon": "information",
-    "title": "iMAPS has been updated!",
-    "message": "See a list of what's new at the link below. Questions? Please email gis@wake.gov.",
-    "optOut": true,
-    "link": {
-      "text": "What's New",
-      "url": "https://maps.wake.gov/imaps/iMAPShelpPDF.pdf#page=3",
-      "show": true
-    }
-  },
   "printUrl": "https://maps.raleighnc.gov/print/rest/services/Geoprocessing/ExportWebMapPro/GPServer/Export%20Web%20Map",
   "geocodeUrl": "https://maps.raleighnc.gov/arcgis/rest/services/Locators/Locator/GeocodeServer",
   "intersectionItem": "edb2153e06c2477995f95b27e5c24661",

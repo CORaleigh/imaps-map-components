@@ -89,7 +89,6 @@ export const usePropertySearch = (
   ) => {
     if (!mapElement.current) return;
     await mapElement.current.view.when();
-    console.log("Search ready");
 
     const sources = await getSearchSources(mapElement.current, event.target);
     if (!sources) return;
@@ -115,6 +114,7 @@ export const usePropertySearch = (
 
   const handleTableReady = useCallback(
     async (event: HTMLArcgisFeatureTableElement["arcgisReady"]) => {
+      await reactiveUtils.whenOnce(() => mapElement.current.view.ready);
       event.target.tableTitle = `0 properties selected`;
       event.target.highlightDisabled = true;
       event.target.noDataMessage = "";
@@ -148,12 +148,13 @@ export const usePropertySearch = (
           );
         }
       });
-      if(grid) grid.appendChild(style);
+      if (grid) grid.appendChild(style);
       await mapElement.current.whenLayerView(tableLayerRef.current);
       setSearchReady(true);
       reactiveUtils.watch(
-        () => tableElement.current.visibleColumns,
+        () => tableElement.current?.visibleColumns,
         (columns) => {
+          if (!columns) return;
           localStorage.setItem(
             `imaps_${webMapId.current}_visibleColumns`,
             JSON.stringify(columns.map((column) => column.fieldName)),
@@ -217,9 +218,7 @@ export const usePropertySearch = (
 
           setCondos(results);
           return results;
-        } else {
-          console.log("search term must be 3 or more characters");
-        }
+        } 
       }
       const condos = await searchForCondosFromSearch(
         event,
@@ -415,7 +414,7 @@ export const usePropertySearch = (
         deleteFeatures: deletes.features,
       });
       (tableLayerRef.current as FeatureLayer).refresh();
-      condos.forEach((condo) => {
+      condos.forEach((condo: Graphic) => {
         condos[0].setAttribute("OID", condos[0].getObjectId());
         condo.setAttribute("selected", "no");
       });

@@ -166,10 +166,7 @@ export const useLocationSearch = (
     }
   };
 
-  const handleSearchClear = (
-    event: HTMLArcgisSearchElement["arcgisSearchClear"],
-  ) => {
-    console.log(event.detail);
+  const handleSearchClear = () => {
     setShowIntersection(false);
     selectedStreet.current = undefined;
     graphicsLayer.current?.removeAll();

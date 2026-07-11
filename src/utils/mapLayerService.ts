@@ -54,7 +54,7 @@ class LayerService {
     const persisted: PersistState = raw ? JSON.parse(raw) : { layers: [] };
 
     this.persistedStateCache = new Map(
-      persisted.layers.map((l) => [l.id, l.visible])
+      persisted.layers.map((l) => [l.id, l.visible]),
     );
 
     return this.persistedStateCache;
@@ -65,7 +65,7 @@ class LayerService {
   }
 
   async createWebMapWithRequiredAndPersisted(
-    id: string
+    id: string,
   ): Promise<{ webmap: WebMap; webmapTemplate: WebMap }> {
     this.persistKey = `imaps_${id}_layerVisibility`;
     this.clearPersistedCache();
@@ -105,12 +105,12 @@ class LayerService {
         .toArray()
         .map((layer: SearchLayer) => layer.id);
     const isSearchable = (id: string) => searchIds?.includes(id);
-    
+
     // Add top-level layers: required or persisted-visible only
     const addLayerRecursive = (
       layer: Layer,
       parent: WebMap | GroupLayer,
-      parentVisible: boolean
+      parentVisible: boolean,
     ): boolean => {
       if (layer.type === "group") {
         const groupLayer = layer as GroupLayer;
@@ -126,16 +126,23 @@ class LayerService {
         // Add children in template order if required or persisted-visible
         for (const child of groupLayer.layers.toArray()) {
           const title = child.title || "";
-         // const shouldDisplay =
+          // const shouldDisplay =
           //  isRequired(title) || isVisibleLastSession(title) || inUrl(title) || (layer.visible && parentVisible);
           const shouldAdd =
             isRequired(title) ||
             isVisibleLastSession(title) ||
             isSearchable(child.id) ||
-            inUrl(title) || (layer.visible && parentVisible);
+            inUrl(title) ||
+            (layer.visible && parentVisible);
 
           if (child.type === "group") {
-            if (addLayerRecursive(child, newGroup, (child.parent as GroupLayer).visible)) {
+            if (
+              addLayerRecursive(
+                child,
+                newGroup,
+                (child.parent as GroupLayer).visible,
+              )
+            ) {
               anyChildAdded = true;
             }
           } else if (shouldAdd) {
@@ -175,14 +182,14 @@ class LayerService {
 
     // Add tables - use Set for faster lookup
     const existingTableTitles = new Set(
-      webmap.tables.toArray().map((t) => t.title)
+      webmap.tables.toArray().map((t) => t.title),
     );
     for (const table of this.webmapTemplate.tables.toArray()) {
       if (!existingTableTitles.has(table.title)) {
         webmap.tables.add(table);
       }
     }
-    
+
     if (urlLayers.length > 0) {
       const makeParentsVisible = (layer: Layer) => {
         let current = layer.parent as GroupLayer | null;
@@ -199,7 +206,7 @@ class LayerService {
         }
       });
     }
-    
+
     return { webmap, webmapTemplate: this.webmapTemplate };
   }
 
@@ -215,7 +222,7 @@ class LayerService {
 
     // Load all group layers in the template to access their children
     const loadAllGroups = async (
-      parent: WebMap | GroupLayer
+      parent: WebMap | GroupLayer,
     ): Promise<void> => {
       const layers = parent.layers.toArray();
 
@@ -232,11 +239,11 @@ class LayerService {
     // PHASE 1: Add all missing layers recursively
     const addMissingLayers = (
       templateLayer: Layer,
-      parent: WebMap | GroupLayer
+      parent: WebMap | GroupLayer,
     ) => {
       // Find existing layer/group in THIS parent
       let existingLayer = parent.layers.find(
-        (l) => l.title === templateLayer.title
+        (l) => l.title === templateLayer.title,
       );
 
       if (!existingLayer) {
@@ -251,21 +258,29 @@ class LayerService {
         } else {
           // Check if this layer already exists ANYWHERE in the map
           const layerExistsInMap = this.map?.allLayers.find(
-            (l) => l.title === templateLayer.title
+            (l) => l.title === templateLayer.title,
           );
-          
+
           if (layerExistsInMap) {
             // Check if it's already in the correct parent
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const existingParent = (layerExistsInMap as any).parent;
-            const targetParentTitle = parent instanceof WebMap ? 'Map' : (parent as GroupLayer).title || 'Map';
-            const existingParentTitle = existingParent?.declaredClass === 'esri.WebMap' ? 'Map' : (existingParent?.title || 'Map');
-            
+            const targetParentTitle =
+              parent instanceof WebMap
+                ? "Map"
+                : (parent as GroupLayer).title || "Map";
+            const existingParentTitle =
+              existingParent?.declaredClass === "esri.WebMap"
+                ? "Map"
+                : existingParent?.title || "Map";
+
             if (existingParentTitle !== targetParentTitle) {
-              console.log(`Layer "${templateLayer.title}" exists in "${existingParentTitle}" but template wants it in "${targetParentTitle}", skipping to avoid duplicate`);
+              console.log(
+                `Layer "${templateLayer.title}" exists in "${existingParentTitle}" but template wants it in "${targetParentTitle}", skipping to avoid duplicate`,
+              );
               return;
             }
-            
+
             // Layer exists in correct parent, use it
             existingLayer = layerExistsInMap;
           } else {
@@ -293,9 +308,7 @@ class LayerService {
     }
 
     // PHASE 2: Reorder from deepest level up to top level
-    const reorderRecursive = (
-      currentParent: WebMap | GroupLayer
-    ) => {
+    const reorderRecursive = (currentParent: WebMap | GroupLayer) => {
       const currentLayers = currentParent.layers.toArray();
 
       // First, recursively reorder all nested groups (depth-first)
@@ -322,8 +335,8 @@ class LayerService {
         // Track which layers we've already added to avoid duplicates
         const addedLayers = new Set<Layer>();
         const layersWithoutTitle: Layer[] = [];
-        
-        currentLayers.forEach(layer => {
+
+        currentLayers.forEach((layer) => {
           if (!layer.title) {
             // Graphics layers or other layers without titles
             layersWithoutTitle.push(layer);
@@ -335,14 +348,14 @@ class LayerService {
         for (const templateTitle of templateOrder) {
           // Find ALL layers with this title that haven't been added yet
           const matchingLayers = currentLayers.filter(
-            l => l.title === templateTitle && !addedLayers.has(l)
+            (l) => l.title === templateTitle && !addedLayers.has(l),
           );
-          
+
           for (const existingLayer of matchingLayers) {
             // Apply visibility
             const persistedVisible = isVisibleLastSession(templateTitle);
             existingLayer.visible = persistedVisible || existingLayer.visible;
-            
+
             orderedTemplateLayers.push(existingLayer);
             addedLayers.add(existingLayer);
           }
@@ -350,19 +363,19 @@ class LayerService {
 
         // Add any remaining layers with titles that aren't in template order
         const remainingLayers = currentLayers.filter(
-          l => l.title && !addedLayers.has(l)
+          (l) => l.title && !addedLayers.has(l),
         );
 
         // Combine: template layers in order, then remaining layers, then layers without titles
         const finalLayerOrder = [
           ...orderedTemplateLayers,
           ...remainingLayers,
-          ...layersWithoutTitle
+          ...layersWithoutTitle,
         ];
 
         // Remove all layers then re-add in correct order
         currentParent.layers.removeAll();
-        finalLayerOrder.forEach(layer => {
+        finalLayerOrder.forEach((layer) => {
           currentParent.layers.add(layer);
         });
       }
@@ -377,7 +390,7 @@ class LayerService {
 
     // Use Set for faster lookup
     const existingLayerTitles = new Set(
-      this.view.map?.layers.toArray().map((l) => l.title) || []
+      this.view.map?.layers.toArray().map((l) => l.title) || [],
     );
 
     const layersArray = webMap.layers.toArray();
@@ -389,7 +402,7 @@ class LayerService {
     }
 
     const existingTableTitles = new Set(
-      this.view.map?.tables.toArray().map((t) => t.title) || []
+      this.view.map?.tables.toArray().map((t) => t.title) || [],
     );
 
     for (const table of webMap.tables.toArray()) {
@@ -403,7 +416,7 @@ class LayerService {
 
     const state: PersistState = JSON.parse(raw);
     // Use Promise.all for parallel async operations
-    
+
     await Promise.all(state.layers.map((lp) => this.applyLayerSettings(lp)));
   }
 
@@ -440,7 +453,7 @@ class LayerService {
 
     // Create lookup map for faster access
     const layerMap = new Map(
-      this.view.map.allLayers.toArray().map((l) => [l.title, l])
+      this.view.map.allLayers.toArray().map((l) => [l.title, l]),
     );
 
     // First, set all group layer visibilities and opacities (top-down)
@@ -498,6 +511,32 @@ class LayerService {
     }
   }
 
+/** Makes any layer whose title is in the URL "layers" param visible, along with its parent group layers */
+  applyUrlLayerVisibility() {
+    if (!this.view?.map) return;
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const layersParam = urlParams.get("layers");
+    if (!layersParam) return;
+    const urlLayers = layersParam.split(",").map((layer) => layer.trim());
+    const inUrl = (title: string) => urlLayers.includes(title);
+
+    const makeParentsVisible = (layer: Layer) => {
+      let current = layer.parent as GroupLayer | null;
+      while (current && current.type === "group") {
+        current.visible = true;
+        current = current.parent as GroupLayer | null;
+      }
+    };
+
+    this.view.map.allLayers.forEach((layer) => {
+      if (layer.title && inUrl(layer.title)) {
+        layer.visible = true;
+        makeParentsVisible(layer);
+      }
+    });
+  }  
+
   serializeLayer(layer: Layer): LayerPersist {
     const lp: LayerPersist = {
       id: layer.title!,
@@ -524,7 +563,6 @@ class LayerService {
   }
 
   async applyLayerSettings(lp: LayerPersist) {
-    
     if (!this.view?.map) return;
 
     const layer = this.view.map.allLayers.find((l) => l.title === lp.id);
@@ -549,7 +587,7 @@ class LayerService {
 
       for (const sl of sublayersArray) {
         const slPersist = lp.sublayers.find(
-          (s) => String(s.id) === String(sl.id)
+          (s) => String(s.id) === String(sl.id),
         );
         if (slPersist) {
           sl.visible = slPersist.visible;
@@ -584,7 +622,7 @@ class LayerService {
     if (existing) return existing;
 
     const templateLayer = this.webmapTemplate.allLayers.find(
-      (l) => l.title === title
+      (l) => l.title === title,
     ) as FeatureLayer | undefined;
 
     if (!templateLayer) return undefined;

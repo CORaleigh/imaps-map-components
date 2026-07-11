@@ -12,7 +12,7 @@ import "@arcgis/map-components/components/arcgis-scale-bar";
 import { lazy } from "react";
 import OverviewMap from "../tools/OverviewMap";
 import CoordinateConversion from "../tools/CoordinateConversion";
-import type { MapMode } from "../../context/MapContext";
+import type { MapMode } from "../../context/MapContext.types.ts";
 import type { ToolType } from "../Shell/useShell";
 
 import styles from "./MapPanel.module.css";
@@ -36,6 +36,9 @@ interface MapPanelProps {
   ) => void;
   onToolClose: () => void;
   onHelpClick: (id: string) => void;
+  onPopupTriggerAction: (
+    event: HTMLArcgisPopupElement["arcgisTriggerAction"],
+  ) => void;
 }
 
 // Lazy-loaded tools with preload
@@ -59,6 +62,7 @@ const MapPanel: React.FC<MapPanelProps> = ({
   onOverviewExpand,
   onToolClose,
   onHelpClick,
+  onPopupTriggerAction,
 }) => {
   // useEffect(() => {
   //   const tools = [PropertySelect, LocationSearch, Measure, Sketch, Print];
@@ -71,7 +75,10 @@ const MapPanel: React.FC<MapPanelProps> = ({
       onarcgisViewReadyChange={onMapReady}
       onarcgisViewHold={onViewHold}
     >
-      <arcgis-popup slot="popup"></arcgis-popup>
+      <arcgis-popup
+        slot="popup"
+        onarcgisTriggerAction={onPopupTriggerAction}
+      ></arcgis-popup>
       <arcgis-zoom slot="top-left"></arcgis-zoom>
       <arcgis-home slot="top-left" goToOverride={onGoHome}></arcgis-home>
       <arcgis-compass slot="top-left"></arcgis-compass>

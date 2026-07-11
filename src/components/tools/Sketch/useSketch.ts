@@ -7,7 +7,7 @@ import SimpleLineSymbol from "@arcgis/core/symbols/SimpleLineSymbol";
 import SimpleMarkerSymbol from "@arcgis/core/symbols/SimpleMarkerSymbol";
 import TextSymbol from "@arcgis/core/symbols/TextSymbol";
 import { useMap } from "../../../context/useMap";
-import type { MapMode } from "../../../context/MapContext";
+import type { MapMode } from "../../../context/MapContext.types";
 import Graphic from "@arcgis/core/Graphic";
 import type GraphicsLayer from "@arcgis/core/layers/GraphicsLayer";
 import type { CreateEvent } from "@arcgis/core/widgets/Sketch/types";

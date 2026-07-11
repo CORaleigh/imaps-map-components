@@ -180,7 +180,7 @@ export const getDurhamPhoto = async (feature: Graphic) => {
       return photo;
     }
   } catch {
-    console.log("no photo available");
+    return;
   }
 };
 
@@ -202,9 +202,7 @@ export const getChathamPhoto = async (feature: Graphic) => {
   const validPhoto = await checkPhoto(photo as string);
   if (validPhoto) {
       return photo;
-  } else {
-      console.log("no photo available");
-  }  
+  } 
 
 };
 

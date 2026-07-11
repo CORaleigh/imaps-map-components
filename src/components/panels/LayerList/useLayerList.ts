@@ -55,9 +55,6 @@ export const useLayerList = (
   const listItemCreatedFunction = useCallback(
     (event: ListItemModifierEvent) => {
       const item = event.item;
-      if (item.visible) {
-        console.log(item.title);
-      }
       if (item.visible && item.parent && item.layer?.type !== "sublayer") {
         item.parent.open = item.parent.visible;
       }

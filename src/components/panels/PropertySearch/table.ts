@@ -9,17 +9,20 @@ import type FieldInfo from "@arcgis/core/popup/FieldInfo";
 
 export const createTableLayer = async (mapElement: HTMLArcgisMapElement) => {
   if (!mapElement || !mapElement.view.map) return;
-  console.log(mapElement.view.ready);
   const table: FeatureLayer = getTableByTitle(
     mapElement,
     "Condos",
   ) as FeatureLayer;
   if (!table) {
-    console.error("Condos table not in web map");
     return;
   }
-  await table.load();
-  
+
+  try {
+    await table.load();
+  } catch {
+    return;
+  }
+
   const copyTable = new FeatureLayer({
     source: [],
     fields: table.fields,

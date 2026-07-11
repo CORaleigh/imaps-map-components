@@ -45,6 +45,7 @@ const Shell: React.FC = () => {
     handlePanelClose,
     handleToolActionClick,
     handleCustomActionClick,
+    handlePopupTriggerAction,
     handleToolClose,
     handleViewReady,
     handleViewHold,
@@ -56,10 +57,11 @@ const Shell: React.FC = () => {
     handleHelpClick,
     helpId,
     mapElement,
-    mapReady
+    mapReady,
   } = useShell();
   const { open, checkbox, handleDialogClose, handleDialogOpen } =
     useDisclaimer();
+
 
   return (
     <>
@@ -299,6 +301,7 @@ const Shell: React.FC = () => {
           onGoHome={handleGoToHome}
           onToolClose={handleToolClose}
           onHelpClick={(id: string) => handleHelpClick(id)}
+          onPopupTriggerAction={handlePopupTriggerAction}
         ></MapPanel>
         <calcite-tooltip closeOnClick reference-element="overview-action">
           Overview

@@ -1,6 +1,6 @@
 import "@arcgis/map-components/components/arcgis-map";
 import "./App.css";
-import { MapProvider } from "./context/MapContext";
+import MapProvider from "./context/MapProvider";
 import Shell from "./components/Shell";
 import AppAlert from "./components/AppAlert";
 

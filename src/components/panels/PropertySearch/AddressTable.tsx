@@ -33,7 +33,6 @@ const AddressTable: React.FC<AddressTableProps> = ({
   );
   const handleAddressTableReady = useCallback(
     async (event: HTMLArcgisFeatureTableElement["arcgisReady"]) => {
-      console.log("address table ready");
       event.target.tableTitle = `0 addresses`;
 
       const table = event.target;

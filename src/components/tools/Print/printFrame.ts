@@ -68,12 +68,7 @@ export function updatePrintFrame(
   const top = centerY - frameHeightPixels / 2;
   //   const right = centerX + frameWidthPixels / 2;
   //   const bottom = centerY + frameHeightPixels / 2;
-  console.log("width:", width);
-  console.log("height:", height);
-  console.log("scale:", scale);
-  console.log("resolution:", mapElement.view.resolution);
-  console.log("frameWidthPixels:", frameWidthPixels);
-  console.log("frameHeightPixels:", frameHeightPixels);
+
   // Create or update the SVG element
   let svg = mapElement.shadowRoot?.getElementById(
     "printFrameSvg",

@@ -52,7 +52,9 @@ const PropertyInfo: React.FC<PropertyInfoProps> = ({
         )}
       </div>
 
-      <arcgis-feature graphic={feature}></arcgis-feature>
+      {feature && (
+        <arcgis-feature graphic={feature}></arcgis-feature>
+      )}
       <div className={styles.featureSubTitle}>
         <h2 className={styles.featureTitle}>Services</h2>
       </div>

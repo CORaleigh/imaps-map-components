@@ -2,14 +2,8 @@
 import { useState, useCallback, useEffect } from "react";
 import { useMap } from "../../context/useMap";
 import { useAppSize, type AppSize } from "../../utils/useAppSize";
-import Extent from "@arcgis/core/geometry/Extent";
-import type { MapMode } from "../../context/MapContext";
-import { constraints } from "../../utils/constraints";
-
-import MapViewConstraints from "@arcgis/core/views/2d/MapViewConstraints.js";
-
-import Color from "@arcgis/core/Color";
-import HighlightOptions from "@arcgis/core/views/support/HighlightOptions";
+import type { MapMode } from "../../context/MapContext.types.ts";
+import { useMapPanel } from "../MapPanel/useMapPanel";
 
 export type PanelType =
   | "propertySearch"
@@ -43,6 +37,9 @@ export interface UseShellProps {
   handlePanelActionClick: (panel: PanelType) => void;
   handleToolActionClick: (panel: ToolType) => void;
   handleCustomActionClick: (action: "identify" | "streetview" | null) => void;
+  handlePopupTriggerAction: (
+    event: HTMLArcgisPopupElement["arcgisTriggerAction"],
+  ) => void;
   handleViewReady: (
     event: HTMLArcgisMapElement["arcgisViewReadyChange"],
   ) => void;
@@ -66,15 +63,15 @@ export interface UseShellProps {
 export const useShell = (): UseShellProps => {
   const appSize = useAppSize();
 
+  const { mapElement, mapReady, selectedCondo, mapMode, handleCustomActionClick, setAlert } =
+    useMap();
+
   const {
-    mapElement,
-    mapReady,
-    setGeometry,
-    webMapId,
-    selectedCondo,
-    mapMode,
-    handleCustomActionClick,
-  } = useMap();
+    handleViewReady,
+    handleViewHold,
+    handleGoToHome,
+    handlePopupTriggerAction,
+  } = useMapPanel();
 
   const [theme, setTheme] = useState<"light" | "dark">(
     localStorage.getItem("imaps_theme_mode") === "dark" ? "dark" : "light",
@@ -91,6 +88,7 @@ export const useShell = (): UseShellProps => {
   const [showHelp, setShowHelp] = useState<boolean>(false);
 
   const [helpId, setHelpId] = useState<string>();
+
   const handleThemeClick = useCallback(() => {
     setTheme((prev: "light" | "dark") => {
       const newTheme = prev === "light" ? "dark" : "light";
@@ -111,6 +109,7 @@ export const useShell = (): UseShellProps => {
       );
     }
   }, [theme]);
+
   const handlePanelActionClick = useCallback(
     (panel: PanelType) => {
       setOpenedPanels((prev) =>
@@ -125,9 +124,9 @@ export const useShell = (): UseShellProps => {
   );
 
   const handlePanelClose = useCallback(() => {
-    console.log("closing panel");
     setActivePanel(null);
   }, []);
+
   const handleToolActionClick = useCallback(
     (tool: ToolType) => {
       setOpenedTools((prev) => (prev.includes(tool) ? prev : [...prev, tool]));
@@ -141,65 +140,8 @@ export const useShell = (): UseShellProps => {
   );
 
   const handleToolClose = useCallback(() => {
-    console.log("closing tool");
     setActiveTool(null);
   }, []);
-  const handleViewChange = useCallback(
-    (event: HTMLArcgisMapElement["arcgisViewChange"]) => {
-      //if (!mapReady) return;
-      if (!event.target.extent) return;
-      localStorage.setItem(
-        `imaps_${webMapId.current}_extent`,
-        JSON.stringify(event.target.extent.toJSON()),
-      );
-    },
-    [webMapId],
-  );
-  const handleViewReady = useCallback(
-    async (event: HTMLArcgisMapElement["arcgisViewReadyChange"]) => {
-      event.target.constraints = constraints as MapViewConstraints;
-
-      const storedExtent = localStorage.getItem(
-        `imaps_${webMapId.current}_extent`,
-      );
-      if (storedExtent) {
-        event.target.view.extent = JSON.parse(storedExtent);
-      }
-      await event.target.view.when();
-      event.target.highlights.push(
-        new HighlightOptions({
-          color: new Color("red"),
-          name: "property-highlight",
-        }),
-      );
-
-      event.target.addEventListener("arcgisViewChange", handleViewChange);
-    },
-    [handleViewChange, webMapId],
-  );
-  const handleViewHold = useCallback(
-    async (event: HTMLArcgisMapElement["arcgisViewHold"]) => {
-      setGeometry(event.detail.mapPoint);
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [],
-  );
-
-  const handleGoToHome: NonNullable<HTMLArcgisHomeElement["goToOverride"]> = (
-    view,
-  ) => {
-    return view.goTo(
-      new Extent({
-        xmin: -8810106.471332055,
-        ymin: 4207611.929668259,
-        xmax: -8689947.462867815,
-        ymax: 4333580.152282169,
-        spatialReference: {
-          wkid: 102100,
-        },
-      }),
-    );
-  };
 
   const handleCoordinateExpandChange = (
     event: HTMLArcgisExpandElement["arcgisPropertyChange"],
@@ -227,7 +169,7 @@ export const useShell = (): UseShellProps => {
 
   const handleHelpClosed = () => {
     setShowHelp(false);
-     setHelpId(undefined);
+    setHelpId(undefined);
   };
   const handleHelpOpened = () => {
     setShowHelp(true);
@@ -237,6 +179,33 @@ export const useShell = (): UseShellProps => {
     setShowHelp(true);
     setHelpId(id);
   };
+
+  const checkForAlert = useCallback(async () => {
+    try {
+      const alertConfig = await fetch("./alert.json");
+      const alertData = await alertConfig.json();
+      if (alertData.show) {
+        setAlert({
+          show: true,
+          message: alertData.message,
+          id: Date.now(),
+          title: alertData.title,
+          autoCloseDuration: alertData.duration,
+          autoClose: alertData.autoClose,
+          kind: alertData.kind,
+          icon: alertData.icon,
+        });
+      }
+    } catch (err) {
+      console.error("Failed to load alert.json:", err);
+    }
+  }, [setAlert]);
+
+  // runs once on mount — checkForAlert is stable (memoized above),
+  // so this intentionally only depends on it, not re-running per render
+  useEffect(() => {
+    checkForAlert();
+  }, [checkForAlert]);
 
   useEffect(() => {
     if (appSize !== "large" && activePanel) {
@@ -266,6 +235,7 @@ export const useShell = (): UseShellProps => {
     handlePanelClose,
     handleToolActionClick,
     handleCustomActionClick,
+    handlePopupTriggerAction,
     handleToolClose,
     handleViewReady,
     handleViewHold,
