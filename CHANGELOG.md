@@ -33,9 +33,9 @@
 ## Measure component
 - added ability to snap to property layer
 
-
 ## Changes to layer persistence
 - previous version stored entire web map JSON, this version stores properties for the visible layers which is used to control which layers are visible on load.
+- when first using this version, the previously stored layers will be reset.  An alert will appear to let the user know.
 
 ## Property labels persistence
 - when property labels are enabled, the selected labels are storaged in local storage and will be visible next time iMAPS is visited.
