@@ -207,7 +207,7 @@ const Sketch: React.FC<SketchProps> = ({
           <div slot="content-bottom">
             <calcite-label layout="inline" scale="s">
               <calcite-switch scale="s" checked={snappingEnabled} oncalciteSwitchChange={handleSnappingChange}></calcite-switch>
-              Snapping
+              Snap to property
             </calcite-label>
             {mapMode === "select" && selectedGraphicIds.length > 0 && (
               <calcite-button
