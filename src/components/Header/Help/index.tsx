@@ -1127,7 +1127,11 @@ export default function Help({ open, onClose, goToId }: HelpProps) {
                     caption="How to measure an area on the map"
                   />
                 </li>
-
+              <calcite-notice open icon="lightbulb">
+                <div slot="message">
+                  Check the snap to property switch to snap your measurement to property lines
+                </div>
+              </calcite-notice>
                 <li>
                   Clear <calcite-icon icon="trash"></calcite-icon>
                   <ul>
@@ -1236,6 +1240,12 @@ export default function Help({ open, onClose, goToId }: HelpProps) {
                   />
                 </li>
               </ul>
+              <calcite-notice open icon="lightbulb">
+                <div slot="message">
+                  Check the snap to property switch to snap your sketches to property lines
+                </div>
+              </calcite-notice>    
+              <br/>          
               <h3 className={styles.header} id="sketch-styles">
                 Changing Sketch Style
               </h3>

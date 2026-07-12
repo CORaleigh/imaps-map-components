@@ -39,3 +39,7 @@
   transform: translateY(8px);
   pointer-events: none;
 }
+
+calcite-notice {
+  margin-bottom: 1em;
+}
