@@ -1244,8 +1244,7 @@ export default function Help({ open, onClose, goToId }: HelpProps) {
                 <div slot="message">
                   Check the snap to property switch to snap your sketches to property lines
                 </div>
-              </calcite-notice>    
-              <br/>          
+              </calcite-notice>              
               <h3 className={styles.header} id="sketch-styles">
                 Changing Sketch Style
               </h3>
