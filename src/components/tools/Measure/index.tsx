@@ -1,5 +1,8 @@
 import React from "react";
 import "@esri/calcite-components/components/calcite-panel";
+import "@esri/calcite-components/components/calcite-label";
+import "@esri/calcite-components/components/calcite-switch";
+
 import "@arcgis/map-components/components/arcgis-distance-measurement-2d";
 import "@arcgis/map-components/components/arcgis-area-measurement-2d";
 
@@ -20,7 +23,8 @@ const Measure: React.FC<MeasureProps> = ({
   onToolClose,
   onHelpClick,
 }) => {
-  const { areaMeasure, distanceMeasure, activeTool, handleActionClick } =
+  const { areaMeasure, distanceMeasure, activeTool, handleActionClick, snappingEnabled,
+  handleSnappingChange } =
     useMeasure(mapElement);
 
   return (
@@ -76,6 +80,16 @@ const Measure: React.FC<MeasureProps> = ({
           style={{ display: activeTool === "area" ? "block" : "none" }}
           unit="imperial"
         ></arcgis-area-measurement-2d>
+      </div>
+      <div slot="content-bottom">
+        <calcite-label layout="inline" scale="s">
+          <calcite-switch
+            scale="s"
+            checked={snappingEnabled}
+            oncalciteSwitchChange={handleSnappingChange}
+          ></calcite-switch>
+          Snap to property
+        </calcite-label>
       </div>
     </calcite-panel>
   );

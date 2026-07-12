@@ -1,6 +1,7 @@
 // hooks/useShell.ts
 import { useState, useCallback, useRef, useEffect } from "react";
-
+import { getLayerByTitle } from "../../../utils/layerHelper";
+import FeatureLayer from "@arcgis/core/layers/FeatureLayer";
 export type ToolType = "distance" | "area" | null;
 
 export interface UseMeasureProps {
@@ -8,15 +9,45 @@ export interface UseMeasureProps {
   distanceMeasure: React.RefObject<HTMLArcgisDistanceMeasurement2dElement>;
   activeTool: ToolType;
   handleActionClick: (panel: ToolType) => void;
+  snappingEnabled: boolean;
+  handleSnappingChange: (
+    event: HTMLCalciteSwitchElement["calciteSwitchChange"],
+  ) => void;
 }
 
 export const useMeasure = (
-  mapElement: React.RefObject<HTMLArcgisMapElement>
+  mapElement: React.RefObject<HTMLArcgisMapElement>,
 ): UseMeasureProps => {
   const [activeTool, setActiveTool] = useState<ToolType>(null);
+  const [snappingEnabled, setSnappingEnabled] = useState<boolean>(false);
   const areaMeasure = useRef<HTMLArcgisAreaMeasurement2dElement>(null!);
   const distanceMeasure = useRef<HTMLArcgisDistanceMeasurement2dElement>(null!);
 
+  const handleSnappingChange = useCallback(
+    (event: HTMLCalciteSwitchElement["calciteSwitchChange"]) => {
+      setSnappingEnabled((prev) => !prev);
+      const propertyLayer = getLayerByTitle(mapElement.current, "Property");
+      if (propertyLayer && propertyLayer.type === "feature") {
+        console.log(event.target.checked);
+        areaMeasure.current.snappingOptions.enabled = event.target.checked;
+        areaMeasure.current.snappingOptions.featureSources = [
+          {
+            layer: propertyLayer as FeatureLayer,
+            enabled: true,
+          },
+        ];
+        distanceMeasure.current.snappingOptions.enabled = event.target.checked;
+
+        distanceMeasure.current.snappingOptions.featureSources = [
+          {
+            layer: propertyLayer as FeatureLayer,
+            enabled: true,
+          },
+        ];
+      }
+    },
+    [mapElement],
+  );
   const handleActionClick = useCallback(
     (tool: ToolType) => {
       setActiveTool(tool === activeTool ? null : tool);
@@ -34,7 +65,7 @@ export const useMeasure = (
         distanceMeasure.current.clear();
       }
     },
-    [activeTool]
+    [activeTool],
   );
 
   const initializedRef = useRef(false);
@@ -49,5 +80,7 @@ export const useMeasure = (
     distanceMeasure,
     activeTool,
     handleActionClick,
+    snappingEnabled,
+    handleSnappingChange,
   };
 };
