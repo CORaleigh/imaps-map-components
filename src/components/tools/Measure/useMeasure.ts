@@ -28,22 +28,22 @@ export const useMeasure = (
       setSnappingEnabled((prev) => !prev);
       const propertyLayer = getLayerByTitle(mapElement.current, "Property");
       if (propertyLayer && propertyLayer.type === "feature") {
-        console.log(event.target.checked);
-        areaMeasure.current.snappingOptions.enabled = event.target.checked;
-        areaMeasure.current.snappingOptions.featureSources = [
-          {
-            layer: propertyLayer as FeatureLayer,
-            enabled: true,
+        [areaMeasure.current, distanceMeasure.current].forEach(
+          (
+            measure:
+              | HTMLArcgisAreaMeasurement2dElement
+              | HTMLArcgisDistanceMeasurement2dElement,
+          ) => {
+            measure.snappingOptions.enabled = event.target.checked;
+            measure.snappingOptions.selfEnabled = true;
+            measure.snappingOptions.featureSources = [
+              {
+                layer: propertyLayer as FeatureLayer,
+                enabled: true,
+              },
+            ];
           },
-        ];
-        distanceMeasure.current.snappingOptions.enabled = event.target.checked;
-
-        distanceMeasure.current.snappingOptions.featureSources = [
-          {
-            layer: propertyLayer as FeatureLayer,
-            enabled: true,
-          },
-        ];
+        );
       }
     },
     [mapElement],
