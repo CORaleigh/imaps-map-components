@@ -5,6 +5,35 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" type="image/svg+xml" href="/favicon.ico" />
     <title>iMAPS</title>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-WS0FB3FN0T"></script>
+    <script async src="https://siteimproveanalytics.com/js/siteanalyze_15202832.js"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-WS0FB3FN0T');
+      gtag('event', 'app_version', {
+        'version': '4.2.1'
+      });      
+    </script>    
+    
+    <script>
+      // Function to check the URL and perform the redirect
+      function redirectIfConfigPuma() {
+          // Get the current URL
+          const urlParams = new URLSearchParams(window.location.search);
+          // Check if 'config' parameter equals 'puma'
+          if (urlParams.get('config')?.toLowerCase() === 'puma') {
+              // Redirect to the new URL
+              window.location.href = 'https://gis.raleighnc.gov/imaps?app=puma';
+          }
+      }
+
+      // Execute the redirect function on page load
+      window.onload = redirectIfConfigPuma;
+    </script>           
   </head>
   <body>
     <div id="root"></div>

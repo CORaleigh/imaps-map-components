@@ -11,6 +11,7 @@ import "@esri/calcite-components/components/calcite-radio-button-group";
 import "@esri/calcite-components/components/calcite-button";
 import "@esri/calcite-components/components/calcite-label";
 import "@esri/calcite-components/components/calcite-loader";
+import "@esri/calcite-components/components/calcite-input-number";
 
 import { usePrint, type Format } from "./usePrint";
 import type { Layout, MapScale } from "./printLayouts";
@@ -146,6 +147,7 @@ const Print: React.FC<PrintProps> = ({ mapElement, closed, onToolClose, onHelpCl
                     ))}
                   </calcite-select>
                 </calcite-label>
+      
                 {printOptions.userDefined && (
                   <calcite-label>
                     <calcite-input-number

@@ -22,7 +22,7 @@ import type Polygon from "@arcgis/core/geometry/Polygon";
 import { updatePropertyLabels } from "../components/panels/LayerList/layers";
 import esriConfig from "@arcgis/core/config";
 import Portal from "@arcgis/core/portal/Portal";
-import { convertToNewFormat } from "./storageConvert";
+import { checkOldStorageFormat } from "./storageConvert";
 
 const MapProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   /** -------------------- Refs -------------------- **/
@@ -217,25 +217,7 @@ const MapProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
       const mapId = params.get("id") ?? config.mapId ?? DEFAULT_MAP_ID;
 
-      let oldStorageId = "imaps_webmap_";
-      if (mapId !== DEFAULT_MAP_ID) {
-        oldStorageId += `${mapId}`;
-      }
-      if (app === "puma") {
-        oldStorageId = "imaps_webmap_puma";
-      }
-      console.log(oldStorageId);
-      if (localStorage.getItem(oldStorageId)) {
-        const oldJson = JSON.parse(localStorage.getItem(oldStorageId)!);
-        const state = { layers: convertToNewFormat(oldJson) };
-
-        localStorage.setItem(
-          `imaps_${mapId}_layerVisibility`,
-          JSON.stringify(state),
-        );
-
-        localStorage.removeItem(oldStorageId);
-      }
+      checkOldStorageFormat(mapId, app, DEFAULT_MAP_ID);
 
       const { webmap, webmapTemplate } =
         await layerService.createWebMapWithRequiredAndPersisted(mapId);

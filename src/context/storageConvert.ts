@@ -2,8 +2,16 @@
 // New (compact) format — what you store
 // ============================================================
 export type LayerType =
-  | "feature" | "vector-tile" | "group" | "map-image"
-  | "tile" | "imagery" | "graphics" | "csv" | "geojson" | "unknown";
+  | "feature"
+  | "vector-tile"
+  | "group"
+  | "map-image"
+  | "tile"
+  | "imagery"
+  | "graphics"
+  | "csv"
+  | "geojson"
+  | "unknown";
 
 export interface SublayerSummary {
   id: string | number | null;
@@ -58,7 +66,8 @@ const LAYER_TYPE_MAP: Record<string, LayerType> = {
 
 function toType(l: OldLayer): LayerType {
   if (l.type) return l.type;
-  if (l.layerType && LAYER_TYPE_MAP[l.layerType]) return LAYER_TYPE_MAP[l.layerType];
+  if (l.layerType && LAYER_TYPE_MAP[l.layerType])
+    return LAYER_TYPE_MAP[l.layerType];
   return "unknown";
 }
 
@@ -104,7 +113,7 @@ function summarizeSublayers(children: OldLayer[]): SublayerSummary[] {
 export function convertToNewFormat(oldState: OldState): CompactLayer[] {
   const ops: OldLayer[] = Array.isArray(oldState)
     ? oldState
-    : oldState.operationalLayers ?? oldState.layers ?? [];
+    : (oldState.operationalLayers ?? oldState.layers ?? []);
 
   const layers: CompactLayer[] = [];
 
@@ -135,4 +144,25 @@ export function convertToNewFormat(oldState: OldState): CompactLayer[] {
 
   walk(ops);
   return layers;
+}
+
+export function checkOldStorageFormat(mapId: string, app: string, DEFAULT_MAP_ID: string): void {
+  let oldStorageId = "imaps_webmap_";
+  if (mapId !== DEFAULT_MAP_ID) {
+    oldStorageId += `${mapId}`;
+  }
+  if (app === "puma") {
+    oldStorageId = "imaps_webmap_puma";
+  }
+  if (localStorage.getItem(oldStorageId)) {
+    const oldJson = JSON.parse(localStorage.getItem(oldStorageId)!);
+    const state = { layers: convertToNewFormat(oldJson) };
+
+    localStorage.setItem(
+      `imaps_${mapId}_layerVisibility`,
+      JSON.stringify(state),
+    );
+
+    localStorage.removeItem(oldStorageId);
+  }
 }

@@ -191,7 +191,7 @@ export const usePrint = (
   ) => {
     setPrintOptions((prev) => ({
       ...prev,
-      scale: parseInt(event.target.value),
+      scale: parseInt(event.target.value) * 12,
     }));
   };
 
