@@ -10,7 +10,7 @@ interface UseCondoHistoryProps {
   mapElementRef: React.RefObject<HTMLArcgisMapElement>;
   searchCondos: (
     where: string,
-    mapEl: HTMLArcgisMapElement
+    mapEl: HTMLArcgisMapElement,
   ) => Promise<Graphic[]>;
   searchReady: boolean;
 }
@@ -21,7 +21,7 @@ export function useCondoHistory({
   setCondos,
   mapElementRef,
   searchCondos,
-  searchReady
+  searchReady,
 }: UseCondoHistoryProps) {
   const restoringFromHistoryRef = useRef(false);
 
@@ -39,12 +39,17 @@ export function useCondoHistory({
       const condosTable = getTableByTitle(mapEl, "Condos");
       if (!condosTable) return;
 
-      const results = await searchCondos(`PIN_NUM = '${pin}'`, mapEl);
+      const results = await searchCondos(
+        `PIN_NUM IN ('${pin.split(",").join("', '")}')`,
+        mapEl,
+      );
       setCondos(results);
-      setSelectedCondo(results[0] || null);
+      if (results.length <= 1) {
+        setSelectedCondo(results[0] || null);
+      }
     })();
   }, [searchReady]);
-  
+
   // Push new state when a condo is selected
   useEffect(() => {
     if (!selectedCondo) return;
@@ -69,8 +74,11 @@ export function useCondoHistory({
   useEffect(() => {
     const onPopState = async (event: PopStateEvent) => {
       restoringFromHistoryRef.current = true;
+      //const pin = event.state?.pin ?? null;
+      console.log(event);
+      const params = new URLSearchParams(window.location.search);
 
-      const pin = event.state?.pin ?? null;
+      const pin = params.get("pin");
 
       if (!pin) {
         setSelectedCondo(null);
@@ -82,8 +90,8 @@ export function useCondoHistory({
       if (!condosTable) return;
 
       const results = await searchCondos(
-        `PIN_NUM = '${pin}'`,
-        mapElementRef.current
+        `PIN_NUM IN ('${pin.split(",").join("', '")}')`,
+        mapElementRef.current,
       );
       setCondos(results);
       setSelectedCondo(results[0] || null);
