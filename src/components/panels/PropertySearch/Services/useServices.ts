@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type RefObject } from "react";
-import { SERVICE_DEFS, type Service } from "./config";
+import { mapConfigServices, type Service } from "./config";
 import { layerService } from "../../../../utils/mapLayerService";
 import * as geodesicBufferOperator from "@arcgis/core/geometry/operators/geodesicBufferOperator.js";
 import type Graphic from "@arcgis/core/Graphic";
@@ -25,7 +25,7 @@ export const useServices = (
 
   const [searching, setSearching] = useState<Record<string, boolean>>({});
 
-  const [services, setServices] = useState<Service[]>(SERVICE_DEFS);
+  const [services, setServices] = useState<Service[]>([]);
   const accordionRef = useRef<HTMLCalciteAccordionElement>(null);
 
   const handleAccordionExpand = async (
@@ -87,6 +87,28 @@ export const useServices = (
 
     setSearching((prev) => ({ ...prev, [svc.title]: false }));
   };
+
+  // Load the service definitions from the app's config JSON (config.json,
+  // puma.json, etc.) so each app can define its own list of services.
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const app = params.get("app") ?? "config";
+    let cancelled = false;
+
+    (async () => {
+      try {
+        const res = await fetch(`${app}.json`);
+        const config = await res.json();
+        if (!cancelled) setServices(mapConfigServices(config.services));
+      } catch (error) {
+        console.error("Failed to load services from config", error);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     if (!mapElement || initializedRef.current || selectedCondo) return;
