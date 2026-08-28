@@ -257,9 +257,10 @@ export const usePropertySearch = (
   };
 
   const handleExportAddresses = async () => {
+    const geometry = addressTableElement.current.filterGeometry ?? selectedCondo?.geometry;
     addressTableElement.current.highlightIds = new Collection(
       await addressTableElement.current.layer?.queryObjectIds({
-        geometry: addressTableElement.current.filterGeometry,
+        geometry: geometry,
       }),
     );
     addressTableElement.current.exportSelectionToCSV(false);
