@@ -141,7 +141,7 @@ const Shell: React.FC = () => {
             </div>
           )}
 
-          <calcite-action-bar slot="action-bar">
+          <calcite-action-bar slot="action-bar" expandDisabled={appSize === "small"}>
             <calcite-action-group>
               <calcite-action
                 id="property-search-action"
