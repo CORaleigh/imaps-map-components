@@ -149,6 +149,7 @@ const Shell: React.FC = () => {
                 text={"Property Search"}
                 icon="search"
                 active={activePanel === "propertySearch"}
+                aria={{ expanded: activePanel === "propertySearch" }}
                 onClick={() => handlePanelActionClick("propertySearch")}
               ></calcite-action>
               <calcite-tooltip
@@ -164,6 +165,7 @@ const Shell: React.FC = () => {
                 text={"Layer List"}
                 icon="layers"
                 active={activePanel === "layerList"}
+                aria={{ expanded: activePanel === "layerList" }}
                 onClick={() => handlePanelActionClick("layerList")}
               ></calcite-action>
               <calcite-tooltip
@@ -178,6 +180,7 @@ const Shell: React.FC = () => {
                 text={"Legend"}
                 icon="legend"
                 active={activePanel === "legend"}
+                aria={{ expanded: activePanel === "legend" }}
                 onClick={() => handlePanelActionClick("legend")}
               ></calcite-action>
               <calcite-tooltip closeOnClick reference-element="legend-action">
@@ -189,6 +192,7 @@ const Shell: React.FC = () => {
                 text={"Basemaps"}
                 icon="basemap"
                 active={activePanel === "basemap"}
+                aria={{ expanded: activePanel === "basemap" }}
                 onClick={() => handlePanelActionClick("basemap")}
               ></calcite-action>
               <calcite-tooltip closeOnClick reference-element="basemaps-action">
@@ -199,6 +203,8 @@ const Shell: React.FC = () => {
                 scale="m"
                 text={"Bookmarks"}
                 icon="bookmark"
+                active={activePanel === "bookmarks"}
+                aria={{ expanded: activePanel === "bookmarks" }}
                 onClick={() => handlePanelActionClick("bookmarks")}
               ></calcite-action>
               <calcite-tooltip
@@ -215,6 +221,7 @@ const Shell: React.FC = () => {
                 text={"Property Select"}
                 icon="select"
                 active={activeTool === "select"}
+                aria={{ expanded: activeTool === "select" }}
                 onClick={() => handleToolActionClick("select")}
               ></calcite-action>
               <calcite-tooltip
@@ -229,6 +236,7 @@ const Shell: React.FC = () => {
                 text={"Location Search"}
                 icon="pin"
                 active={activeTool === "location"}
+                aria={{ expanded: activeTool === "location" }}
                 onClick={() => handleToolActionClick("location")}
               ></calcite-action>
               <calcite-tooltip
@@ -243,6 +251,7 @@ const Shell: React.FC = () => {
                 text={"Measure"}
                 icon="measure"
                 active={activeTool === "measure"}
+                aria={{ expanded: activeTool === "measure" }}
                 onClick={() => handleToolActionClick("measure")}
               ></calcite-action>
               <calcite-tooltip closeOnClick reference-element="measure-action">
@@ -254,6 +263,7 @@ const Shell: React.FC = () => {
                 text={"Sketch"}
                 icon="pencil"
                 active={activeTool === "sketch"}
+                aria={{ expanded: activeTool === "sketch" }}
                 onClick={() => handleToolActionClick("sketch")}
               ></calcite-action>
               <calcite-tooltip closeOnClick reference-element="sketch-action">
@@ -266,6 +276,7 @@ const Shell: React.FC = () => {
                 text={"Print"}
                 icon="print"
                 active={activeTool === "print"}
+                aria={{ expanded: activeTool === "print" }}
                 onClick={() => handleToolActionClick("print")}
               ></calcite-action>
               <calcite-tooltip closeOnClick reference-element="print-action">
