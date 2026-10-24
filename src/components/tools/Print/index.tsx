@@ -218,12 +218,12 @@ const Print: React.FC<PrintProps> = ({ mapElement, closed, onToolClose, onHelpCl
                   key={result.id.toString()}
                   value={result.id.toString()}
                   oncalciteListItemClose={handleRemovePrintResult}
+                  oncalciteListItemSelect={() => window.open(result.url)}
                   disabled={result.loading}
                 >
                   <div
                     slot="content"
                     className="arcgis-print__exported-file"
-                    onClick={() => window.open(result.url)}
                   >
                     {!result.loading && (
                       <calcite-icon

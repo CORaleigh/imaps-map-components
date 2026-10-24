@@ -250,9 +250,25 @@ export const usePrint = (
   const handleRemovePrintResult = (
     event: HTMLCalciteListItemElement["calciteListItemClose"],
   ) => {
+    // keep keyboard focus in place instead of losing it to <body>: move to the next result,
+    // the previous one if this was last, or the Exports tab when the list is now empty
+    const item = event.target;
+    const items = Array.from(item.parentElement?.querySelectorAll("calcite-list-item") ?? []);
+    const index = items.indexOf(item);
+    const neighbor = items[index + 1] ?? items[index - 1];
+    const exportsTab = item.closest("calcite-tabs")?.querySelector<HTMLElement>("calcite-tab-title[selected]");
+
     setExports((prev) =>
       prev.filter((result) => result.id.toString() !== event.target.value),
     );
+
+    requestAnimationFrame(() => {
+      if (neighbor?.isConnected) {
+        neighbor.setFocus();
+      } else {
+        exportsTab?.focus();
+      }
+    });
   };
 
   useEffect(() => {
