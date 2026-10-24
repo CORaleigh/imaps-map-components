@@ -30,6 +30,7 @@ const Measure: React.FC<MeasureProps> = ({
   return (
     <calcite-panel
       heading="Measure"
+      headingLevel={2}
       closable
       oncalcitePanelClose={() => onToolClose()}
       closed={closed}

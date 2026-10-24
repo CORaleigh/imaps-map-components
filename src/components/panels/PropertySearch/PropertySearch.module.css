@@ -23,7 +23,7 @@
   justify-content: space-between;
   background-color: var(--calcite-color-foreground-1);
 }
-.featureHeader h2 {
+.featureHeader h3 {
   width: 100%;
   text-align: center;
 }

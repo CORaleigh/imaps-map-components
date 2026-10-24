@@ -20,7 +20,7 @@ export const getPopupContent = (
     createEnvironmentalButtons(mapElement),
     {
       type: "text",
-      text: "<h2>General</h2>",
+      text: "<h4 style=\"font-size: var(--calcite-font-size-xl); font-weight: var(--calcite-font-weight-semibold);\">General</h4>",
     },
     {
       type: "fields",
@@ -57,7 +57,7 @@ export const getPopupContent = (
     },
     {
       type: "text",
-      text: "<h2>Owner</h1>",
+      text: "<h4 style=\"font-size: var(--calcite-font-size-xl); font-weight: var(--calcite-font-weight-semibold);\">Owner</h4>",
     },
     {
       type: "text",
@@ -65,7 +65,7 @@ export const getPopupContent = (
     },
     {
       type: "text",
-      text: "<h2>Valuation</h1>",
+      text: "<h4 style=\"font-size: var(--calcite-font-size-xl); font-weight: var(--calcite-font-weight-semibold);\">Valuation</h4>",
     },
     {
       type: "fields",
@@ -87,7 +87,7 @@ export const getPopupContent = (
     },
     {
       type: "text",
-      text: "<h2>Last Sale</h1>",
+      text: "<h4 style=\"font-size: var(--calcite-font-size-xl); font-weight: var(--calcite-font-weight-semibold);\">Last Sale</h4>",
     },
     {
       type: "fields",
@@ -106,7 +106,7 @@ export const getPopupContent = (
     },
     {
       type: "text",
-      text: "<h2>Deeds</h1>",
+      text: "<h4 style=\"font-size: var(--calcite-font-size-xl); font-weight: var(--calcite-font-weight-semibold);\">Deeds</h4>",
     },
     {
       type: "fields",
@@ -143,7 +143,7 @@ export const getPopupContent = (
     feature.getAttribute("HEATEDAREA")
       ? {
           type: "text",
-          text: "<h2>Building</h1>",
+          text: "<h4 style=\"font-size: var(--calcite-font-size-xl); font-weight: var(--calcite-font-weight-semibold);\">Building</h4>",
         }
       : {
           type: "text",

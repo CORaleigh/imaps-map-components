@@ -19,7 +19,8 @@ const Legend: React.FC<LegendProps> = ({ mapElement, closed, onPanelClose }) => 
   }, [mapElement]);  
   return (
     <calcite-panel
-      heading="Layers"
+      heading="Legend"
+      headingLevel={2}
       closable
       oncalcitePanelClose={() => onPanelClose()}
       closed={closed}

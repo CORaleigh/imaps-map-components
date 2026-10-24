@@ -53,7 +53,7 @@ const PropertyInfo: React.FC<PropertyInfoProps> = ({
             onNextProperty={onNextProperty}
           ></NextPropertyButton>
         )}
-        <h2 className={styles.featureTitle} ref={titleElement} tabIndex={-1}>{title}</h2>
+        <h3 className={styles.featureTitle} ref={titleElement} tabIndex={-1}>{title}</h3>
         {condos.length > 1 && (
           <NextPropertyButton
             mapElement={mapElement}
@@ -69,14 +69,14 @@ const PropertyInfo: React.FC<PropertyInfoProps> = ({
         <arcgis-feature graphic={feature}></arcgis-feature>
       )}
       <div className={styles.featureSubTitle}>
-        <h2 className={styles.featureTitle}>Services</h2>
+        <h4 className={styles.featureTitle}>Services</h4>
       </div>
       <Services
         mapElement={mapElement.current}
         selectedCondo={feature}
       ></Services>
       <div className={styles.featureSubTitle}>
-        <h2 className={styles.featureTitle}>Addresses</h2>
+        <h4 className={styles.featureTitle}>Addresses</h4>
       </div>
     </>
   );

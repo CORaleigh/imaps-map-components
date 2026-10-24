@@ -61,6 +61,7 @@ const PropertySearch: React.FC<PropertySearchProps> = ({
     <>
       <calcite-panel
         heading="Property Search"
+        headingLevel={2}
         closable
         oncalcitePanelClose={() => onPanelClose()}
         closed={closed}

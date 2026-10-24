@@ -43,6 +43,7 @@ const PropertySelect: React.FC<PropertySelectProps> = ({
     <>
       <calcite-panel
         heading="Property Select"
+        headingLevel={2}
         closable
         oncalcitePanelClose={handleToolClose}
         closed={closed}

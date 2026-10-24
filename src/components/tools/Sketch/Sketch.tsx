@@ -71,6 +71,7 @@ const Sketch: React.FC<SketchProps> = ({
       <div>
         <calcite-panel
           heading="Sketch"
+          headingLevel={2}
           closable
           oncalcitePanelClose={() => {
             onToolClose();

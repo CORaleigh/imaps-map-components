@@ -30,6 +30,7 @@ const Bookmarks: React.FC<BookmarksProps> = ({
   return (
     <calcite-panel
       heading="Bookmarks"
+      headingLevel={2}
       closable
       oncalcitePanelClose={() => onPanelClose()}
       closed={closed}

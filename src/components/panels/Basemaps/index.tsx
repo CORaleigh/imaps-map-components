@@ -43,6 +43,7 @@ const Basemaps: React.FC<BasemapsProps> = ({
     <>
       <calcite-panel
         heading="Basemaps"
+        headingLevel={2}
         closable
         oncalcitePanelClose={() => onPanelClose()}
         closed={closed}

@@ -35,6 +35,7 @@ const LayerList: React.FC<LayerListProps> = ({
       <calcite-panel
         id={styles.layerList}
         heading="Layer List"
+        headingLevel={2}
         closable
         oncalcitePanelClose={() => onPanelClose()}
         closed={closed}
