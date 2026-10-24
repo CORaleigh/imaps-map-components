@@ -277,12 +277,9 @@ const wellCreator = async (
   if (featureSet.features.length) {
     const pin = featureSet.features[0].getAttribute("PIN_NUM");
     const btn = createButton("link", "Wells");
-    btn.onclick = () => {
-      window.open(
-        `https://maps.wakegov.com/water-analysis/index.html#/?pin=${pin}`,
-        "wells"
-      );
-    };
+    btn.setAttribute("href", `https://maps.wakegov.com/water-analysis/index.html#/?pin=${pin}`);
+    btn.setAttribute("target", "wells");
+    btn.setAttribute("label", "Wells, opens in a new tab");
     div.append(btn);
   }
 
@@ -302,12 +299,9 @@ const wellCreator = async (
   if (septicFeatureSet.features.length) {
     const pin = septicFeatureSet.features[0].getAttribute("PIN_NUM");
     const btn = createButton("link", "Septic");
-    btn.onclick = () => {
-      window.open(
-        `https://maps.wakegov.com/septic/index.html#/?pin=${pin}`,
-        "septic"
-      );
-    };
+    btn.setAttribute("href", `https://maps.wakegov.com/septic/index.html#/?pin=${pin}`);
+    btn.setAttribute("target", "septic");
+    btn.setAttribute("label", "Septic, opens in a new tab");
     div.append(btn);
   }
 
@@ -333,19 +327,16 @@ export const createLinkButtons = () => {
         }
 
         const btn = createButton("link", "Google Maps");
-        btn.onclick = () => {
-          const latitude = centroidOperator.execute(graphic.geometry as Polygon)
-            ?.latitude;
-          const longitude = centroidOperator.execute(graphic.geometry as Polygon)
-            ?.longitude;
-          if (latitude && longitude) {
-            const url = `https://www.google.com/maps/@${
-              latitude - 0.0006721930485
-            },${longitude - 0.0000196467158},68a,35y,49.52t/data=!3m1!1e3`;
-            window.open(url, "googlewindow");
-          }
-        };
-        div.append(btn);
+        const centroid = centroidOperator.execute(graphic.geometry as Polygon);
+        if (centroid?.latitude && centroid?.longitude) {
+          // href makes calcite-button render a real link (link role, open-in-new-tab, copy address)
+          btn.setAttribute("href", `https://www.google.com/maps/@${
+            centroid.latitude - 0.0006721930485
+          },${centroid.longitude - 0.0000196467158},68a,35y,49.52t/data=!3m1!1e3`);
+          btn.setAttribute("target", "googlewindow");
+          btn.setAttribute("label", "Google Maps, opens in a new tab");
+          div.append(btn);
+        }
 
         const tax = createButton("home", "Tax Page");
 
@@ -359,10 +350,9 @@ export const createLinkButtons = () => {
           }`,
           graphic // Use the defined graphic
         );
-        tax.onclick = () => {
-          window.open(taxUrl as string, "taxwindow");
-        };
-        tax.textContent = "Tax Page";
+        tax.setAttribute("href", taxUrl as string);
+        tax.setAttribute("target", "taxwindow");
+        tax.setAttribute("label", "Tax Page, opens in a new tab");
         div.append(tax);
 
         return div; // Ensure to return the created div
@@ -407,16 +397,16 @@ export const createDurhamButton = () => {
       );
       if (durham) {
         const durhamBtn = createButton("home", "Durham County");
-        durhamBtn.onclick = () => {
-          window.open(durham as string, "durham");
-        };
+        durhamBtn.setAttribute("href", durham as string);
+        durhamBtn.setAttribute("target", "durham");
+        durhamBtn.setAttribute("label", "Durham County, opens in a new tab");
         div.append(durhamBtn);
       }
       if (chatham) {
         const chathamBtn = createButton("home", "Chatham County");
-        chathamBtn.onclick = () => {
-          window.open(chatham as string, "chatham");
-        };
+        chathamBtn.setAttribute("href", chatham as string);
+        chathamBtn.setAttribute("target", "chatham");
+        chathamBtn.setAttribute("label", "Chatham County, opens in a new tab");
         div.append(chathamBtn);
       }
       return div; // Return the div as HTMLElement
@@ -473,22 +463,16 @@ const deedCreator: PopupTemplateContentCreator = async (e) => {
     if (!cityDecode?.includes("DURHAM COUNTY") || !cityDecode) {
       if (deed) {
         const deedBtn = createButton("file-text", "Deeds");
-        deedBtn.onclick = () => {
-          window.open(
-            `https://rodrecords.wake.gov/web/document/DOCC${deed}`, //`https://rodcrpi.wakegov.com/booksweb/pdfview.aspx?docid=${deed}&RecordDate=`,
-            "deedwindow"
-          );
-        };
+        deedBtn.setAttribute("href", `https://rodrecords.wake.gov/web/document/DOCC${deed}`); //`https://rodcrpi.wakegov.com/booksweb/pdfview.aspx?docid=${deed}&RecordDate=`,
+        deedBtn.setAttribute("target", "deedwindow");
+        deedBtn.setAttribute("label", "Deeds, opens in a new tab");
         div.append(deedBtn);
       }
       if (bom) {
         const bombtn = createButton("map", "Book of Maps");
-        bombtn.onclick = () => {
-          window.open(
-            `https://rodrecords.wake.gov/web/document/DOCC${bom}`, //`https://rodcrpi.wakegov.com/booksweb/pdfview.aspx?docid=${bom}&RecordDate=`,
-            "bomwindow"
-          );
-        };
+        bombtn.setAttribute("href", `https://rodrecords.wake.gov/web/document/DOCC${bom}`); //`https://rodcrpi.wakegov.com/booksweb/pdfview.aspx?docid=${bom}&RecordDate=`,
+        bombtn.setAttribute("target", "bomwindow");
+        bombtn.setAttribute("label", "Book of Maps, opens in a new tab");
         div.append(bombtn);
       }
     }
@@ -496,14 +480,11 @@ const deedCreator: PopupTemplateContentCreator = async (e) => {
     return div; // Return the div directly
   } else {
     const deedBtn = createButton("file-text", "Deeds");
-    deedBtn.onclick = () => {
-      window.open(
-        `https://rodweb.dconc.gov/web/web/integration/search?field_BookPageID_DOT_Volume=${graphic.getAttribute(
-          "DEED_BOOK"
-        )}&field_BookPageID_DOT_Page=${graphic.getAttribute("DEED_PAGE")}`,
-        "deedwindow"
-      );
-    };
+    deedBtn.setAttribute("href", `https://rodweb.dconc.gov/web/web/integration/search?field_BookPageID_DOT_Volume=${graphic.getAttribute(
+      "DEED_BOOK"
+    )}&field_BookPageID_DOT_Page=${graphic.getAttribute("DEED_PAGE")}`);
+    deedBtn.setAttribute("target", "deedwindow");
+    deedBtn.setAttribute("label", "Deeds, opens in a new tab");
     div.append(deedBtn);
     return div; // Return the div directly
   }
