@@ -45,6 +45,11 @@
   background-color: var(--calcite-color-foreground-1);
 }
 
+/* the property title only receives focus from code so screen readers announce it; it isn't a control */
+.featureTitle[tabindex="-1"]:focus {
+  outline: none;
+}
+
 
 
 .searchContainer {

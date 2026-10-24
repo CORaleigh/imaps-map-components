@@ -37,6 +37,7 @@ const Header: React.FC<HeaderProps> = ({
             appSize !== "small" ? "Wake County and City of Raleigh" : ""
           }
           href="https://www.wake.gov/departments-government/geographic-information-services-gis/maps-apps-data/imaps-information"
+          label="iMAPS information, Wake County GIS"
         ></calcite-navigation-logo>
 
         <calcite-dropdown

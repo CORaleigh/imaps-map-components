@@ -90,19 +90,21 @@ const MapPanel: React.FC<MapPanelProps> = ({
         <calcite-action-bar layout="vertical" expandDisabled>
           <calcite-action
             id="identify-action"
-            label="identify"
-            text={"identify"}
+            label="Identify"
+            text={"Identify"}
             icon="information"
             active={mapMode === "identify"}
+            aria={{ pressed: mapMode === "identify" }}
             onClick={() => onCustomActionClick("identify")}
           ></calcite-action>
 
           <calcite-action
             id="streetview-action"
-            label="streetview"
-            text={"streetview"}
+            label="Street View"
+            text={"Street View"}
             icon="i360-view"
             active={mapMode === "streetview"}
+            aria={{ pressed: mapMode === "streetview" }}
             onClick={() => onCustomActionClick("streetview")}
           ></calcite-action>
         </calcite-action-bar>
@@ -113,7 +115,7 @@ const MapPanel: React.FC<MapPanelProps> = ({
           reference-element="streetview-action"
           placement="right"
         >
-          Streetview
+          Street View
         </calcite-tooltip>
       </div>
       <arcgis-expand
@@ -122,7 +124,8 @@ const MapPanel: React.FC<MapPanelProps> = ({
         expandIcon="crosshair"
         onarcgisPropertyChange={onCoordinateExpand}
         mode="floating"
-        aria-label="Coodinate Conversion"
+        expandTooltip="Show coordinate conversion"
+        collapseTooltip="Hide coordinate conversion"
       >
         <CoordinateConversion
           mapElement={mapElement}
@@ -138,7 +141,8 @@ const MapPanel: React.FC<MapPanelProps> = ({
         id="overview-action"
         mode="floating"
         onarcgisPropertyChange={onOverviewExpand}
-        aria-label="Overview Map"
+        expandTooltip="Show overview map"
+        collapseTooltip="Hide overview map"
       >
         <OverviewMap
           mapElement={mapElement}

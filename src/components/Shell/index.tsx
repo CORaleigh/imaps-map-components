@@ -59,7 +59,7 @@ const Shell: React.FC = () => {
     mapElement,
     mapReady,
   } = useShell();
-  const { open, checkbox, handleDialogClose, handleDialogOpen } =
+  const { open, checkbox, handleDialogClose, handleDialogClosed, handleDialogOpen } =
     useDisclaimer();
 
 
@@ -318,6 +318,7 @@ const Shell: React.FC = () => {
         open={open}
         checkbox={checkbox}
         onClose={handleDialogClose}
+        onClosed={handleDialogClosed}
       ></Disclaimer>
       <Help open={showHelp} onClose={handleHelpClosed} goToId={helpId}></Help>
     </>

@@ -1,7 +1,7 @@
 // PropertyInfo.tsx
 
 import "@arcgis/map-components/components/arcgis-feature";
-import React, { type RefObject } from "react";
+import React, { useEffect, useRef, type RefObject } from "react";
 
 
 import styles from "./PropertySearch.module.css";
@@ -28,6 +28,19 @@ const PropertyInfo: React.FC<PropertyInfoProps> = ({
   title,
   onNextProperty,
 }) => {
+  const titleElement = useRef<HTMLHeadingElement>(null);
+
+  // move focus to the property title when a new property is shown, so screen readers announce it
+  // and keyboard users continue from the details (focus was otherwise lost to <body>)
+  useEffect(() => {
+    const frame = requestAnimationFrame(() => {
+      if (titleElement.current?.checkVisibility()) {
+        titleElement.current.focus();
+      }
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [feature, title]);
+
   return (
     <>
       <div className={styles.featureHeader}>
@@ -40,7 +53,7 @@ const PropertyInfo: React.FC<PropertyInfoProps> = ({
             onNextProperty={onNextProperty}
           ></NextPropertyButton>
         )}
-        <h2 className={styles.featureTitle}>{title}</h2>
+        <h2 className={styles.featureTitle} ref={titleElement} tabIndex={-1}>{title}</h2>
         {condos.length > 1 && (
           <NextPropertyButton
             mapElement={mapElement}

@@ -40,6 +40,7 @@ const SearchInput: React.FC<SearchInputProps> = ({
   return (
     <>
       <arcgis-search
+        id="property-search-input"
         className={styles.searchContainer}
         ref={searchElement}
         referenceElement={mapElement.current}

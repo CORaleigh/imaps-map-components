@@ -6,11 +6,18 @@ interface DisclaimerProps {
   open: boolean;
   checkbox: RefObject<HTMLCalciteCheckboxElement | null>;
   onClose: () => void;
+  onClosed: () => void;
 }
 
-const Disclaimer: React.FC<DisclaimerProps> = ({ open, checkbox, onClose }) => {
+const Disclaimer: React.FC<DisclaimerProps> = ({ open, checkbox, onClose, onClosed }) => {
   return (
-    <calcite-dialog open={open} heading="Disclaimer" width="s" closeDisabled>
+    <calcite-dialog
+      open={open}
+      heading="Disclaimer"
+      width="s"
+      closeDisabled
+      oncalciteDialogClose={onClosed}
+    >
       iMAPS makes every effort to produce and publish the most current and
       accurate information possible. However, the maps are productions for
       information purposes, and are NOT surveys. No warranties, expressed or
